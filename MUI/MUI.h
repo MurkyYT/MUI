@@ -162,6 +162,8 @@ namespace MUI {
 		COLORREF m_ButtonTextColor = NULL;
 		void SetBackroundColor(COLORREF color);
 		BOOL Activate();
+		void Show();
+		void Hide();
 	private:
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 0;

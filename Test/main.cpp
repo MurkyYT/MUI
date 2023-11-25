@@ -54,7 +54,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
         &block
     };
     window.AddComponents(comps);
-    window.Show(nCmdShow);
+    window.Show(SW_SHOW);
 
     window.MinSize.x = 500;
     window.MinSize.y = 500;

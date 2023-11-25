@@ -51,6 +51,14 @@ namespace MUI
 	{
 		return  this->Create(title, DEFAULT_SIZE, DEFAULT_SIZE, iconId);
 	}
+	void Window::Show()
+	{
+		ShowWindow(this->m_hWnd, SW_SHOW);
+	}
+	void Window::Hide()
+	{
+		ShowWindow(this->m_hWnd, SW_HIDE);
+	}
 	void Window::AddComponents(std::vector<UIComponent*> comps)
 	{
 		for(UIComponent* comp : comps)
