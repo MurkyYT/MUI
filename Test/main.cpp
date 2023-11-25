@@ -7,13 +7,14 @@ void ButtonClick();
 void RadioGroupChanged();
 TextBox box(L"Test-TextBox", FALSE, 0, 0, 100, 100);
 Button button(L"Input-Box text",FALSE, 0, 100, 100, 20);
-CheckBox chkbox(L"CheckBox", 100, 0, 70, 15);
+CheckBox chkbox(L"CheckBox", 100, 300, 70, 15);
 TextBlock block(L"", 180, 0, 70, 15);
 TextBlock radioBlock(L"Radio Index: -1", 120, 50, 100, 15);
 RadioGroup group(L"Window Mode", 120, 70, 209, 85);
 RadioButton button1(L"Fullscreen", 130, 90, 90, 15);
 RadioButton button2(L"Windowed Fullscreen", 130, 110, 140, 15);
 RadioButton button3(L"Windowed", 130, 130, 140, 15);
+ListView lstView(10, 10, 200, 200);
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) {
     (void)hPrevInstance;
     (void)lpCmdLine;
@@ -53,8 +54,18 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
         &chkbox,
         &block
     };
-    window.AddComponents(comps);
+    //window.AddComponents(comps);
+    window.AddComponent(&chkbox);
+    window.AddComponent(&lstView);
     window.Show(SW_SHOW);
+    HICON ico = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+    lstView.AddIcon(ico);
+    lstView.AddColumn(L"Test", 100);
+    lstView.AddColumn(L"Test2", 100);
+    ListItem itm(0, std::vector<std::wstring> {L"TEST1", L"TEST2"});
+    lstView.AddItem(&itm);
+    ListItem itm2(0, std::vector<std::wstring> {L"TEST3", L"TEST4"});
+    lstView.AddItem(&itm2);
 
     window.MinSize.x = 500;
     window.MinSize.y = 500;
@@ -80,7 +91,6 @@ void CheckBoxClick()
     if (chkbox.IsChecked()) {
         //button.SetStyle(button.GetStyle() | BS_OWNERDRAW);
         block.SetText(L"Checked");
-
     }
     else
     {

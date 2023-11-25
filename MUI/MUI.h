@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <string>
 #include <unordered_map>
+#include <commctrl.h> 
+#pragma comment (lib, "comctl32")
 #pragma endregion
 #pragma region Defines
 #define WINDOW_CLASS L"MUI_Window"
@@ -10,6 +12,7 @@
 #pragma endregion
 #pragma region CONFIG
 #define NEW_STYLE 1
+#define HIDE_ON_CLOSE 0
 #pragma endregion
 #pragma region INTERNAL
 #if NEW_STYLE
@@ -43,7 +46,8 @@ namespace MUI {
 		UICheckBox,
 		UITextBlock,
 		UIRadioGroup,
-		UIRadioButton
+		UIRadioButton,
+		UIListView
 	};
 	/*
 	Base class for each UIComponent
@@ -82,6 +86,40 @@ namespace MUI {
 	Class declarations of each UIComponent
 	*/
 
+	class ListItem
+	{
+		friend class ListView;
+	public:
+		ListItem(int imageIndex, std::vector<std::wstring> values);
+		void SetImageIndex(int index);
+		std::vector<std::wstring> GetValues();
+		int GetImageIndex();
+	private:
+		int imageIndex;
+		std::vector<std::wstring> values;
+	};
+	class ListView : public MUI::UIComponent
+	{
+	public:
+		ListView(int x, int y, int width, int height);
+		BOOL AddColumn(const wchar_t* title, int length = 100);
+		BOOL AddItem(ListItem* item);
+		BOOL AddIcon(HICON icon);
+		ListItem* GetSelected();
+		ListItem* GetItemAt(int i);
+		int GetSelectedIndex();
+		int FreeItemIndex() { return this->itemIndex; }
+		void DeleteIconAt(int i);
+		void ClearIcons();
+		void DeleteItemAt(int i);
+		void ClearItems();
+	private:
+		std::vector<ListItem> m_Items;
+		UINT columnIndex;
+		UINT itemIndex;
+		HIMAGELIST hLarge;   // Image list for icon view.
+		HIMAGELIST hSmall;   // Image list for other views.
+	};
 	class RadioButton : public MUI::UIComponent
 	{
 		friend class RadioGroup;
@@ -164,6 +202,7 @@ namespace MUI {
 		BOOL Activate();
 		void Show();
 		void Hide();
+		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
 	private:
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 0;

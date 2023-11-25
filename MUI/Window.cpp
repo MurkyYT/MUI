@@ -155,6 +155,14 @@ namespace MUI
 				lpMMI->ptMaxTrackSize = window->MaxSize;
 				break;
 			}
+#if HIDE_ON_CLOSE
+			case WM_CLOSE:
+			{
+				window->Hide();
+				return 0;
+			}
+#endif // HIDE_ON_CLOSE
+
 			default:
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 			}

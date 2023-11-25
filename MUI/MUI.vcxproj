@@ -136,6 +136,8 @@
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CheckBox.cpp" />
+    <ClCompile Include="ListItem.cpp" />
+    <ClCompile Include="ListView.cpp" />
     <ClCompile Include="RadioButton.cpp" />
     <ClCompile Include="RadioGroup.cpp" />
     <ClCompile Include="TextBox.cpp" />
