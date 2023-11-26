@@ -23,7 +23,14 @@ namespace MUI
 	}
 	BOOL Window::Activate()
 	{
-		return SetActiveWindow(this->m_hWnd) != NULL;
+		SetForegroundWindow(this->m_hWnd);
+		if (GetForegroundWindow() != this->m_hWnd)
+		{
+			SwitchToThisWindow(this->m_hWnd, TRUE);
+			Sleep(2);
+			SetForegroundWindow(this->m_hWnd);
+		}
+		return GetForegroundWindow() == this->m_hWnd;
 	}
 	BOOL Window::Create(const wchar_t* title, int width, int height,DWORD iconId)
 	{
@@ -155,14 +162,17 @@ namespace MUI
 				lpMMI->ptMaxTrackSize = window->MaxSize;
 				break;
 			}
-#if HIDE_ON_CLOSE
 			case WM_CLOSE:
 			{
+				if (window->onClose)
+					((func_type)window->onClose)();
+#if HIDE_ON_CLOSE
 				window->Hide();
 				return 0;
-			}
 #endif // HIDE_ON_CLOSE
+				break;
 
+			}
 			default:
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);
 			}

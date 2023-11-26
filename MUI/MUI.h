@@ -69,6 +69,9 @@ namespace MUI {
 			LONG style = GetWindowLong(handle, GWL_STYLE);
 			return style ? style : this->style;
 		}
+		void Hide() { ShowWindow(handle, SW_HIDE); }
+		void Show() { ShowWindow(handle, SW_SHOW); }
+		BOOL IsHidden() { return !IsWindowVisible(handle); }
 	protected:
 		UIType type = Null;
 		HWND handle = NULL;
@@ -190,6 +193,7 @@ namespace MUI {
 		BOOL AddComponent(UIComponent* comp);
 		void AddComponents(std::vector<UIComponent*> comps);
 		void Show(int cmdShow);
+		void SubscribeToOnClose(void* func) { onClose = func; }
 		COLORREF m_StaticBacgkround = NULL;
 		COLORREF m_StaticTextColor = NULL;
 
@@ -204,6 +208,7 @@ namespace MUI {
 		void Hide();
 		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
 	private:
+		void* onClose;
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 0;
 		std::vector<uint64_t> m_UnusedIndexes;

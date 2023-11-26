@@ -5,6 +5,7 @@ using namespace MUI;
 void CheckBoxClick();
 void ButtonClick();
 void RadioGroupChanged();
+void WindowClose();
 TextBox box(L"Test-TextBox", FALSE, 0, 0, 100, 100);
 Button button(L"Input-Box text",FALSE, 0, 100, 100, 20);
 CheckBox chkbox(L"CheckBox", 100, 300, 70, 15);
@@ -20,6 +21,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     (void)lpCmdLine;
     
     Window window(hInstance);
+    window.SubscribeToOnClose(WindowClose);
     button.SubscribeToOnClick(ButtonClick);
     chkbox.SubscribeToOnClick(CheckBoxClick);
     group.SubscribeToOnChange(RadioGroupChanged);
@@ -91,11 +93,13 @@ void CheckBoxClick()
     if (chkbox.IsChecked()) {
         //button.SetStyle(button.GetStyle() | BS_OWNERDRAW);
         block.SetText(L"Checked");
+        lstView.Show();
     }
     else
     {
         //button.SetStyle(button.GetStyle() & ~BS_OWNERDRAW);
         block.SetText(L"UnChecked");
+        lstView.Hide();
     }
 }
 void RadioGroupChanged()
@@ -104,4 +108,8 @@ void RadioGroupChanged()
     wchar_t buffer[256];
     wsprintfW(buffer, L"Radio Index: %d", index);
     radioBlock.SetText(buffer);
+}
+void WindowClose()
+{
+    OutputDebugString(L"Window is closed!\n");
 }
