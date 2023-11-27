@@ -47,7 +47,8 @@ namespace MUI {
 		UITextBlock,
 		UIRadioGroup,
 		UIRadioButton,
-		UIListView
+		UIListView,
+		UIImage
 	};
 	/*
 	Base class for each UIComponent
@@ -89,6 +90,14 @@ namespace MUI {
 	Class declarations of each UIComponent
 	*/
 
+	class Image : public MUI::UIComponent
+	{
+	public:
+		Image(int x, int y, int width, int height);
+		void SetImage(HBITMAP hBmp);
+	private:
+		HBITMAP m_hBmp;
+	};
 	class ListItem
 	{
 		friend class ListView;
