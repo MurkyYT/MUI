@@ -20,7 +20,7 @@ namespace MUI
 	void RadioGroup::SubscribeToOnChange(void* func)
 	{
 		if (func)
-			this->onClick = func;
+			this->onEvent = func;
 	}
 	int RadioGroup::CurrentRadioButton()
 	{

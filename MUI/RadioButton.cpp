@@ -15,6 +15,6 @@ namespace MUI
 	void RadioButton::SubscribeToOnClick(void* func)
 	{
 		if (func)
-			this->onClick = func;
+			this->onEvent = func;
 	}
 }

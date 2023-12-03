@@ -16,6 +16,6 @@ namespace MUI {
 	void Button::SubscribeToOnClick(void* func)
 	{
 		if (func)
-			this->onClick = func;
+			this->onEvent = func;
 	}
 }

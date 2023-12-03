@@ -35,6 +35,26 @@ namespace MUI {
 		static const COLORREF GREY = RGB(225, 225, 225);
 		static const COLORREF GRAY = Color::GREY;
 	};
+	struct Margin
+	{
+		LONG left, right, top, bottom;
+		Margin(
+			LONG left = 0, 
+			LONG right = 0, 
+			LONG top = 0,
+			LONG bottom = 0) : left(left), right(right), top(top), bottom(bottom) {}
+	};
+	/*Enum for each aligment*/
+	enum Aligment
+	{
+		None,
+		Top,
+		Bottom,
+		Left,
+		Right,
+		Center,
+		Stretch
+	};
 	/*
 	Enum for each UIComponent Type
 	*/
@@ -57,24 +77,22 @@ namespace MUI {
 	{
 		friend class Window;
 	public:
-		BOOL SetStyle(DWORD newStyle)
-		{
-			style = newStyle;
-			BOOL res = SetWindowLong(handle, GWL_STYLE, style) != NULL;
-			SendMessage(handle, BM_SETSTYLE, newStyle, TRUE);
-			SetWindowPos(handle, HWND_TOPMOST, x, y, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-			UpdateWindow(handle);
-			return res;
-		}
-		DWORD GetStyle() {
-			LONG style = GetWindowLong(handle, GWL_STYLE);
-			return style ? style : this->style;
-		}
-		void Hide() { ShowWindow(handle, SW_HIDE); }
-		void Show() { ShowWindow(handle, SW_SHOW); }
-		BOOL IsHidden() { return !IsWindowVisible(handle); }
+		BOOL SetStyle(DWORD newStyle);
+		DWORD GetStyle();
+		void SetVerticalAligment(Aligment alg);
+		void SetHorizontalAligment(Aligment alg);
+		void SetMargin(Margin m);
+		void Hide();
+		void Show();
+		BOOL IsHidden();
 	protected:
+		void reposition(int h, int w);
+		void UpdateHorizontalAligment(POINT& pos, int w);
+		void UpdateVerticalAligment(POINT& pos, int h);
 		UIType type = Null;
+		Aligment m_hAligment = None;
+		Aligment m_vAligment = None;
+		Margin m_margin = {};
 		HWND handle = NULL;
 		HWND windowHandle = NULL;
 		DWORD id = NULL;
@@ -84,7 +102,7 @@ namespace MUI {
 		COLORREF backgroundColor = NULL;
 		UIComponent* parent = NULL;
 		int x, y, width, height;
-		void* onClick = NULL;
+		void* onEvent = NULL;
 	};
 	/*
 	Class declarations of each UIComponent
@@ -217,6 +235,7 @@ namespace MUI {
 		void Hide();
 		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
 	private:
+		void RepositionComponents();
 		void* onClose;
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 0;

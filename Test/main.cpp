@@ -58,6 +58,10 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     };
     //window.AddComponents(comps);
     window.AddComponent(&chkbox);
+    chkbox.SetHorizontalAligment(Center);
+    chkbox.SetVerticalAligment(Top);
+    lstView.SetHorizontalAligment(Stretch);
+    lstView.SetVerticalAligment(Center);
     window.AddComponent(&lstView);
     window.Show(SW_SHOW);
     HICON ico = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
@@ -69,9 +73,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     ListItem itm2(0, std::vector<std::wstring> {L"TEST3", L"TEST4"});
     lstView.AddItem(&itm2);
 
-    window.MinSize.x = 500;
+   /* window.MinSize.x = 500;
     window.MinSize.y = 500;
-    window.MaxSize = window.MinSize;
+    window.MaxSize = window.MinSize;*/
 
     MSG msg = {};
 

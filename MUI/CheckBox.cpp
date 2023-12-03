@@ -15,7 +15,7 @@ namespace MUI {
 	void CheckBox::SubscribeToOnClick(void* func)
 	{
 		if (func)
-			this->onClick = func;
+			this->onEvent = func;
 	}
 	BOOL CheckBox::IsChecked()
 	{
@@ -24,7 +24,7 @@ namespace MUI {
 	void CheckBox::SetChecked(BOOL checked)
 	{
 		CheckDlgButton(this->windowHandle, this->id, checked);
-		if(this->onClick)
-			((void (*)(void))(this->onClick))();
+		if(this->onEvent)
+			((void (*)(void))(this->onEvent))();
 	}
 }

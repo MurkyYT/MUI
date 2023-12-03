@@ -101,6 +101,7 @@ namespace MUI
 		comp->id = (DWORD)index;
 		comp->windowHandle = this->m_hWnd;
 		this->m_Assets[index] = comp;
+		this->RepositionComponents();
 		return TRUE;
 	}
 	void Window::v_RegisterClass(const wchar_t* name, DWORD iconId)
@@ -140,7 +141,6 @@ namespace MUI
 			case WM_COMMAND:
 				window->OnCommand(wParam, lParam);
 				break;
-
 			case WM_CREATE:
 				window->OnCreate();
 				return 0;
@@ -162,6 +162,11 @@ namespace MUI
 				lpMMI->ptMaxTrackSize = window->MaxSize;
 				break;
 			}
+			case WM_SIZE:
+			{
+				window->RepositionComponents();
+				break;
+			}
 			case WM_CLOSE:
 			{
 				if (window->onClose)
@@ -179,6 +184,17 @@ namespace MUI
 		}
 
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	}
+	void Window::RepositionComponents()
+	{
+		RECT rect;
+		if (GetClientRect(this->m_hWnd, &rect))
+		{
+			int width = rect.right - rect.left;
+			int height = rect.bottom - rect.top;
+			for (auto& comp : this->m_Assets)
+				comp.second->reposition(height, width);
+		}
 	}
 	LRESULT Window::OnColorButton(WPARAM wParam) {
 		HDC hdcButton = (HDC)wParam;
@@ -239,10 +255,10 @@ namespace MUI
 		if(this->m_Assets.find((UINT)wParam) != m_Assets.end())
 		{
 			UIComponent* comp = this->m_Assets[(UINT)wParam];
-			if(comp->onClick)
-				((func_type)comp->onClick)();
-			if(comp->parent && comp->parent->onClick)
-				((func_type)comp->parent->onClick)();
+			if(comp->onEvent)
+				((func_type)comp->onEvent)();
+			if(comp->parent && comp->parent->onEvent)
+				((func_type)comp->parent->onEvent)();
 		}
 	}
 	void Window::OnDestroy() {
