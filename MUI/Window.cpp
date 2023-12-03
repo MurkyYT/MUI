@@ -51,7 +51,9 @@ namespace MUI
 			this->m_hInstance,
 			this
 		);
-
+#ifdef DEBUG
+		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+#endif // DEBUG
 		return m_hWnd != NULL;
 	}
 	BOOL Window::Create(const wchar_t* title, DWORD iconId)
@@ -138,6 +140,29 @@ namespace MUI
 
 		if (window) {
 			switch (uMsg) {
+#ifdef DEBUG
+			case WM_PAINT:
+			{
+				PAINTSTRUCT  ps;
+				HDC          hdc;
+				hdc = BeginPaint(hWnd, &ps);
+				Graphics graphics(hdc);
+				Pen      pen(Gdiplus::Color(255, 0, 0, 255));
+				RECT rect;
+				if (GetClientRect(window->m_hWnd, &rect))
+				{
+					int width = rect.right - rect.left;
+					int height = rect.bottom - rect.top;
+					// draw grid rows and columns here, just a test right now
+					int x = width / 4;
+					for (size_t i = 1; i < 4; i++)
+					{
+						graphics.DrawLine(&pen, x * i, 0, x * i, height);
+					}
+				}
+				EndPaint(hWnd, &ps);
+			}
+#endif
 			case WM_COMMAND:
 				window->OnCommand(wParam, lParam);
 				break;
@@ -171,6 +196,9 @@ namespace MUI
 			{
 				if (window->onClose)
 					((func_type)window->onClose)();
+#ifdef DEBUG
+				GdiplusShutdown(window->gdiplusToken);
+#endif // DEBUG
 #if HIDE_ON_CLOSE
 				window->Hide();
 				return 0;

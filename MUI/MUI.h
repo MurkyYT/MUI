@@ -20,6 +20,13 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif // NEW_STYLE
+#ifndef NDEBUG
+#define DEBUG
+#include <objidl.h>
+#include <gdiplus.h>
+using namespace Gdiplus;
+#pragma comment (lib,"Gdiplus.lib")
+#endif
 #pragma endregion
 
 namespace MUI {
@@ -86,7 +93,7 @@ namespace MUI {
 		void Show();
 		BOOL IsHidden();
 	protected:
-		void reposition(int h, int w);
+		virtual void reposition(int h, int w);
 		void UpdateHorizontalAligment(POINT& pos, int w);
 		void UpdateVerticalAligment(POINT& pos, int h);
 		UIType type = Null;
@@ -235,8 +242,12 @@ namespace MUI {
 		void Hide();
 		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
 	private:
+#ifdef DEBUG
+		GdiplusStartupInput gdiplusStartupInput;
+		ULONG_PTR           gdiplusToken;
+#endif // DEBUG
 		void RepositionComponents();
-		void* onClose;
+		void* onClose = NULL;
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 0;
 		std::vector<uint64_t> m_UnusedIndexes;

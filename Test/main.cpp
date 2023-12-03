@@ -60,6 +60,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     window.AddComponent(&chkbox);
     chkbox.SetHorizontalAligment(Center);
     chkbox.SetVerticalAligment(Top);
+    chkbox.SetChecked(TRUE);
     lstView.SetHorizontalAligment(Stretch);
     lstView.SetVerticalAligment(Center);
     window.AddComponent(&lstView);

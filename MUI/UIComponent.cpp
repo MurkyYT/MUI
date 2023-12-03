@@ -13,7 +13,7 @@ namespace MUI
 		this->UpdateHorizontalAligment(pos, w);
 		pos.x = pos.x - this->m_margin.right + this->m_margin.left;
 		pos.y = pos.y - this->m_margin.bottom + this->m_margin.top;
-		SetWindowPos(this->handle, NULL, pos.x, pos.y, this->width, this->height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+		SetWindowPos(this->handle, NULL, pos.x, pos.y, this->width, this->height, SWP_FRAMECHANGED);
 		UpdateWindow(this->handle);
 	}
 	void UIComponent::UpdateVerticalAligment(POINT& pos, int h)
