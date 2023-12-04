@@ -30,7 +30,7 @@ namespace MUI
 			pos.y = h / 2 - this->height / 2;
 			break;
 		case MUI::Stretch:
-			pos.y = 0;
+			//pos.y = 0;
 			this->height = h;
 			break;
 		}
@@ -49,7 +49,7 @@ namespace MUI
 			pos.x = w / 2 - this->width / 2;
 			break;
 		case MUI::Stretch:
-			pos.x = 0;
+			//pos.x = 0;
 			this->width = w;
 			break;
 		}

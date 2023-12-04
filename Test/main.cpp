@@ -16,6 +16,7 @@ RadioButton button1(L"Fullscreen", 130, 90, 90, 15);
 RadioButton button2(L"Windowed Fullscreen", 130, 110, 140, 15);
 RadioButton button3(L"Windowed", 130, 130, 140, 15);
 ListView lstView(10, 10, 200, 200);
+Grid grid;
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) {
     (void)hPrevInstance;
     (void)lpCmdLine;
@@ -57,13 +58,19 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
         &block
     };
     //window.AddComponents(comps);
-    window.AddComponent(&chkbox);
+   /* window.AddComponent(&chkbox);
     chkbox.SetHorizontalAligment(Center);
     chkbox.SetVerticalAligment(Top);
     chkbox.SetChecked(TRUE);
+    window.AddComponent(&lstView);*/
+    grid.AddColumn(100, L"Auto");
+    grid.AddColumn(150, L"Auto");
+    grid.AddRow(100, L"Auto");
+    grid.AddRow(150, L"Auto");
     lstView.SetHorizontalAligment(Stretch);
-    lstView.SetVerticalAligment(Center);
-    window.AddComponent(&lstView);
+    lstView.SetVerticalAligment(Stretch);
+    grid.AddItem(&lstView, 2, 2);
+    window.SetGrid(&grid);
     window.Show(SW_SHOW);
     HICON ico = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
     lstView.AddIcon(ico);

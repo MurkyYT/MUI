@@ -1,4 +1,5 @@
 #include "MUI.h"
+
 typedef void (*func_type)(void);
 
 namespace MUI 
@@ -68,6 +69,12 @@ namespace MUI
 	{
 		ShowWindow(this->m_hWnd, SW_HIDE);
 	}
+	void Window::SetGrid(Grid* grid) 
+	{ 
+		this->m_grid = grid; 
+		this->b_useGrid = TRUE;
+		this->AddComponents(this->m_grid->GetComponents());
+	}
 	void Window::AddComponents(std::vector<UIComponent*> comps)
 	{
 		for(UIComponent* comp : comps)
@@ -103,7 +110,8 @@ namespace MUI
 		comp->id = (DWORD)index;
 		comp->windowHandle = this->m_hWnd;
 		this->m_Assets[index] = comp;
-		this->RepositionComponents();
+		if(!this->b_useGrid)
+			this->RepositionComponents();
 		return TRUE;
 	}
 	void Window::v_RegisterClass(const wchar_t* name, DWORD iconId)
@@ -149,16 +157,15 @@ namespace MUI
 				Graphics graphics(hdc);
 				Pen      pen(Gdiplus::Color(255, 0, 0, 255));
 				RECT rect;
-				if (GetClientRect(window->m_hWnd, &rect))
+				if (window->b_useGrid && window->m_grid && GetClientRect(window->m_hWnd, &rect))
 				{
 					int width = rect.right - rect.left;
 					int height = rect.bottom - rect.top;
 					// draw grid rows and columns here, just a test right now
-					int x = width / 4;
-					for (size_t i = 1; i < 4; i++)
-					{
-						graphics.DrawLine(&pen, x * i, 0, x * i, height);
-					}
+					for (GridRow* row : window->m_grid->m_rows)
+						graphics.DrawLine(&pen, 0, row->GetY(), width, row->GetY());
+					for (GridColumn* col : window->m_grid->m_columns)
+						graphics.DrawLine(&pen, col->GetX(),0 , col->GetX(), height);
 				}
 				EndPaint(hWnd, &ps);
 			}
@@ -189,7 +196,10 @@ namespace MUI
 			}
 			case WM_SIZE:
 			{
-				window->RepositionComponents();
+				for(GridItem* itm : window->m_grid->GetItems())
+				{
+					window->m_grid->Reposition(itm);
+				}
 				break;
 			}
 			case WM_CLOSE:

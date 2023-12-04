@@ -83,6 +83,7 @@ namespace MUI {
 	class UIComponent
 	{
 		friend class Window;
+		friend class Grid;
 	public:
 		BOOL SetStyle(DWORD newStyle);
 		DWORD GetStyle();
@@ -92,6 +93,9 @@ namespace MUI {
 		void Hide();
 		void Show();
 		BOOL IsHidden();
+	private:
+		int GetFullWidth() { return this->width + this->m_margin.left - this->m_margin.right; }
+		int GetFullHeight() { return this->height + this->m_margin.top - this->m_margin.bottom; }
 	protected:
 		virtual void reposition(int h, int w);
 		void UpdateHorizontalAligment(POINT& pos, int w);
@@ -110,6 +114,48 @@ namespace MUI {
 		UIComponent* parent = NULL;
 		int x, y, width, height;
 		void* onEvent = NULL;
+	};
+	/*Every grid related thingy*/
+	struct GridItem
+	{
+		friend class Grid;
+	private:
+		int row;
+		int column;
+		UIComponent* component;
+	};
+	class GridRow {
+		friend class Grid;
+	public:
+		int GetY() { return this->y; }
+	private:
+		int y;
+		int height;
+		const wchar_t* text_height;
+	};
+	class GridColumn {
+		friend class Grid;
+	public:
+		int GetX() { return this->x; }
+	private:
+		int x;
+		int width;
+		const wchar_t* text_width;
+	};
+	class Grid {
+		friend class Window;
+	public:
+		Grid();
+		std::vector<UIComponent*> GetComponents();
+		std::vector<GridItem*> GetItems() { return this->m_items; }
+		void AddColumn(int x,const wchar_t* width);
+		void AddRow(int y,const wchar_t* height);
+		void AddItem(UIComponent* comp, int row, int column);
+	private:
+		void Reposition(GridItem* itm);
+		std::vector<GridRow*> m_rows;
+		std::vector<GridColumn*> m_columns;
+		std::vector<GridItem*> m_items;
 	};
 	/*
 	Class declarations of each UIComponent
@@ -225,9 +271,11 @@ namespace MUI {
 		BOOL Create(const wchar_t* title, int width, int height, DWORD iconId);
 		BOOL Create(const wchar_t* title, DWORD iconId);
 		BOOL AddComponent(UIComponent* comp);
+		void SetGrid(Grid* grid);
+		void ToggleGrid() { this->b_useGrid = !this->b_useGrid; }
 		void AddComponents(std::vector<UIComponent*> comps);
 		void Show(int cmdShow);
-		void SubscribeToOnClose(void* func) { onClose = func; }
+		void SubscribeToOnClose(void* func) { this->onClose = func; }
 		COLORREF m_StaticBacgkround = NULL;
 		COLORREF m_StaticTextColor = NULL;
 
@@ -248,6 +296,8 @@ namespace MUI {
 #endif // DEBUG
 		void RepositionComponents();
 		void* onClose = NULL;
+		BOOL b_useGrid = FALSE;
+		Grid* m_grid = NULL;
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 0;
 		std::vector<uint64_t> m_UnusedIndexes;
