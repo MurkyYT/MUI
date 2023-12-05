@@ -124,9 +124,15 @@ namespace MUI
 			GridColumn* o_column = this->m_columns[itm->column];
 			GridRow* o_row = this->m_rows[itm->row];
 			UIComponent* comp = itm->component;
+			int width = o_column->width;
+			int height = o_row->height;
+			for (size_t i = 0; i < itm->component->columnSpan && i < this->m_columns.size(); i++)
+				width += this->m_columns[itm->column + i]->width;
+			for (size_t i = 0; i < itm->component->rowSpan && i < this->m_rows.size(); i++)
+				height += this->m_rows[itm->row + i]->height;
 			comp->x = o_column->x;
 			comp->y = o_row->y;
-			comp->reposition(o_row->height, o_column->width);
+			comp->reposition(height, width);
 		}
 	}
 }

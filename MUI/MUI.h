@@ -89,6 +89,13 @@ namespace MUI {
 	public:
 		BOOL SetStyle(DWORD newStyle);
 		DWORD GetStyle();
+		void SetColumnSpan(int span) 
+		{
+			this->columnSpan = max(0, span);
+		};
+		void SetRowSpan(int span) {
+			this->rowSpan = max(0, span);
+		}
 		void SetVerticalAligment(Aligment alg);
 		void SetHorizontalAligment(Aligment alg);
 		void SetMargin(Margin m);
@@ -115,6 +122,8 @@ namespace MUI {
 		COLORREF backgroundColor = NULL;
 		UIComponent* parent = NULL;
 		int x, y, width, height;
+		int columnSpan = 0;
+		int rowSpan = 0;
 		void* onEvent = NULL;
 	};
 	/*Every grid related thingy*/
