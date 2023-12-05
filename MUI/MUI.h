@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 #include <commctrl.h> 
+#include <dwmapi.h>
+#pragma comment (lib, "dwmapi")
 #pragma comment (lib, "comctl32")
 #pragma endregion
 #pragma region Defines
@@ -27,9 +29,30 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 using namespace Gdiplus;
 #pragma comment (lib,"Gdiplus.lib")
 #endif
+#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
+#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#endif
 #pragma endregion
 
 namespace MUI {
+	static inline bool IsDarkMode()
+	{
+		DWORD vType;
+		DWORD vLen = 0;
+		DWORD val = 0;
+		HKEY hKey;
+		if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", 0, KEY_READ | KEY_WOW64_64KEY, &hKey) != ERROR_SUCCESS)
+		{
+			RegCloseKey(hKey);
+			return FALSE;
+		}
+		if ((RegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, &vType, NULL, &vLen) == ERROR_SUCCESS) && (vType == REG_DWORD)) {
+			RegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, &vType, (LPBYTE)&val, &vLen);
+			RegCloseKey(hKey);
+			return val == 0;
+		}
+		return FALSE;
+	};
 	/*
 	Every colorref in MUI
 	*/

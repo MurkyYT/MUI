@@ -140,6 +140,8 @@ namespace MUI
 			CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 			window = reinterpret_cast<Window*>(pCreate->lpCreateParams);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
+			BOOL value = IsDarkMode();
+			DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
 			window->m_hWnd = hWnd;
 		}
 		else {
