@@ -197,11 +197,9 @@ namespace MUI
 			}
 			case WM_SIZE:
 			{
+				window->m_grid->Reorder(window->m_hWnd);
 				for(GridItem* itm : window->m_grid->GetItems())
-				{
-					window->m_grid->Reorder(window->m_hWnd);
 					window->m_grid->Reposition(itm);
-				}
 				break;
 			}
 			case WM_CLOSE:

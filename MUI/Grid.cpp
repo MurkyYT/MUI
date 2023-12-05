@@ -124,8 +124,8 @@ namespace MUI
 			GridColumn* o_column = this->m_columns[itm->column];
 			GridRow* o_row = this->m_rows[itm->row];
 			UIComponent* comp = itm->component;
-			int width = o_column->width;
-			int height = o_row->height;
+			int width = max(o_column->width, 0);
+			int height = max(o_row->height, 0);
 			for (size_t i = 0; i < itm->component->columnSpan && i < this->m_columns.size(); i++)
 				width += this->m_columns[itm->column + i]->width;
 			for (size_t i = 0; i < itm->component->rowSpan && i < this->m_rows.size(); i++)
