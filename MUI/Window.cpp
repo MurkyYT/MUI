@@ -161,11 +161,12 @@ namespace MUI
 				{
 					int width = rect.right - rect.left;
 					int height = rect.bottom - rect.top;
-					// draw grid rows and columns here, just a test right now
 					for (GridRow* row : window->m_grid->m_rows)
 						graphics.DrawLine(&pen, 0, row->GetY(), width, row->GetY());
 					for (GridColumn* col : window->m_grid->m_columns)
 						graphics.DrawLine(&pen, col->GetX(),0 , col->GetX(), height);
+					graphics.DrawLine(&pen, width-1, 0, width-1, height);
+					graphics.DrawLine(&pen, 0, height-1, width-1, height-1);
 				}
 				EndPaint(hWnd, &ps);
 			}
@@ -198,6 +199,7 @@ namespace MUI
 			{
 				for(GridItem* itm : window->m_grid->GetItems())
 				{
+					window->m_grid->Reorder(window->m_hWnd);
 					window->m_grid->Reposition(itm);
 				}
 				break;

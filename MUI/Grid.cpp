@@ -41,40 +41,92 @@ namespace MUI
 		itm->column = column;
 		itm->row = row;
 		itm->component = comp;
+		this->m_columns[column]->components.push_back(comp);
+		this->m_rows[row]->components.push_back(comp);
 		this->m_items.push_back(itm);
+		this->Reorder(comp->windowHandle);
 		this->Reposition(itm);
 	}
-	void Grid::Reposition(GridItem* itm)
+	int clip(int n, int min) {
+		if (n < min)
+			return min;
+		return n;
+	}
+	void Grid::Reorder(HWND windowHandle)
 	{
-		GridColumn* o_column = this->m_columns[itm->column];
-		GridRow* o_row = this->m_rows[itm->row];
-		UIComponent* comp = itm->component;
-		if (o_column->text_width == L"Auto")
-		{
-			if (comp->GetFullWidth() > o_column->width)
-				o_column->width = comp->GetFullWidth();
-			for (int i = itm->column + 1; i < this->m_columns.size(); i++)
-				this->m_columns[i]->x += o_column->width - (this->m_columns[i]->x - o_column->x);
-		}
-		if (o_row->text_height == L"Auto")
-		{
-			if (comp->GetFullHeight() > o_row->height)
-				o_row->height = comp->GetFullHeight();
-			for (int i = itm->row + 1; i < this->m_rows.size(); i++)
-				this->m_rows[i]->y += o_row->height - (this->m_rows[i]->y - o_row->y);
-		}
 		RECT rect;
-		if (GetClientRect(comp->windowHandle, &rect))
+		if (GetClientRect(windowHandle, &rect))
 		{
+			std::vector<std::tuple<GridColumn*,int>> starColumns;
+			for (int i = 0; i < this->m_columns.size(); i++) {
+				GridColumn* o_column = this->m_columns[i];
+			
+				if (o_column->text_width == L"Auto")
+				{
+					o_column->width = o_column->GetBiggestWidth();
+					for (int j =  i + 1; j < this->m_columns.size(); j++)
+						this->m_columns[j]->x += o_column->width - clip((this->m_columns[j]->x - o_column->x),0);
+				}
+				if (o_column->text_width == L"*") {
+					starColumns.push_back(std::make_tuple(o_column, i));
+					o_column->width = o_column->GetBiggestWidth();
+				}
+			}
+			for(std::tuple<GridColumn*,int> star : starColumns)
+			{
+				GridColumn* o_column = std::get<0>(star);
+				int othersWidth = 0;
+				for (int j = std::get<1>(star) + 1; j < this->m_columns.size(); j++)
+					othersWidth += this->m_columns[j]->width;
+				o_column->width = rect.right - rect.left - o_column->x - othersWidth;
+				for (int j = std::get<1>(star) + 1; j < this->m_columns.size(); j++)
+					this->m_columns[j]->x += o_column->width;
+			}
+			std::vector<std::tuple<GridRow*, int>> starRows;
+			for (int i = 0; i < this->m_rows.size(); i++) {
+				GridRow* o_row = this->m_rows[i];
+				if (o_row->text_height == L"Auto")
+				{
+					o_row->height = o_row->GetBiggestHeight();
+					for (int j = i + 1; j < this->m_rows.size(); j++)
+						this->m_rows[j]->y += o_row->height - clip((this->m_rows[j]->y - o_row->y),0);
+				}
+				if (o_row->text_height == L"*") {
+					starRows.push_back(std::make_tuple(o_row, i));
+					o_row->height = o_row->GetBiggestHeight();
+				}
+			}
+			for (std::tuple<GridRow*, int> star : starRows)
+			{
+				GridRow* o_row = std::get<0>(star);
+				int othersHeight = 0;
+				for (int j = std::get<1>(star) + 1; j < this->m_rows.size(); j++)
+					othersHeight += this->m_rows[j]->height;
+				o_row->height = rect.bottom - rect.top - o_row->y - othersHeight;
+				for (int j = std::get<1>(star) + 1; j < this->m_rows.size(); j++)
+					this->m_rows[j]->y += o_row->height;
+			}
 			int width = rect.right - rect.left;
 			int height = rect.bottom - rect.top;
 			GridRow* row = this->m_rows[m_rows.size() - 1];
 			GridColumn* col = this->m_columns[m_columns.size() - 1];
-			row->height = height - row->y;
-			col->width = width - col->x;
+			if (row->text_height == L"*")
+				row->height = height - row->y;
+			if (col->text_width == L"*")
+				col->width = width - col->x;
 		}
-		comp->x = o_column->x;
-		comp->y = o_row->y;
-		comp->reposition(o_row->height, o_column->width);
+	}
+	void Grid::Reposition(GridItem* itm)
+	{
+		RECT rect;
+		if (GetClientRect(itm->component->windowHandle, &rect))
+		{
+			GridColumn* o_column = this->m_columns[itm->column];
+			GridRow* o_row = this->m_rows[itm->row];
+			UIComponent* comp = itm->component;
+			comp->x = o_column->x;
+			comp->y = o_row->y;
+			comp->reposition(o_row->height, o_column->width);
+		}
 	}
 }

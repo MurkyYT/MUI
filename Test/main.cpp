@@ -63,15 +63,20 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     chkbox.SetVerticalAligment(Top);
     chkbox.SetChecked(TRUE);
     window.AddComponent(&lstView);*/
-    grid.AddColumn(100, L"Auto");
+    grid.AddColumn(100, L"*");
     grid.AddColumn(150, L"Auto");
-    grid.AddRow(100, L"Auto");
+    grid.AddRow(100, L"*");
     grid.AddRow(150, L"Auto");
     lstView.SetHorizontalAligment(Stretch);
     lstView.SetVerticalAligment(Stretch);
-    grid.AddItem(&lstView, 2, 2);
+    block.SetVerticalAligment(Center);
+    chkbox.SetVerticalAligment(Center);
+    grid.AddItem(&lstView, 1,1);
+    grid.AddItem(&chkbox, 1, 2);
+    grid.AddItem(&block, 1, 0);
     window.SetGrid(&grid);
     window.Show(SW_SHOW);
+    //lstView.Hide();
     HICON ico = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
     lstView.AddIcon(ico);
     lstView.AddColumn(L"Test", 100);

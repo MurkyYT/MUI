@@ -84,6 +84,8 @@ namespace MUI {
 	{
 		friend class Window;
 		friend class Grid;
+		friend class GridRow;
+		friend class GridColumn;
 	public:
 		BOOL SetStyle(DWORD newStyle);
 		DWORD GetStyle();
@@ -132,6 +134,15 @@ namespace MUI {
 		int y;
 		int height;
 		const wchar_t* text_height;
+		std::vector<UIComponent*> components;
+		int GetBiggestHeight()
+		{
+			int max = 0;
+			for (UIComponent* comp : this->components)
+				if (max < comp->GetFullHeight())
+					max = comp->GetFullHeight();
+			return max;
+		}
 	};
 	class GridColumn {
 		friend class Grid;
@@ -141,6 +152,15 @@ namespace MUI {
 		int x;
 		int width;
 		const wchar_t* text_width;
+		std::vector<UIComponent*> components;
+		int GetBiggestWidth()
+		{
+			int max = 0;
+			for (UIComponent* comp : this->components)
+				if (max < comp->GetFullWidth())
+					max = comp->GetFullWidth();
+			return max;
+		}
 	};
 	class Grid {
 		friend class Window;
@@ -152,6 +172,7 @@ namespace MUI {
 		void AddRow(int y,const wchar_t* height);
 		void AddItem(UIComponent* comp, int row, int column);
 	private:
+		void Reorder(HWND windowHandle);
 		void Reposition(GridItem* itm);
 		std::vector<GridRow*> m_rows;
 		std::vector<GridColumn*> m_columns;
