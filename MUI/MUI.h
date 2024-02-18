@@ -15,6 +15,7 @@
 #pragma region CONFIG
 #define NEW_STYLE 1
 #define HIDE_ON_CLOSE 0
+#define USE_MULTIPLE_WINDOW_ICONS 0
 #pragma endregion
 #pragma region INTERNAL
 #if NEW_STYLE
@@ -209,6 +210,8 @@ namespace MUI {
 		std::vector<GridRow*> m_rows;
 		std::vector<GridColumn*> m_columns;
 		std::vector<GridItem*> m_items;
+		BOOL m_AddedCustomRow = FALSE;
+		BOOL m_AddedCustomColumn = FALSE;
 	};
 	/*
 	Class declarations of each UIComponent
@@ -247,8 +250,10 @@ namespace MUI {
 		int FreeItemIndex() { return this->itemIndex; }
 		void DeleteIconAt(int i);
 		void ClearIcons();
+		void ClearColumns();
 		void DeleteItemAt(int i);
 		void ClearItems();
+		void Clear();
 	private:
 		std::vector<ListItem> m_Items;
 		UINT columnIndex;
@@ -327,7 +332,6 @@ namespace MUI {
 		void SetGrid(Grid* grid);
 		void ToggleGrid() { this->b_useGrid = !this->b_useGrid; }
 		void AddComponents(std::vector<UIComponent*> comps);
-		void Show(int cmdShow);
 		void SubscribeToOnClose(void* func) { this->onClose = func; }
 		COLORREF m_StaticBacgkround = NULL;
 		COLORREF m_StaticTextColor = NULL;
@@ -339,6 +343,8 @@ namespace MUI {
 		COLORREF m_ButtonTextColor = NULL;
 		void SetBackroundColor(COLORREF color);
 		BOOL Activate();
+		void HideAll();
+		void ShowAll();
 		void Show();
 		void Hide();
 		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
@@ -350,9 +356,12 @@ namespace MUI {
 		void RepositionComponents();
 		void* onClose = NULL;
 		BOOL b_useGrid = FALSE;
+		const wchar_t* m_title;
+		int m_width, m_height;
+		DWORD m_iconId;
 		Grid* m_grid = NULL;
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
-		UINT m_Index = 0;
+		UINT m_Index = 1;
 		std::vector<uint64_t> m_UnusedIndexes;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		HWND m_hWnd = NULL;
@@ -368,5 +377,7 @@ namespace MUI {
 		LRESULT OnColorButton(WPARAM wParam);
 		LRESULT OnDraw(WPARAM wParam, LPARAM lParam);
 		void OnCreate();
+		BOOL m_Destroyed = FALSE;
+		static int m_Windows;
 	};
 }

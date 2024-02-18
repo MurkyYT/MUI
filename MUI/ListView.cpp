@@ -26,6 +26,12 @@ namespace MUI
 	{
 		ImageList_RemoveAll(this->hLarge);
 		ImageList_RemoveAll(this->hSmall);
+		this->hLarge = ImageList_Create(32,
+			32,
+			ILC_COLOR32, 3, 0);
+		this->hSmall = ImageList_Create(32,
+			32,
+			ILC_COLOR32, 3, 0);
 	}
 	void ListView::DeleteIconAt(int i)
 	{
@@ -43,6 +49,18 @@ namespace MUI
 		ListView_DeleteAllItems(this->handle);
 		this->m_Items.erase(this->m_Items.begin(), this->m_Items.end());
 		this->itemIndex = 0;
+	}
+	void ListView::ClearColumns()
+	{
+		for (size_t i = 0; i < this->columnIndex; i++)
+			ListView_DeleteColumn(this->handle, i);
+		this->columnIndex = 0;
+	}
+	void ListView::Clear()
+	{
+		this->ClearColumns();
+		this->ClearIcons();
+		this->ClearItems();
 	}
 	int ListView::GetSelectedIndex() 
 	{

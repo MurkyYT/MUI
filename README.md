@@ -13,7 +13,7 @@
 * Components list:
    * Button
    * CheckBox
-   * Grid (you have to explicitly set the grid by using `window->SetGrid(&grid)` as in the test project, grid currently is very experimental and will probably change overtime)
+   * Grid (you have to explicitly set the grid by using `window->SetGrid(&grid)` as in the demo project)
    * Image
    * ListView
    * RadioGroup
@@ -22,7 +22,7 @@
    * TextBox
 * Custom coloring of each component type(works best with `#define NEW_STYLE 0` )
 ## Demo project
-*You can find a demo project inside the `Test` folder, this project is where i test new features and additions*
+*You can find a demo project inside the `Demo` folder, this project is where i test new features and additions*
 
 ![demo-image](example.png)
 

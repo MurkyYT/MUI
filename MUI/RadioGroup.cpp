@@ -24,7 +24,7 @@ namespace MUI
 	}
 	int RadioGroup::CurrentRadioButton()
 	{
-		for (size_t i = 0; i < this->m_Buttons.size(); i++)
+		for (int i = 0; i < this->m_Buttons.size(); i++)
 		{
 			if (IsDlgButtonChecked(this->windowHandle, this->m_Buttons[i]->id))
 				return i;

@@ -4,6 +4,7 @@ typedef void (*func_type)(void);
 
 namespace MUI 
 {
+	int Window::m_Windows = 0;
 	Window::Window(HINSTANCE hInstance) : m_hWnd(NULL), m_hInstance(hInstance) {}
 	Window::~Window()
 	{
@@ -18,10 +19,6 @@ namespace MUI
 	{
 		this->m_hBrushBackground = CreateSolidBrush(color);
 	}
-	void Window::Show(int cmdShow) {
-		ShowWindow(this->m_hWnd, cmdShow);
-		UpdateWindow(this->m_hWnd);
-	}
 	BOOL Window::Activate()
 	{
 		SetForegroundWindow(this->m_hWnd);
@@ -35,23 +32,47 @@ namespace MUI
 	}
 	BOOL Window::Create(const wchar_t* title, int width, int height,DWORD iconId)
 	{
-		this->v_RegisterClass(WINDOW_CLASS,iconId);
+		m_title = title;
+		m_height = height;
+		m_width = width;
+		m_iconId = iconId;
+#if USE_MULTIPLE_WINDOW_ICONS
+		std::wstring className = std::wstring(WINDOW_CLASS).append(std::to_wstring(m_Windows));
+#else
+		std::wstring className = std::wstring(WINDOW_CLASS);
+#endif
+		this->v_RegisterClass(className.c_str(), m_iconId);
 
 		this->m_hWnd = CreateWindowEx
 		(
 			0,
-			WINDOW_CLASS,
-			title,
+			className.c_str(),
+			m_title,
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			width,
-			height,
+			m_width,
+			m_height,
 			NULL,
 			NULL,
 			this->m_hInstance,
 			this
 		);
+		m_Windows += 1;
+		m_Destroyed = FALSE;
+		/*
+		* Menu bar creation example
+		HMENU hMenubar = CreateMenu();
+		HMENU hMenu = CreateMenu();
+
+		AppendMenuW(hMenu, MF_STRING, 2222, L"&New");
+		AppendMenuW(hMenu, MF_STRING, 222222, L"&Open");
+		AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
+		AppendMenuW(hMenu, MF_STRING, 222222, L"&Quit");
+		AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hMenu, L"&File");
+		SetMenu(m_hWnd, hMenubar);
+		DrawMenuBar(m_hWnd);
+		*/
 #ifdef DEBUG
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 #endif // DEBUG
@@ -63,11 +84,25 @@ namespace MUI
 	}
 	void Window::Show()
 	{
+		if (m_Destroyed) {
+			OutputDebugString(L"Window was destroyed\n");
+			return;
+		}
 		ShowWindow(this->m_hWnd, SW_SHOW);
 	}
 	void Window::Hide()
 	{
 		ShowWindow(this->m_hWnd, SW_HIDE);
+	}
+	void Window::HideAll()
+	{
+		for (size_t i = 1; i < m_Index; i++)
+			m_Assets[i]->Hide();
+	}
+	void Window::ShowAll()
+	{
+		for (size_t i = 1; i < m_Index; i++)
+			m_Assets[i]->Show();
 	}
 	void Window::SetGrid(Grid* grid) 
 	{ 
@@ -204,11 +239,22 @@ namespace MUI
 					for (GridItem* itm : window->m_grid->GetItems())
 						window->m_grid->Reposition(itm);
 				}
+				else 
+				{
+					RECT rect;
+					if (GetClientRect(window->m_hWnd, &rect))
+					{
+						for (size_t i = 1; i < window->m_Index; i++)
+							window->m_Assets[i]->reposition(
+								rect.bottom - rect.top,
+								rect.right - rect.left);
+					}
+				}
 				break;
 			}
 			case WM_CLOSE:
 			{
-				if (window->onClose)
+				if (window->onClose) 
 					((func_type)window->onClose)();
 #ifdef DEBUG
 				GdiplusShutdown(window->gdiplusToken);
@@ -308,9 +354,11 @@ namespace MUI
 		DeleteObject(this->m_hBrushBackground);
 		this->m_Assets.erase(this->m_Assets.begin(), this->m_Assets.end());
 		this->m_UnusedIndexes.erase(this->m_UnusedIndexes.begin(), this->m_UnusedIndexes.end());
-		DeleteObject(&(this->m_Index));
-
-		PostQuitMessage(0);
+		m_Index = 1;
+		m_Windows--;
+		m_Destroyed = TRUE;
+		if (m_Windows <= 0)
+			PostQuitMessage(0);
 	}
 	void Window::OnCreate()
 	{

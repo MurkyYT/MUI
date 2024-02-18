@@ -6,6 +6,8 @@ void CheckBoxClick();
 void ButtonClick();
 void RadioGroupChanged();
 void WindowClose();
+void OpenGridExample();
+void InitializeGridDemoWindow();
 TextBox box(L"Test-TextBox", FALSE, 0, 0, 100, 100);
 Button button(L"Input-Box text",FALSE, 0, 100, 100, 20);
 CheckBox chkbox(L"CheckBox", 100, 300, 70, 15);
@@ -16,13 +18,14 @@ RadioButton button1(L"Fullscreen", 130, 90, 90, 15);
 RadioButton button2(L"Windowed Fullscreen", 130, 110, 140, 15);
 RadioButton button3(L"Windowed", 130, 130, 140, 15);
 ListView lstView(10, 10, 200, 200);
+HINSTANCE m_hInstance;
 Grid grid;
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, INT nCmdShow) {
+Window* gridWindow;
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT nCmdShow) {
     (void)hPrevInstance;
     (void)lpCmdLine;
-    
-    Window window(hInstance);
-    window.SubscribeToOnClose(WindowClose);
+    m_hInstance = hInstance;
+
     button.SubscribeToOnClick(ButtonClick);
     chkbox.SubscribeToOnClick(CheckBoxClick);
     group.SubscribeToOnChange(RadioGroupChanged);
@@ -30,21 +33,58 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     group.AddRadioButton(&button2);
     group.AddRadioButton(&button3);
     /*
-    * Add vertical scroll bar.
-    * If before window creation it shows correctly, if after, only scroll wheel works(could be a bug ? )
-    */ 
+   * Add vertical scroll bar.
+   * If before window creation it shows correctly, if after, only scroll wheel works(could be a bug ? )
+   */
     box.SetStyle(box.GetStyle() | WS_VSCROLL);
+    chkbox.SetChecked(1);
+    grid.AddColumn(0, L"Auto");
+    grid.AddColumn(0, L"*");
+    grid.AddColumn(0, L"Auto");
+    lstView.SetHorizontalAligment(Stretch);
+    lstView.SetVerticalAligment(Stretch);
+    block.SetVerticalAligment(Center);
+    chkbox.SetVerticalAligment(Center);
+    grid.AddItem(&lstView, 0, 1);
+    grid.AddItem(&chkbox, 0, 2);
+    grid.AddItem(&block, 0, 0);
+
    /* window.SetBackroundColor(Color::PURPLE);
     window.m_StaticBacgkround = Color::PURPLE;
     window.m_StaticTextColor = Color::LIGHT_PURPLE;
     window.m_EditBacgkround = Color::LIGHT_PURPLE;
     window.m_ButtonBacgkround = Color::WHITE;
     window.m_ButtonTextColor = Color::DARK_PURPLE;*/
-    if (!window.Create(L"MUI Demo",(DWORD)IDI_ICON1)) {
-        return 0;
-    }
-    chkbox.SetChecked(1);
 
+    Window mainWindow(hInstance);
+    mainWindow.Create(L"MUI Demo", (DWORD)IDI_ICON1);
+    mainWindow.Show();
+    Button btn(L"Open grid demo", FALSE, 0, 0, 0, 0);
+    btn.SetHorizontalAligment(Stretch);
+    btn.SetVerticalAligment(Stretch);
+    mainWindow.AddComponent(&btn);
+    btn.SubscribeToOnClick(OpenGridExample);
+
+   /* window.MinSize.x = 500;
+    window.MinSize.y = 500;
+    window.MaxSize = window.MinSize;*/
+
+    MSG msg = {};
+
+    while (GetMessage(&msg, nullptr, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return static_cast<int>(msg.wParam);
+}
+void InitializeGridDemoWindow()
+{
+    gridWindow = new Window(m_hInstance);
+    gridWindow->SubscribeToOnClose(WindowClose);
+    if (!gridWindow->Create(L"MUI Grid Demo", (DWORD)IDI_ICON1)) {
+        return;
+    }
     std::vector<UIComponent*> comps =
     {
         &button,
@@ -63,41 +103,28 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     chkbox.SetVerticalAligment(Top);
     chkbox.SetChecked(TRUE);
     window.AddComponent(&lstView);*/
-    grid.AddColumn(100, L"*");
-    grid.AddColumn(150, L"Auto");
-    grid.AddRow(100, L"*");
-    grid.AddRow(150, L"Auto");
-    lstView.SetHorizontalAligment(Stretch);
-    lstView.SetVerticalAligment(Stretch);
-    block.SetVerticalAligment(Center);
-    chkbox.SetVerticalAligment(Center);
-    grid.AddItem(&lstView, 1,1);
-    grid.AddItem(&chkbox, 1, 2);
-    grid.AddItem(&block, 1, 0);
-    window.SetGrid(&grid);
-    window.Show(SW_SHOW);
-    //lstView.Hide();
-    HICON ico = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-    lstView.AddIcon(ico);
+   
+    gridWindow->SetGrid(&grid);
+
+    lstView.Clear();
+    HICON ico = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
+    BOOL suc = lstView.AddIcon(ico);
     lstView.AddColumn(L"Test", 100);
     lstView.AddColumn(L"Test2", 100);
     ListItem itm(0, std::vector<std::wstring> {L"TEST1", L"TEST2"});
     lstView.AddItem(&itm);
     ListItem itm2(0, std::vector<std::wstring> {L"TEST3", L"TEST4"});
     lstView.AddItem(&itm2);
-
-   /* window.MinSize.x = 500;
-    window.MinSize.y = 500;
-    window.MaxSize = window.MinSize;*/
-
-    MSG msg = {};
-
-    while (GetMessage(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+}
+void OpenGridExample()
+{
+    if (!gridWindow || gridWindow->IsHidden()) 
+    {
+        InitializeGridDemoWindow();
+        gridWindow->Show();
     }
-
-    return static_cast<int>(msg.wParam);
+    else
+        gridWindow->Activate();
 }
 void ButtonClick()
 {
