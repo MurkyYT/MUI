@@ -1,22 +1,23 @@
 #include "MUI.h"
 
-typedef void (*func_type)(void);
-
 namespace MUI 
 {
 	int Window::m_Windows = 0;
-	Window::Window(HINSTANCE hInstance) : m_hWnd(NULL), m_hInstance(hInstance) {}
+	Window::Window() : m_hWnd(NULL), m_hInstance(GetModuleHandleW(NULL)) {
+	}
 	Window::~Window()
 	{
 		this->OnDestroy();
 	}
 
 	Window* Window::w_GetObject(HWND hWnd) {
-		return (Window*)(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		LONG_PTR ptr = GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		return reinterpret_cast<Window*>(ptr);
 	}
 
 	void Window::SetBackroundColor(COLORREF color)
 	{
+		this->m_cBackground = color;
 		this->m_hBrushBackground = CreateSolidBrush(color);
 	}
 	BOOL Window::Activate()
@@ -36,7 +37,7 @@ namespace MUI
 		m_height = height;
 		m_width = width;
 		m_iconId = iconId;
-#if USE_MULTIPLE_WINDOW_ICONS
+#if USE_MULTIPLE_WINDOW_CLASSES
 		std::wstring className = std::wstring(WINDOW_CLASS).append(std::to_wstring(m_Windows));
 #else
 		std::wstring className = std::wstring(WINDOW_CLASS);
@@ -60,19 +61,6 @@ namespace MUI
 		);
 		m_Windows += 1;
 		m_Destroyed = FALSE;
-		/*
-		* Menu bar creation example
-		HMENU hMenubar = CreateMenu();
-		HMENU hMenu = CreateMenu();
-
-		AppendMenuW(hMenu, MF_STRING, 2222, L"&New");
-		AppendMenuW(hMenu, MF_STRING, 222222, L"&Open");
-		AppendMenuW(hMenu, MF_SEPARATOR, 0, NULL);
-		AppendMenuW(hMenu, MF_STRING, 222222, L"&Quit");
-		AppendMenuW(hMenubar, MF_POPUP, (UINT_PTR)hMenu, L"&File");
-		SetMenu(m_hWnd, hMenubar);
-		DrawMenuBar(m_hWnd);
-		*/
 #ifdef DEBUG
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 #endif // DEBUG
@@ -85,7 +73,7 @@ namespace MUI
 	void Window::Show()
 	{
 		if (m_Destroyed) {
-			OutputDebugString(L"Window was destroyed\n");
+			throw std::exception("Window was destroyed\n");
 			return;
 		}
 		ShowWindow(this->m_hWnd, SW_SHOW);
@@ -109,6 +97,61 @@ namespace MUI
 		this->m_grid = grid; 
 		this->b_useGrid = TRUE;
 		this->AddComponents(this->m_grid->GetComponents());
+	}
+	void Window::SetMenuBar(MenuBar* menu)
+	{
+		if (this->m_dockMenu)
+			delete m_dockMenu;
+		this->m_dockMenu = menu;
+		HMENU hMenubar = CreateMenu();
+		for (size_t i = 0; i < menu->m_menus.size(); i++)
+		{
+			HMENU hMenu = CreateMenu();
+			menu->m_menus[i]->m_hMenu = hMenu;
+			AppendChilds(menu->m_menus[i], hMenu);
+			menu->m_menus[i]->SetStyle(MF_POPUP);
+			AppendMenuW(hMenubar, menu->m_menus[i]->style, (UINT_PTR)hMenu, menu->m_menus[i]->m_WindowName);
+		}
+		SetMenu(m_hWnd, hMenubar);
+		DrawMenuBar(m_hWnd);
+	}
+	void Window::AppendChilds(Menu* menu,HMENU hMenu)
+	{
+		for (size_t i = 0; i < menu->m_childs.size(); i++)
+		{
+			uint64_t index = NULL;
+			UIComponent* comp = menu->m_childs[i];
+			if (comp->type != UISeparator) {
+				index = this->m_Index;
+				if (this->m_UnusedIndexes.size() != 0)
+				{
+					index = this->m_UnusedIndexes[0];
+					this->m_UnusedIndexes.erase(this->m_UnusedIndexes.begin());
+				}
+				else
+					this->m_Index++;
+				m_Assets[index] = comp;
+			}
+			if (comp->type == UIMenu)
+			{
+				menu->m_menus[i]->m_ParentHMENU = hMenu;
+				menu->m_menus[i]->id = (DWORD)index;
+				if (menu->m_menus[i]->m_childs.size() > 0)
+				{
+					HMENU newHMenu = CreateMenu();
+					menu->m_menus[i]->m_hMenu = newHMenu;
+					menu->m_menus[i]->SetStyle(MF_POPUP);
+					AppendChilds(menu->m_menus[i], newHMenu);
+					AppendMenuW(hMenu, menu->m_menus[i]->style, (UINT_PTR)newHMenu, comp->m_WindowName);
+				}
+				else
+					AppendMenuW(hMenu, comp->style, index, comp->m_WindowName);
+			}
+			else
+			{
+				AppendMenuW(hMenu, comp->style, index, comp->m_WindowName);
+			}
+		}
 	}
 	void Window::AddComponents(std::vector<UIComponent*> comps)
 	{
@@ -185,15 +228,19 @@ namespace MUI
 
 		if (window) {
 			switch (uMsg) {
-#ifdef DEBUG
+
 			case WM_PAINT:
 			{
-				PAINTSTRUCT  ps;
-				HDC          hdc;
-				hdc = BeginPaint(hWnd, &ps);
+
+				PAINTSTRUCT ps;
+				RECT rect;
+				HDC hdc = BeginPaint(window->m_hWnd, &ps);
+				GetClientRect(window->m_hWnd, &rect);
+				SetDCBrushColor(hdc, window->m_cBackground);
+				FillRect(hdc, &rect, (HBRUSH)GetStockObject(DC_BRUSH));
+#ifdef DEBUG
 				Graphics graphics(hdc);
 				Pen      pen(Gdiplus::Color(255, 0, 0, 255));
-				RECT rect;
 				if (window->b_useGrid && window->m_grid && GetClientRect(window->m_hWnd, &rect))
 				{
 					int width = rect.right - rect.left;
@@ -201,15 +248,16 @@ namespace MUI
 					for (GridRow* row : window->m_grid->m_rows)
 						graphics.DrawLine(&pen, 0, row->GetY(), width, row->GetY());
 					for (GridColumn* col : window->m_grid->m_columns)
-						graphics.DrawLine(&pen, col->GetX(),0 , col->GetX(), height);
-					graphics.DrawLine(&pen, width-1, 0, width-1, height);
-					graphics.DrawLine(&pen, 0, height-1, width-1, height-1);
+						graphics.DrawLine(&pen, col->GetX(), 0, col->GetX(), height);
+					graphics.DrawLine(&pen, width - 1, 0, width - 1, height);
+					graphics.DrawLine(&pen, 0, height - 1, width - 1, height - 1);
 				}
-				EndPaint(hWnd, &ps);
-			}
 #endif
+				EndPaint(window->m_hWnd, &ps);
+			}
+
 			case WM_COMMAND:
-				window->OnCommand(wParam, lParam);
+				window->OnCommand(uMsg,wParam, lParam);
 				break;
 			case WM_CREATE:
 				window->OnCreate();
@@ -254,15 +302,11 @@ namespace MUI
 			}
 			case WM_CLOSE:
 			{
-				if (window->onClose) 
-					((func_type)window->onClose)();
+				if (window->OnClose) 
+					window->OnClose(NULL,{});
 #ifdef DEBUG
 				GdiplusShutdown(window->gdiplusToken);
 #endif // DEBUG
-#if HIDE_ON_CLOSE
-				window->Hide();
-				return 0;
-#endif // HIDE_ON_CLOSE
 				break;
 
 			}
@@ -336,17 +380,14 @@ namespace MUI
 		}
 		return TRUE;
 	}
-	void Window::OnCommand(WPARAM wParam, LPARAM lParam) {
+	void Window::OnCommand(UINT uMsg,WPARAM wParam, LPARAM lParam) {
 		(void)wParam;
 		(void)lParam;
 
 		if(this->m_Assets.find((UINT)wParam) != m_Assets.end())
 		{
 			UIComponent* comp = this->m_Assets[(UINT)wParam];
-			if(comp->onEvent)
-				((func_type)comp->onEvent)();
-			if(comp->parent && comp->parent->onEvent)
-				((func_type)comp->parent->onEvent)();
+			comp->HandleEvents(uMsg,wParam,lParam);
 		}
 	}
 	void Window::OnDestroy() {
@@ -357,8 +398,10 @@ namespace MUI
 		m_Index = 1;
 		m_Windows--;
 		m_Destroyed = TRUE;
+#if EXIT_ON_CLOSE
 		if (m_Windows <= 0)
 			PostQuitMessage(0);
+#endif // EXIT_ON_CLOSE
 	}
 	void Window::OnCreate()
 	{
@@ -370,7 +413,6 @@ namespace MUI
 	}
 	LRESULT Window::OnDraw(WPARAM wParam, LPARAM lParam) {
 		LPDRAWITEMSTRUCT pdis = (LPDRAWITEMSTRUCT)lParam;
-
 		DrawText(
 			pdis->hDC,
 			this->m_Assets[(UINT)wParam]->m_WindowName,

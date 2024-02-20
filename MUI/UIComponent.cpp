@@ -58,7 +58,7 @@ namespace MUI
 	{
 		if (alg == Left || alg == Right)
 		{
-			OutputDebugString(L"Wrong aligment for 'vedtical aligment'\n");
+			throw std::exception("Wrong aligment for 'vertical aligment'\n");
 			return;
 		}
 		this->m_vAligment = alg;
@@ -66,7 +66,7 @@ namespace MUI
 	void UIComponent::SetHorizontalAligment(Aligment alg)
 	{
 		if (alg == Top || alg == Bottom) {
-			OutputDebugString(L"Wrong aligment for 'horizontal aligment'\n");
+			throw std::exception("Wrong aligment for 'horizontal aligment'\n");
 			return;
 		}
 		this->m_hAligment = alg;

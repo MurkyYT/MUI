@@ -17,10 +17,17 @@ namespace MUI
 		this->m_Buttons.push_back(button);
 		button->parent = this;
 	}
-	void RadioGroup::SubscribeToOnChange(void* func)
+	void RadioGroup::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (func)
-			this->onEvent = func;
+		/*switch (HIWORD(wParam))
+		{
+		default:
+			break;
+		}*/
+		if (OnChange)
+			OnChange(this,{uMsg,wParam,lParam});
+		if (this->parent)
+			S_HandleEvents(this->parent,uMsg, wParam,lParam);
 	}
 	int RadioGroup::CurrentRadioButton()
 	{

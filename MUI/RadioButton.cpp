@@ -12,9 +12,18 @@ namespace MUI
 		this->height = height;
 		this->style = WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON | WS_TABSTOP;
 	}
-	void RadioButton::SubscribeToOnClick(void* func)
+	void RadioButton::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (func)
-			this->onEvent = func;
+		switch (HIWORD(wParam))
+		{
+		case BN_CLICKED:
+		{
+			if (OnClick)
+				OnClick(this,{uMsg,wParam,lParam});
+
+		}
+		}
+		if (this->parent)
+			S_HandleEvents(this->parent,uMsg, wParam,lParam);
 	}
 }

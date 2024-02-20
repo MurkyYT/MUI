@@ -12,10 +12,18 @@ namespace MUI {
 		this->height = height;
 		this->style = WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | WS_TABSTOP;
 	}
-	void CheckBox::SubscribeToOnClick(void* func)
+	void CheckBox::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (func)
-			this->onEvent = func;
+		switch (HIWORD(wParam))
+		{
+		case BN_CLICKED:
+		{
+			if (this->OnClick)
+				OnClick(this, { uMsg,wParam,lParam });
+		}
+		}
+		if (this->parent)
+			S_HandleEvents(this->parent, uMsg,wParam,lParam);
 	}
 	BOOL CheckBox::IsChecked()
 	{
@@ -24,7 +32,5 @@ namespace MUI {
 	void CheckBox::SetChecked(BOOL checked)
 	{
 		CheckDlgButton(this->windowHandle, this->id, checked);
-		if(this->onEvent)
-			((void (*)(void))(this->onEvent))();
 	}
 }

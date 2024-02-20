@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <commctrl.h> 
 #include <dwmapi.h>
+#include <functional>
 #pragma comment (lib, "dwmapi")
 #pragma comment (lib, "comctl32")
 #pragma endregion
@@ -14,8 +15,8 @@
 #pragma endregion
 #pragma region CONFIG
 #define NEW_STYLE 1
-#define HIDE_ON_CLOSE 0
-#define USE_MULTIPLE_WINDOW_ICONS 0
+#define EXIT_ON_CLOSE 1
+#define USE_MULTIPLE_WINDOW_CLASSES 0
 #pragma endregion
 #pragma region INTERNAL
 #if NEW_STYLE
@@ -99,11 +100,15 @@ namespace MUI {
 		UIRadioGroup,
 		UIRadioButton,
 		UIListView,
-		UIImage
+		UIImage,
+		UIMenu,
+		UISeparator,
+		UIMenuBar
 	};
 	/*
 	Base class for each UIComponent
 	*/
+	
 	class UIComponent
 	{
 		friend class Window;
@@ -113,13 +118,8 @@ namespace MUI {
 	public:
 		BOOL SetStyle(DWORD newStyle);
 		DWORD GetStyle();
-		void SetColumnSpan(int span) 
-		{
-			this->columnSpan = max(0, span);
-		};
-		void SetRowSpan(int span) {
-			this->rowSpan = max(0, span);
-		}
+		void SetColumnSpan(int span) { this->columnSpan = max(0, span); }
+		void SetRowSpan(int span) { this->rowSpan = max(0, span); }
 		void SetVerticalAligment(Aligment alg);
 		void SetHorizontalAligment(Aligment alg);
 		void SetMargin(Margin m);
@@ -130,6 +130,12 @@ namespace MUI {
 		int GetFullWidth() { return this->width + this->m_margin.left - this->m_margin.right; }
 		int GetFullHeight() { return this->height + this->m_margin.top - this->m_margin.bottom; }
 	protected:
+		static
+			void S_HandleEvents(UIComponent* o, UINT uMsg, WPARAM wParam, LPARAM lParam)
+		{
+			o->HandleEvents(uMsg,wParam,lParam);
+		}
+		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) {};
 		virtual void reposition(int h, int w);
 		void UpdateHorizontalAligment(POINT& pos, int w);
 		void UpdateVerticalAligment(POINT& pos, int h);
@@ -148,7 +154,43 @@ namespace MUI {
 		int x, y, width, height;
 		int columnSpan = 0;
 		int rowSpan = 0;
-		void* onEvent = NULL;
+	};
+	typedef struct 
+	{
+		UINT    msg;
+		WPARAM  wParam;
+		LPARAM  lParam;
+	} EventArgs_t;
+	typedef std::function<void(UIComponent* const sender, EventArgs_t info)> EventCallback_t;
+	class Separator : public MUI::UIComponent
+	{
+	public:
+		Separator();
+	};
+	class Menu : public MUI::UIComponent
+	{
+		friend class Window;
+	public:
+		Menu(LPCWSTR text);
+		void Add(Menu* menu);
+		void Add(Separator* sep);
+		BOOL IsChecked();
+		void SetChecked(BOOL checked);
+		EventCallback_t OnClick;
+	private:
+		HMENU m_hMenu;
+		HMENU m_ParentHMENU;
+		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		std::vector<Menu*> m_menus;
+		std::vector<UIComponent*> m_childs;
+	};
+	class MenuBar : public MUI::UIComponent
+	{
+		friend class Window;
+	public:
+		void Add(Menu* menu);
+	private:
+		std::vector<Menu*> m_menus;
 	};
 	/*Every grid related thingy*/
 	struct GridItem
@@ -266,31 +308,38 @@ namespace MUI {
 		friend class RadioGroup;
 	public:
 		RadioButton(LPCWSTR text, int x, int y, int width, int height);
-		void SubscribeToOnClick(void* func);
+		EventCallback_t OnClick;
+	private:
+		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 	class RadioGroup : public MUI::UIComponent
 	{
 	public:
 		RadioGroup(LPCWSTR text, int x, int y, int width, int height);
 		int CurrentRadioButton();
-		void SubscribeToOnChange(void* func);
 		void AddRadioButton(RadioButton* button);
+		EventCallback_t OnChange{ NULL };
 	private:
+		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<RadioButton*> m_Buttons;
 	};
 	class Button : public MUI::UIComponent
 	{
 	public:
 		Button(LPCWSTR text, BOOL customColors, int x, int y, int width, int height);
-		void SubscribeToOnClick(void* func);
+		EventCallback_t OnClick{ NULL };
+	private:
+		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 	class CheckBox : public MUI::UIComponent
 	{
 	public:
 		CheckBox(LPCWSTR text, int x, int y, int width, int height);
-		void SubscribeToOnClick(void* func);
 		BOOL IsChecked();
 		void SetChecked(BOOL checked);
+		EventCallback_t OnClick{ NULL };
+	private:
+		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 	class TextBox : public MUI::UIComponent
 	{
@@ -314,7 +363,7 @@ namespace MUI {
 	class Window
 	{
 	public:
-		Window(HINSTANCE hInstance);
+		Window();
 		~Window();
 
 		POINT MinSize
@@ -330,9 +379,9 @@ namespace MUI {
 		BOOL Create(const wchar_t* title, DWORD iconId);
 		BOOL AddComponent(UIComponent* comp);
 		void SetGrid(Grid* grid);
+		void SetMenuBar(MenuBar* menu);
 		void ToggleGrid() { this->b_useGrid = !this->b_useGrid; }
 		void AddComponents(std::vector<UIComponent*> comps);
-		void SubscribeToOnClose(void* func) { this->onClose = func; }
 		COLORREF m_StaticBacgkround = NULL;
 		COLORREF m_StaticTextColor = NULL;
 
@@ -341,6 +390,25 @@ namespace MUI {
 
 		COLORREF m_ButtonBacgkround = NULL;
 		COLORREF m_ButtonTextColor = NULL;
+
+		HWND GetHWND() { return m_hWnd; }
+		HINSTANCE GetHINSTACE() { return m_hInstance; }
+		void Close() { DestroyWindow(m_hWnd); }
+		EventCallback_t OnClose{ NULL };
+		SIZE GetSize() 
+		{
+			RECT rect;
+			if (GetWindowRect(m_hWnd, &rect))
+			{
+				int width = rect.right - rect.left;
+				int height = rect.bottom - rect.top;
+				SIZE res;
+				res.cx = width;
+				res.cy = height;
+				return res;
+			}
+			return SIZE();
+		}
 		void SetBackroundColor(COLORREF color);
 		BOOL Activate();
 		void HideAll();
@@ -353,13 +421,14 @@ namespace MUI {
 		GdiplusStartupInput gdiplusStartupInput;
 		ULONG_PTR           gdiplusToken;
 #endif // DEBUG
+		void AppendChilds(Menu* menu, HMENU hMenu);
 		void RepositionComponents();
-		void* onClose = NULL;
 		BOOL b_useGrid = FALSE;
 		const wchar_t* m_title;
 		int m_width, m_height;
 		DWORD m_iconId;
 		Grid* m_grid = NULL;
+		MenuBar* m_dockMenu = NULL;
 		std::unordered_map<uint64_t, UIComponent*> m_Assets;
 		UINT m_Index = 1;
 		std::vector<uint64_t> m_UnusedIndexes;
@@ -368,9 +437,10 @@ namespace MUI {
 		HINSTANCE m_hInstance = NULL;
 		HFONT m_hFont = NULL;
 		HBRUSH m_hBrushBackground = NULL;
+		COLORREF m_cBackground = MUI::Color::WHITE;
 		static Window* w_GetObject(HWND hwnd);
 		void v_RegisterClass(const wchar_t* name, DWORD iconId);
-		void OnCommand(WPARAM wParam, LPARAM lParam);
+		void OnCommand(UINT uMsg,WPARAM wParam, LPARAM lParam);
 		void OnDestroy();
 		LRESULT OnColorStatic(WPARAM wParam);
 		LRESULT OnColorEdit(WPARAM wParam);

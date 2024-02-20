@@ -46,7 +46,7 @@ namespace MUI
 	{
 		if (row == this->m_rows.size() || column == this->m_columns.size())
 		{
-			OutputDebugString(L"Row index or column index is out of range\n");
+			throw std::exception("Row index or column index is out of range\n");
 			return;
 		}
 		GridItem* itm = new GridItem();

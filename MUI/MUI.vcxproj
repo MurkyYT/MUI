@@ -140,6 +140,7 @@
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="ListItem.cpp" />
     <ClCompile Include="ListView.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="RadioButton.cpp" />
     <ClCompile Include="RadioGroup.cpp" />
     <ClCompile Include="TextBox.cpp" />

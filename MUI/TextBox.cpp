@@ -17,12 +17,13 @@ namespace MUI {
 	}
 	std::wstring TextBox::GetText()
 	{
-		wchar_t buffer[MAX_PATH];
+		int len = GetWindowTextLengthW(this->handle) + 1;
+		wchar_t* buffer = new wchar_t[len];
 		int suc = GetDlgItemText(
 			this->windowHandle,
 			this->id,
 			buffer,
-			MAX_PATH
+			len
 		);
 		if (suc)
 			return std::wstring(buffer);

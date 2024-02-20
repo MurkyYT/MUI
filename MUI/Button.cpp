@@ -13,9 +13,18 @@ namespace MUI {
 		if (customColor)
 			this->style |= BS_OWNERDRAW;
 	}
-	void Button::SubscribeToOnClick(void* func)
+	void Button::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		if (func)
-			this->onEvent = func;
+		switch (HIWORD(wParam))
+		{
+		case BN_CLICKED:
+		{
+			if (this->OnClick)
+				OnClick(this, { uMsg,wParam,lParam });
+			
+		}
+		}
+		if (this->parent)
+			S_HandleEvents(this->parent, uMsg, wParam,lParam);
 	}
 }
