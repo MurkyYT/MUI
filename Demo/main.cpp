@@ -4,7 +4,7 @@
 #include "MainWindow.h"
 
 
-INT WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT nCmdShow) {
+INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT nCmdShow) {
     (void)hPrevInstance;
     (void)lpCmdLine;
    
