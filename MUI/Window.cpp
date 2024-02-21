@@ -59,7 +59,7 @@ namespace MUI
 			this->m_hInstance,
 			this
 		);
-		m_Windows += 1;
+		m_Windows++;
 		m_Destroyed = FALSE;
 #ifdef DEBUG
 		GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
@@ -391,17 +391,25 @@ namespace MUI
 		}
 	}
 	void Window::OnDestroy() {
-		DeleteObject(this->m_hFont);
-		DeleteObject(this->m_hBrushBackground);
-		this->m_Assets.erase(this->m_Assets.begin(), this->m_Assets.end());
-		this->m_UnusedIndexes.erase(this->m_UnusedIndexes.begin(), this->m_UnusedIndexes.end());
-		m_Index = 1;
-		m_Windows--;
-		m_Destroyed = TRUE;
+		if (!m_Destroyed) {
+			DeleteObject(this->m_hFont);
+			DeleteObject(this->m_hBrushBackground);
+			for (size_t i = 1; i < this->m_Index; i++)
+				delete this->m_Assets[i];
+			this->m_Assets.erase(this->m_Assets.begin(), this->m_Assets.end());
+			this->m_UnusedIndexes.erase(this->m_UnusedIndexes.begin(), this->m_UnusedIndexes.end());
+			if (m_grid)
+				delete m_grid;
+			if (m_dockMenu)
+				delete m_dockMenu;
+			m_Index = 1;
+			m_Windows--;
+			m_Destroyed = TRUE;
 #if EXIT_ON_CLOSE
-		if (m_Windows <= 0)
-			PostQuitMessage(0);
+			if (m_Windows <= 0)
+				PostQuitMessage(0);
 #endif // EXIT_ON_CLOSE
+		}
 	}
 	void Window::OnCreate()
 	{

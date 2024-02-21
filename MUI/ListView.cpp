@@ -2,6 +2,10 @@
 
 namespace MUI
 {
+	ListView::~ListView()
+	{
+		this->Clear();
+	}
 	ListView::ListView(int x,int y,int width, int height)
 	{
 		this->columnIndex = 0;
@@ -26,6 +30,10 @@ namespace MUI
 	{
 		ImageList_RemoveAll(this->hLarge);
 		ImageList_RemoveAll(this->hSmall);
+		if (hLarge)
+			ImageList_Destroy(hLarge);
+		if (hSmall)
+			ImageList_Destroy(hSmall);
 		this->hLarge = ImageList_Create(32,
 			32,
 			ILC_COLOR32, 3, 0);
@@ -41,12 +49,15 @@ namespace MUI
 	void ListView::DeleteItemAt(int i)
 	{
 		ListView_DeleteItem(this->handle,i);
+		delete m_Items[i];
 		this->m_Items.erase(this->m_Items.begin() + i);
 		this->itemIndex--;
 	}
 	void ListView::ClearItems()
 	{
 		ListView_DeleteAllItems(this->handle);
+		for (size_t i = 0; i < m_Items.size(); i++)
+			delete m_Items[i];
 		this->m_Items.erase(this->m_Items.begin(), this->m_Items.end());
 		this->itemIndex = 0;
 	}
@@ -68,13 +79,13 @@ namespace MUI
 	}
 	ListItem* ListView::GetItemAt(int i)
 	{
-		return &this->m_Items[i];
+		return this->m_Items[i];
 	}
 	ListItem* ListView::GetSelected()
 	{
 		int iPos = ListView_GetNextItem(this->handle, -1, LVNI_SELECTED);
 		if(iPos != -1)
-			return &this->m_Items[iPos];
+			return this->m_Items[iPos];
 		return NULL;
 	}
 	BOOL ListView::AddIcon(HICON icon)
@@ -114,7 +125,7 @@ namespace MUI
 			ListView_SetItem(this->handle, (LPARAM)&lvi);
 			index++;
 		}
-		this->m_Items.push_back(ListItem(*item));
+		this->m_Items.push_back(item);
 		return GetLastError() == 0;
 	}
 }

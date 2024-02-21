@@ -1,6 +1,10 @@
 #include "MUI.h"
 namespace MUI
 {
+	ListItem::~ListItem()
+	{
+		values.clear();
+	}
 	ListItem::ListItem(int imageIndex, std::vector<std::wstring> values)
 	{
 		this->imageIndex = imageIndex;

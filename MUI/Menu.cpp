@@ -5,10 +5,20 @@ namespace MUI
 	{
 		this->m_menus.push_back(menu);
 	}
+	MenuBar::~MenuBar()
+	{
+		for (size_t i = 0; i < m_menus.size(); i++)
+			delete m_menus[i];
+	}
 	Separator::Separator()
 	{
 		this->style = MF_SEPARATOR;
 		this->type = UISeparator;
+	}
+	Menu::~Menu() 
+	{
+		for (size_t i = 0; i < m_separators.size(); i++)
+			delete m_separators[i];
 	}
 	Menu::Menu(LPCWSTR text)
 	{
@@ -25,6 +35,7 @@ namespace MUI
 	{
 		this->m_childs.push_back(sep);
 		this->m_menus.push_back(NULL);
+		this->m_separators.push_back(sep);
 	}
 	BOOL Menu::IsChecked()
 	{

@@ -35,7 +35,6 @@ using namespace Gdiplus;
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 #pragma endregion
-
 namespace MUI {
 	static inline bool IsDarkMode()
 	{
@@ -115,7 +114,9 @@ namespace MUI {
 		friend class Grid;
 		friend class GridRow;
 		friend class GridColumn;
+		friend class ContextMenu;
 	public:
+		virtual ~UIComponent() {};
 		BOOL SetStyle(DWORD newStyle);
 		DWORD GetStyle();
 		void SetColumnSpan(int span) { this->columnSpan = max(0, span); }
@@ -151,7 +152,7 @@ namespace MUI {
 		DWORD style = NULL;
 		COLORREF backgroundColor = NULL;
 		UIComponent* parent = NULL;
-		int x, y, width, height;
+		int x, y, width, height = 0;
 		int columnSpan = 0;
 		int rowSpan = 0;
 	};
@@ -170,7 +171,9 @@ namespace MUI {
 	class Menu : public MUI::UIComponent
 	{
 		friend class Window;
+		friend class ContextMenu;
 	public:
+		~Menu();
 		Menu(LPCWSTR text);
 		void Add(Menu* menu);
 		void Add(Separator* sep);
@@ -182,12 +185,30 @@ namespace MUI {
 		HMENU m_ParentHMENU;
 		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<Menu*> m_menus;
+		std::vector<Separator*> m_separators;
 		std::vector<UIComponent*> m_childs;
 	};
-	class MenuBar : public MUI::UIComponent
+	class ContextMenu : private MUI::UIComponent
 	{
 		friend class Window;
 	public:
+		~ContextMenu();
+		void Add(Menu* menu);
+		void Add(Separator* sep);
+		void Open();
+	private:
+		std::vector<Menu*> m_menus;
+		std::vector<UIComponent*> m_childs;
+		std::unordered_map<uint64_t, UIComponent*> m_Assets;
+		static LRESULT CALLBACK SubclassWndProc(HWND hwnd, UINT wm, WPARAM wParam, LPARAM lParam);
+		void AppendChilds(Menu* menu, HMENU hMenu);
+		UINT m_Index = 1;
+	};
+	class MenuBar /*: public MUI::UIComponent*/
+	{
+		friend class Window;
+	public:
+		~MenuBar();
 		void Add(Menu* menu);
 	private:
 		std::vector<Menu*> m_menus;
@@ -240,6 +261,7 @@ namespace MUI {
 	class Grid {
 		friend class Window;
 	public:
+		~Grid();
 		Grid();
 		std::vector<UIComponent*> GetComponents();
 		std::vector<GridItem*> GetItems() { return this->m_items; }
@@ -271,6 +293,7 @@ namespace MUI {
 	{
 		friend class ListView;
 	public:
+		~ListItem();
 		ListItem(int imageIndex, std::vector<std::wstring> values);
 		void SetImageIndex(int index);
 		std::vector<std::wstring> GetValues();
@@ -282,6 +305,7 @@ namespace MUI {
 	class ListView : public MUI::UIComponent
 	{
 	public:
+		~ListView();
 		ListView(int x, int y, int width, int height);
 		BOOL AddColumn(const wchar_t* title, int length = 100);
 		BOOL AddItem(ListItem* item);
@@ -297,7 +321,7 @@ namespace MUI {
 		void ClearItems();
 		void Clear();
 	private:
-		std::vector<ListItem> m_Items;
+		std::vector<ListItem*> m_Items;
 		UINT columnIndex;
 		UINT itemIndex;
 		HIMAGELIST hLarge;   // Image list for icon view.
@@ -347,6 +371,10 @@ namespace MUI {
 		TextBox(LPCWSTR text, BOOL number, int x, int y, int width, int height);
 		std::wstring GetText();
 		int GetNumber();
+		/*void EnableHorizontalScrollbar(BOOL isEnabled);
+		void EnableVerticalScrollbar(BOOL isEnabled);
+		BOOL HorizontalScrollbarEnabled();
+		BOOL VerticalScrollbarEnabled();*/
 	private:
 		BOOL isNum;
 	};
@@ -402,7 +430,7 @@ namespace MUI {
 			{
 				int width = rect.right - rect.left;
 				int height = rect.bottom - rect.top;
-				SIZE res;
+				SIZE res{};
 				res.cx = width;
 				res.cy = height;
 				return res;

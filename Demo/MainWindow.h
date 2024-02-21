@@ -13,6 +13,8 @@ private:
 	void OpenGridExample();
 	void OpenControlsDemo();
 	void ShowAbout();
+	void ControlsDemoClosed();
+	void GridDemoClosed();
 	GridDemoWindow* gridDemo;
 	ControlsDemoWindow* controlsDemo;
 	void InitializeComponent()

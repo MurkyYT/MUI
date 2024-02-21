@@ -7,6 +7,8 @@ void MainWindow::OpenGridExample()
 {
     if (!gridDemo || gridDemo->IsHidden())
     {
+        if (gridDemo)
+            delete gridDemo;
         gridDemo = new GridDemoWindow();
         gridDemo->Show();
     }
@@ -15,13 +17,16 @@ void MainWindow::OpenGridExample()
 }
 void MainWindow::OpenControlsDemo()
 {
-    if (!controlsDemo || controlsDemo->IsHidden())
-    {
-        controlsDemo = new ControlsDemoWindow();
-        controlsDemo->Show();
-    }
-    else
-        controlsDemo->Activate();
+
+	if (!controlsDemo || controlsDemo->IsHidden())
+	{
+        if(controlsDemo)
+            delete controlsDemo;
+		controlsDemo = new ControlsDemoWindow();
+		controlsDemo->Show();
+	}
+	else
+		controlsDemo->Activate();
 }
 void MainWindow::ShowAbout()
 {

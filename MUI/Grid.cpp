@@ -1,6 +1,21 @@
 #include "MUI.h"
 namespace MUI
 {
+	Grid::~Grid()
+	{
+		for (size_t i = 0; i < m_rows.size(); i++)
+			delete m_rows[i];
+		for (size_t i = 0; i < m_columns.size(); i++)
+			delete m_columns[i];
+		for (size_t i = 0; i < m_items.size(); i++)
+			delete m_items[i];
+		if(!m_items.empty())
+			m_items.clear();
+		if (!m_rows.empty())
+			m_rows.clear();
+		if (!m_columns.empty())
+			m_columns.clear();
+	}
 	Grid::Grid()
 	{
 		this->AddColumn(0, L"*");

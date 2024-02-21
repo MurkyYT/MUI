@@ -4,19 +4,25 @@
 #include "MainWindow.h"
 
 
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, INT nCmdShow) {
-    (void)hPrevInstance;
-    (void)lpCmdLine;
-   
-    MainWindow* mainWind = new MainWindow();
-    mainWind->Show();
+INT WINAPI WinMain(
+	_In_ HINSTANCE hInstance,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPSTR lpCmdLine,
+	_In_ int nShowCmd
+)
+{
+	(void)hPrevInstance;
+	(void)lpCmdLine;
 
-    MSG msg = {};
+	MainWindow* mainWind = new MainWindow();
+	mainWind->Show();
 
-    while (GetMessage(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+	MSG msg = {};
 
-    return static_cast<int>(msg.wParam);
+	while (GetMessage(&msg, nullptr, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	return static_cast<int>(msg.wParam);
 }
