@@ -395,7 +395,14 @@ namespace MUI
 			DeleteObject(this->m_hFont);
 			DeleteObject(this->m_hBrushBackground);
 			for (size_t i = 1; i < this->m_Index; i++)
-				delete this->m_Assets[i];
+				switch (m_Assets[i]->type)
+				{
+				case UISeparator:
+				case UIMenu:
+					break;
+				default:
+					delete this->m_Assets[i];
+				}
 			this->m_Assets.erase(this->m_Assets.begin(), this->m_Assets.end());
 			this->m_UnusedIndexes.erase(this->m_UnusedIndexes.begin(), this->m_UnusedIndexes.end());
 			if (m_grid)

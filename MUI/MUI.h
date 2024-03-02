@@ -6,6 +6,7 @@
 #include <commctrl.h> 
 #include <dwmapi.h>
 #include <functional>
+#include <memory>
 #pragma comment (lib, "dwmapi")
 #pragma comment (lib, "comctl32")
 #pragma endregion

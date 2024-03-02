@@ -13,10 +13,8 @@ private:
 	void OpenGridExample();
 	void OpenControlsDemo();
 	void ShowAbout();
-	void ControlsDemoClosed();
-	void GridDemoClosed();
-	GridDemoWindow* gridDemo;
-	ControlsDemoWindow* controlsDemo;
+	std::shared_ptr<GridDemoWindow> gridDemo;
+	std::shared_ptr<ControlsDemoWindow> controlsDemo;
 	void InitializeComponent()
 	{
 		MenuBar* dockMenu = new MenuBar();

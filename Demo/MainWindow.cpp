@@ -7,9 +7,7 @@ void MainWindow::OpenGridExample()
 {
     if (!gridDemo || gridDemo->IsHidden())
     {
-        if (gridDemo)
-            delete gridDemo;
-        gridDemo = new GridDemoWindow();
+        gridDemo = std::shared_ptr<GridDemoWindow>(new GridDemoWindow());
         gridDemo->Show();
     }
     else
@@ -20,9 +18,7 @@ void MainWindow::OpenControlsDemo()
 
 	if (!controlsDemo || controlsDemo->IsHidden())
 	{
-        if(controlsDemo)
-            delete controlsDemo;
-		controlsDemo = new ControlsDemoWindow();
+		controlsDemo = std::shared_ptr<ControlsDemoWindow>(new ControlsDemoWindow());
 		controlsDemo->Show();
 	}
 	else
