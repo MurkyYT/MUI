@@ -1,21 +1,21 @@
 #include "MUI.h"
 namespace MUI
 {
-	Grid::~Grid()
+	/*Grid::~Grid()
 	{
 		for (size_t i = 0; i < m_rows.size(); i++)
-			delete m_rows[i];
+			m_rows[i].reset();
 		for (size_t i = 0; i < m_columns.size(); i++)
-			delete m_columns[i];
+			m_columns[i].reset();
 		for (size_t i = 0; i < m_items.size(); i++)
-			delete m_items[i];
+			m_items[i].reset();
 		if(!m_items.empty())
 			m_items.clear();
 		if (!m_rows.empty())
 			m_rows.clear();
 		if (!m_columns.empty())
 			m_columns.clear();
-	}
+	}*/
 	Grid::Grid()
 	{
 		this->AddColumn(0, L"*");
@@ -24,7 +24,7 @@ namespace MUI
 	std::vector<UIComponent*> Grid::GetComponents()
 	{
 		std::vector<UIComponent*> res;
-		for (GridItem* itm : this->m_items) {
+		for (std::shared_ptr<GridItem> itm : this->m_items) {
 			res.push_back(itm->component);
 		}
 		return res;
@@ -33,7 +33,7 @@ namespace MUI
 	{
 		if (!m_AddedCustomColumn && this->m_columns.size() > 0)
 		{
-			delete this->m_columns[0];
+			this->m_columns[0].reset();
 			this->m_columns.erase(this->m_columns.begin());
 			m_AddedCustomColumn = TRUE;
 		}
@@ -41,13 +41,13 @@ namespace MUI
 		col->x = x;
 		col->width = 0;
 		col->text_width = width;
-		this->m_columns.push_back(col);
+		this->m_columns.push_back(std::shared_ptr<GridColumn>(col));
 	}
 	void Grid::AddRow(int y, const wchar_t* height)
 	{
 		if (!m_AddedCustomRow && this->m_rows.size() > 0)
 		{
-			delete this->m_rows[0];
+			this->m_rows[0].reset();
 			this->m_rows.erase(this->m_rows.begin());
 			m_AddedCustomRow = TRUE;
 		}
@@ -55,7 +55,7 @@ namespace MUI
 		row->y = y;
 		row->height = 0;
 		row->text_height = height;
-		this->m_rows.push_back(row);
+		this->m_rows.push_back(std::shared_ptr<GridRow>(row));
 	}
 	void Grid::AddItem(UIComponent* comp, int row, int column)
 	{
@@ -70,7 +70,7 @@ namespace MUI
 		itm->component = comp;
 		this->m_columns[column]->components.push_back(comp);
 		this->m_rows[row]->components.push_back(comp);
-		this->m_items.push_back(itm);
+		this->m_items.push_back(std::shared_ptr<GridItem>(itm));
 		this->Reorder(comp->windowHandle);
 		this->Reposition(itm);
 	}
@@ -92,7 +92,7 @@ namespace MUI
 			int freeHeight = height;
 			for (int i = 0; i < this->m_columns.size(); i++) 
 			{
-				GridColumn* o_column = this->m_columns[i];
+				GridColumn* o_column = this->m_columns[i].get();
 				if (o_column->text_width == L"Auto")
 				{
 					o_column->width = o_column->GetBiggestWidth();
@@ -132,7 +132,7 @@ namespace MUI
 				}
 			}
 			for (int i = 0; i < this->m_rows.size(); i++) {
-				GridRow* o_row = this->m_rows[i];
+				GridRow* o_row = this->m_rows[i].get();
 				if (o_row->text_height == L"Auto")
 				{
 					o_row->height = o_row->GetBiggestHeight();
@@ -171,8 +171,8 @@ namespace MUI
 						this->m_rows[index + 1]->y = o_row->height + o_row->y;
 				}
 			}
-			GridRow* row = this->m_rows[m_rows.size() - 1];
-			GridColumn* col = this->m_columns[m_columns.size() - 1];
+			GridRow* row = this->m_rows[m_rows.size() - 1].get();
+			GridColumn* col = this->m_columns[m_columns.size() - 1].get();
 			if (row->text_height == L"*")
 				row->height = height - row->y;
 			if (col->text_width == L"*")
@@ -184,8 +184,8 @@ namespace MUI
 		RECT rect;
 		if (GetClientRect(itm->component->windowHandle, &rect))
 		{
-			GridColumn* o_column = this->m_columns[itm->column];
-			GridRow* o_row = this->m_rows[itm->row];
+			GridColumn* o_column = this->m_columns[itm->column].get();
+			GridRow* o_row = this->m_rows[itm->row].get();
 			UIComponent* comp = itm->component;
 			int width = max(o_column->width, 0);
 			int height = max(o_row->height, 0);

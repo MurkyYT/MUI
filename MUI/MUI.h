@@ -262,19 +262,19 @@ namespace MUI {
 	class Grid {
 		friend class Window;
 	public:
-		~Grid();
+		/*~Grid();*/
 		Grid();
 		std::vector<UIComponent*> GetComponents();
-		std::vector<GridItem*> GetItems() { return this->m_items; }
+		std::vector<std::shared_ptr<GridItem>> GetItems() { return this->m_items; }
 		void AddColumn(int x,const wchar_t* width);
 		void AddRow(int y,const wchar_t* height);
 		void AddItem(UIComponent* comp, int row, int column);
 	private:
 		void Reorder(HWND windowHandle);
 		void Reposition(GridItem* itm);
-		std::vector<GridRow*> m_rows;
-		std::vector<GridColumn*> m_columns;
-		std::vector<GridItem*> m_items;
+		std::vector<std::shared_ptr<GridRow>> m_rows;
+		std::vector<std::shared_ptr<GridColumn>> m_columns;
+		std::vector<std::shared_ptr<GridItem>> m_items;
 		BOOL m_AddedCustomRow = FALSE;
 		BOOL m_AddedCustomColumn = FALSE;
 	};
@@ -456,9 +456,9 @@ namespace MUI {
 		const wchar_t* m_title;
 		int m_width, m_height;
 		DWORD m_iconId;
-		Grid* m_grid = NULL;
-		MenuBar* m_dockMenu = NULL;
-		std::unordered_map<uint64_t, UIComponent*> m_Assets;
+		std::shared_ptr<Grid> m_grid = NULL;
+		std::shared_ptr<MenuBar> m_dockMenu = NULL;
+		std::unordered_map<uint64_t, std::shared_ptr<UIComponent>> m_Assets;
 		UINT m_Index = 1;
 		std::vector<uint64_t> m_UnusedIndexes;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

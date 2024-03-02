@@ -94,15 +94,14 @@ namespace MUI
 	}
 	void Window::SetGrid(Grid* grid) 
 	{ 
-		this->m_grid = grid; 
+		this->m_grid = std::shared_ptr<Grid>(grid); 
 		this->b_useGrid = TRUE;
 		this->AddComponents(this->m_grid->GetComponents());
 	}
 	void Window::SetMenuBar(MenuBar* menu)
 	{
-		if (this->m_dockMenu)
-			delete m_dockMenu;
-		this->m_dockMenu = menu;
+		m_dockMenu.reset();
+		this->m_dockMenu = std::shared_ptr<MenuBar>(menu);
 		HMENU hMenubar = CreateMenu();
 		for (size_t i = 0; i < menu->m_menus.size(); i++)
 		{
@@ -130,7 +129,7 @@ namespace MUI
 				}
 				else
 					this->m_Index++;
-				m_Assets[index] = comp;
+				m_Assets[index] = std::shared_ptr<UIComponent>(comp);
 			}
 			if (comp->type == UIMenu)
 			{
@@ -187,7 +186,7 @@ namespace MUI
 		);
 		comp->id = (DWORD)index;
 		comp->windowHandle = this->m_hWnd;
-		this->m_Assets[index] = comp;
+		this->m_Assets[index] = std::shared_ptr<UIComponent>(comp);
 		if(!this->b_useGrid)
 			this->RepositionComponents();
 		return TRUE;
@@ -245,9 +244,9 @@ namespace MUI
 				{
 					int width = rect.right - rect.left;
 					int height = rect.bottom - rect.top;
-					for (GridRow* row : window->m_grid->m_rows)
+					for (std::shared_ptr<GridRow> row : window->m_grid->m_rows)
 						graphics.DrawLine(&pen, 0, row->GetY(), width, row->GetY());
-					for (GridColumn* col : window->m_grid->m_columns)
+					for (std::shared_ptr<GridColumn> col : window->m_grid->m_columns)
 						graphics.DrawLine(&pen, col->GetX(), 0, col->GetX(), height);
 					graphics.DrawLine(&pen, width - 1, 0, width - 1, height);
 					graphics.DrawLine(&pen, 0, height - 1, width - 1, height - 1);
@@ -284,8 +283,8 @@ namespace MUI
 			{
 				if (window->m_grid) {
 					window->m_grid->Reorder(window->m_hWnd);
-					for (GridItem* itm : window->m_grid->GetItems())
-						window->m_grid->Reposition(itm);
+					for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
+						window->m_grid->Reposition(itm.get());
 				}
 				else 
 				{
@@ -386,7 +385,7 @@ namespace MUI
 
 		if(this->m_Assets.find((UINT)wParam) != m_Assets.end())
 		{
-			UIComponent* comp = this->m_Assets[(UINT)wParam];
+			UIComponent* comp = this->m_Assets[(UINT)wParam].get();
 			comp->HandleEvents(uMsg,wParam,lParam);
 		}
 	}
@@ -394,7 +393,7 @@ namespace MUI
 		if (!m_Destroyed) {
 			DeleteObject(this->m_hFont);
 			DeleteObject(this->m_hBrushBackground);
-			for (size_t i = 1; i < this->m_Index; i++)
+			/*for (size_t i = 1; i < this->m_Index; i++)
 				switch (m_Assets[i]->type)
 				{
 				case UISeparator:
@@ -402,13 +401,11 @@ namespace MUI
 					break;
 				default:
 					delete this->m_Assets[i];
-				}
+				}*/
 			this->m_Assets.erase(this->m_Assets.begin(), this->m_Assets.end());
 			this->m_UnusedIndexes.erase(this->m_UnusedIndexes.begin(), this->m_UnusedIndexes.end());
-			if (m_grid)
-				delete m_grid;
-			if (m_dockMenu)
-				delete m_dockMenu;
+			m_dockMenu.reset();
+			m_grid.reset();
 			m_Index = 1;
 			m_Windows--;
 			m_Destroyed = TRUE;
