@@ -74,11 +74,6 @@ namespace MUI
 		this->Reorder(comp->windowHandle);
 		this->Reposition(itm);
 	}
-	int clip(int n, int min) {
-		if (n < min)
-			return min;
-		return n;
-	}
 	void Grid::Reorder(HWND windowHandle)
 	{
 		RECT rect;
@@ -115,6 +110,7 @@ namespace MUI
 						if (i + 1 < this->m_columns.size())
 							this->m_columns[i + 1]->x = o_column->width + o_column->x;
 						freeWidth -= lenInt;
+						free(s);
 					}
 				}
 			}
@@ -155,6 +151,7 @@ namespace MUI
 						if (i + 1 < this->m_rows.size())
 							this->m_rows[i + 1]->y = o_row->height + o_row->y;
 						freeHeight -= lenInt;
+						free(s);
 					}
 				}
 			}

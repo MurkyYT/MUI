@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DarkMode.h" />
     <ClInclude Include="MUI.h" />
   </ItemGroup>
   <ItemGroup>

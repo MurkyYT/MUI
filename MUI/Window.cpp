@@ -1,4 +1,5 @@
 #include "MUI.h"
+#include "DarkMode.h"
 
 namespace MUI 
 {
@@ -219,6 +220,7 @@ namespace MUI
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
 			BOOL value = IsDarkMode();
 			DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
+			InitDarkMode();
 			window->m_hWnd = hWnd;
 		}
 		else {
