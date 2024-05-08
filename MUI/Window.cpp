@@ -218,9 +218,9 @@ namespace MUI
 			CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
 			window = reinterpret_cast<Window*>(pCreate->lpCreateParams);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
-			BOOL value = IsDarkMode();
-			DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value));
 			InitDarkMode();
+			_AllowDarkModeForWindow(hWnd, TRUE);
+			RefreshTitleBarThemeColor(hWnd);
 			window->m_hWnd = hWnd;
 		}
 		else {
@@ -229,7 +229,11 @@ namespace MUI
 
 		if (window) {
 			switch (uMsg) {
-
+			case WM_SETTINGCHANGE:
+			{
+				if(IsColorSchemeChangeMessage(lParam))
+					RefreshTitleBarThemeColor(hWnd);
+			}
 			case WM_PAINT:
 			{
 
