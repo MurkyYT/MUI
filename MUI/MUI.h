@@ -103,7 +103,8 @@ namespace MUI {
 		UIImage,
 		UIMenu,
 		UISeparator,
-		UIMenuBar
+		UIMenuBar,
+		UIComboBox
 	};
 	/*
 	Base class for each UIComponent
@@ -169,6 +170,30 @@ namespace MUI {
 	public:
 		Separator();
 	};
+	enum ComboBoxStyle {
+		Simple = CBS_SIMPLE,
+		DropDown = CBS_DROPDOWN,
+		DropDownList = CBS_DROPDOWNLIST
+	};
+	/*
+	* https://learn.microsoft.com/en-us/windows/win32/controls/create-a-simple-combo-box
+	* https://learn.microsoft.com/en-us/windows/win32/controls/about-combo-boxes
+	*/
+	class ComboBox : public MUI::UIComponent
+	{
+	public:
+		ComboBox(std::vector<std::wstring> items, ComboBoxStyle style);
+		ComboBox(ComboBoxStyle style);
+		std::wstring GetSelectedString();
+		int GetSelectedIndex();
+		std::vector<std::wstring> GetItems();
+		void AddItem(std::wstring item);
+		void DeleteItem(std::wstring item);
+		void DeleteItem(int i);
+	private:
+		std::vector<std::wstring> m_Items;
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+	};
 	class Menu : public MUI::UIComponent
 	{
 		friend class Window;
@@ -184,7 +209,7 @@ namespace MUI {
 	private:
 		HMENU m_hMenu;
 		HMENU m_ParentHMENU;
-		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<Menu*> m_menus;
 		std::vector<Separator*> m_separators;
 		std::vector<UIComponent*> m_childs;
@@ -307,7 +332,7 @@ namespace MUI {
 	{
 	public:
 		~ListView();
-		ListView(int x, int y, int width, int height);
+		ListView(int x, int y, int width, int height, BOOL autoWidth = TRUE);
 		BOOL AddColumn(const wchar_t* title, int length = 100);
 		BOOL AddItem(ListItem* item);
 		BOOL AddIcon(HICON icon);
@@ -324,6 +349,7 @@ namespace MUI {
 	private:
 		std::vector<ListItem*> m_Items;
 		UINT columnIndex;
+		BOOL autoWidth;
 		UINT itemIndex;
 		HIMAGELIST hLarge;   // Image list for icon view.
 		HIMAGELIST hSmall;   // Image list for other views.
@@ -335,7 +361,7 @@ namespace MUI {
 		RadioButton(LPCWSTR text, int x, int y, int width, int height);
 		EventCallback_t OnClick;
 	private:
-		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 	class RadioGroup : public MUI::UIComponent
 	{
@@ -345,7 +371,7 @@ namespace MUI {
 		void AddRadioButton(RadioButton* button);
 		EventCallback_t OnChange{ NULL };
 	private:
-		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<RadioButton*> m_Buttons;
 	};
 	class Button : public MUI::UIComponent
@@ -354,7 +380,7 @@ namespace MUI {
 		Button(LPCWSTR text, BOOL customColors, int x, int y, int width, int height);
 		EventCallback_t OnClick{ NULL };
 	private:
-		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 	class CheckBox : public MUI::UIComponent
 	{
@@ -364,7 +390,7 @@ namespace MUI {
 		void SetChecked(BOOL checked);
 		EventCallback_t OnClick{ NULL };
 	private:
-		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 	class TextBox : public MUI::UIComponent
 	{

@@ -42,8 +42,8 @@ private:
 		listView->Clear();
 		HICON ico = LoadIcon(this->GetHINSTACE(), MAKEINTRESOURCE(IDI_ICON1));
 		listView->AddIcon(ico);
-		listView->AddColumn(L"Test", 100);
-		listView->AddColumn(L"Test2", 100);
+		listView->AddColumn(L"Test", -1);
+		listView->AddColumn(L"Test2", -1);
 		ListItem* itm = new ListItem(0, std::vector<std::wstring> {L"TEST1", L"TEST2"});
 		listView->AddItem(itm);
 		ListItem* itm2 = new ListItem(0, std::vector<std::wstring> {L"TEST3", L"TEST4"});

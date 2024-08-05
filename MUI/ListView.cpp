@@ -6,7 +6,7 @@ namespace MUI
 	{
 		this->Clear();
 	}
-	ListView::ListView(int x,int y,int width, int height)
+	ListView::ListView(int x,int y,int width, int height, BOOL autoWidth)
 	{
 		this->columnIndex = 0;
 		this->itemIndex = 0;
@@ -17,6 +17,7 @@ namespace MUI
 		this->y = y;
 		this->width = width;
 		this->height = height;
+		this->autoWidth = autoWidth;
 		this->style = WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT |
 			 WS_EX_CLIENTEDGE;
 		this->hLarge = ImageList_Create(32,
@@ -115,7 +116,7 @@ namespace MUI
 		if (item->imageIndex > -1)
 			lvi.iImage = item->imageIndex;
 		lvi.iSubItem = 0;
-		lvi.pszText = (LPWSTR)L"1";
+		lvi.pszText = (LPWSTR)L"";
 		ListView_InsertItem(this->handle, (LPARAM)&lvi);
 		UINT index = 0;
 		for(std::wstring value : item->values)
@@ -123,6 +124,8 @@ namespace MUI
 			lvi.iSubItem = index;
 			lvi.pszText = (LPWSTR)value.c_str();
 			ListView_SetItem(this->handle, (LPARAM)&lvi);
+			if(this->autoWidth)
+				ListView_SetColumnWidth(this->handle, index, LVSCW_AUTOSIZE);
 			index++;
 		}
 		this->m_Items.push_back(item);

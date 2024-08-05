@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CheckBox.cpp" />
+    <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ContextMenu.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Image.cpp" />
