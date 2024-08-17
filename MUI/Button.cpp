@@ -9,7 +9,7 @@ namespace MUI {
 		this->y = y;
 		this->width = width;
 		this->height = height;
-		this->style = WS_CHILD | WS_VISIBLE | ES_CENTER;
+		this->style = WS_CHILD | WS_VISIBLE | ES_CENTER | WS_CLIPSIBLINGS;
 		if (customColor)
 			this->style |= BS_OWNERDRAW;
 	}

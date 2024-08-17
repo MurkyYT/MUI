@@ -1,9 +1,10 @@
 #pragma once
+#include <vector>
 #pragma region Includes
 #include <Windows.h>
 #include <string>
 #include <unordered_map>
-#include <commctrl.h> 
+#include <commctrl.h>
 #include <dwmapi.h>
 #include <functional>
 #include <memory>
@@ -13,10 +14,13 @@
 #pragma region Defines
 #define WINDOW_CLASS L"MUI_Window"
 #define DEFAULT_SIZE 500
+#define DIVIDER_CLASS_NAME L"MUI_Divider"
+#define DIVIDER_NOTIFY_MSG (WM_APP)
 #pragma endregion
 #pragma region CONFIG
 #define NEW_STYLE 1
 #define EXIT_ON_CLOSE 1
+#define DIVIDER_SIZE 4
 #define USE_MULTIPLE_WINDOW_CLASSES 0
 #pragma endregion
 #pragma region INTERNAL
@@ -71,8 +75,8 @@ namespace MUI {
 	{
 		LONG left, right, top, bottom;
 		Margin(
-			LONG left = 0, 
-			LONG right = 0, 
+			LONG left = 0,
+			LONG right = 0,
 			LONG top = 0,
 			LONG bottom = 0) : left(left), right(right), top(top), bottom(bottom) {}
 	};
@@ -109,7 +113,7 @@ namespace MUI {
 	/*
 	Base class for each UIComponent
 	*/
-	
+
 	class UIComponent
 	{
 		friend class Window;
@@ -158,7 +162,7 @@ namespace MUI {
 		int columnSpan = 0;
 		int rowSpan = 0;
 	};
-	typedef struct 
+	typedef struct
 	{
 		UINT    msg;
 		WPARAM  wParam;
@@ -249,6 +253,7 @@ namespace MUI {
 		UIComponent* component;
 	};
 	class GridRow {
+		friend class Window;
 		friend class Grid;
 	public:
 		int GetY() { return this->y; }
@@ -267,11 +272,13 @@ namespace MUI {
 		}
 	};
 	class GridColumn {
+		friend class Window;
 		friend class Grid;
 	public:
 		int GetX() { return this->x; }
 	private:
 		int x;
+		double perc;
 		int width;
 		const wchar_t* text_width;
 		std::vector<UIComponent*> components;
@@ -284,6 +291,21 @@ namespace MUI {
 			return max;
 		}
 	};
+	class Divider {
+	    friend class Window;
+	    friend class Grid;
+	private:
+	    HWND hwnd;
+		LPARAM strct = NULL;
+		POINT start;
+		int fullWidth;
+        int width;
+        int height;
+		int row,column;
+	    int x;
+	    int y;
+		BOOL isVertical;
+	};
 	class Grid {
 		friend class Window;
 	public:
@@ -291,15 +313,19 @@ namespace MUI {
 		Grid();
 		std::vector<UIComponent*> GetComponents();
 		std::vector<std::shared_ptr<GridItem>> GetItems() { return this->m_items; }
+		std::vector<std::shared_ptr<Divider>> GetDividers();
 		void AddColumn(int x,const wchar_t* width);
+		void AddDivider(int column,int row, BOOL isVertical = FALSE);
 		void AddRow(int y,const wchar_t* height);
 		void AddItem(UIComponent* comp, int row, int column);
 	private:
-		void Reorder(HWND windowHandle);
+		void CalculateStarPercentages();
+		void Reorder(HWND windowHandle,BOOL firstRun = FALSE);
 		void Reposition(GridItem* itm);
 		std::vector<std::shared_ptr<GridRow>> m_rows;
 		std::vector<std::shared_ptr<GridColumn>> m_columns;
 		std::vector<std::shared_ptr<GridItem>> m_items;
+		std::unordered_map<int, std::unordered_map<int,std::shared_ptr<Divider>>> rowColToDivider;
 		BOOL m_AddedCustomRow = FALSE;
 		BOOL m_AddedCustomColumn = FALSE;
 	};
@@ -450,7 +476,7 @@ namespace MUI {
 		HINSTANCE GetHINSTACE() { return m_hInstance; }
 		void Close() { DestroyWindow(m_hWnd); }
 		EventCallback_t OnClose{ NULL };
-		SIZE GetSize() 
+		SIZE GetSize()
 		{
 			RECT rect;
 			if (GetWindowRect(m_hWnd, &rect))

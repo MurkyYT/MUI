@@ -10,7 +10,7 @@ namespace MUI {
 		this->y = y;
 		this->width = width;
 		this->height = height;
-		this->style = WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | WS_TABSTOP;
+		this->style = WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | WS_TABSTOP | WS_CLIPSIBLINGS;
 	}
 	void CheckBox::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{

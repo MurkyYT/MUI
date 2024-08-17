@@ -32,9 +32,10 @@ private:
 		textBlock = new TextBlock(L"", 180, 0, 70, 15);
 		textBlock->SetVerticalAligment(Center);
 		textBlock->SetText(L"Checked");
-		grid->AddColumn(0, L"Auto");
+		grid->AddColumn(0, L"*");
 		grid->AddColumn(0, L"*");
 		grid->AddColumn(0, L"Auto");
+		grid->AddDivider(1, 0,FALSE);
 		grid->AddItem(listView, 0, 1);
 		grid->AddItem(checkBox, 0, 2);
 		grid->AddItem(textBlock, 0, 0);
@@ -48,7 +49,6 @@ private:
 		listView->AddItem(itm);
 		ListItem* itm2 = new ListItem(0, std::vector<std::wstring> {L"TEST3", L"TEST4"});
 		listView->AddItem(itm2);
-		checkBox->SetChecked(1);	
+		checkBox->SetChecked(1);
 	}
 };
-

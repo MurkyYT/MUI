@@ -10,7 +10,7 @@ namespace MUI
 		this->y = y;
 		this->width = width;
 		this->height = height;
-		this->style = WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON | WS_TABSTOP;
+		this->style = WS_VISIBLE | WS_CHILD | BS_AUTORADIOBUTTON | WS_TABSTOP | WS_CLIPSIBLINGS;
 	}
 	void RadioButton::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{

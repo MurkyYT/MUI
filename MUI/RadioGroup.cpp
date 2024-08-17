@@ -10,7 +10,7 @@ namespace MUI
 		this->y = y;
 		this->width = width;
 		this->height = height;
-		this->style = WS_VISIBLE | WS_CHILD | BS_GROUPBOX | BS_CENTER;
+		this->style = WS_VISIBLE | WS_CHILD | BS_GROUPBOX | BS_CENTER | WS_CLIPSIBLINGS;
 	}
 	void RadioGroup::AddRadioButton(RadioButton* button)
 	{

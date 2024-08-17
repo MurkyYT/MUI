@@ -11,7 +11,7 @@ namespace MUI
 		this->y = y;
 		this->width = width;
 		this->height = height;
-		this->style = WS_VISIBLE | WS_CHILD | SS_BITMAP;
+		this->style = WS_VISIBLE | WS_CHILD | SS_BITMAP | WS_CLIPSIBLINGS;
 	}
 	void Image::SetImage(HBITMAP hBmp)
 	{

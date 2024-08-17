@@ -10,7 +10,7 @@ namespace MUI {
 		this->y = y;
 		this->width = width;
 		this->height = height;
-		this->style = WS_BORDER | WS_CHILD | WS_VISIBLE | ES_LEFT | ES_MULTILINE;
+		this->style = WS_BORDER | WS_CHILD | WS_VISIBLE | ES_LEFT | ES_MULTILINE | WS_CLIPSIBLINGS;
 		if (number)
 			this->style |= ES_NUMBER;
 		this->isNum = number;

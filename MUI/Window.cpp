@@ -1,7 +1,9 @@
 #include "MUI.h"
 #include "DarkMode.h"
+#include "Divider.h"
+#include <memory>
 
-namespace MUI 
+namespace MUI
 {
 	int Window::m_Windows = 0;
 	Window::Window() : m_hWnd(NULL), m_hInstance(GetModuleHandleW(NULL)) {
@@ -50,7 +52,7 @@ namespace MUI
 			0,
 			className.c_str(),
 			m_title,
-			WS_OVERLAPPEDWINDOW,
+			WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
 			m_width,
@@ -93,11 +95,44 @@ namespace MUI
 		for (size_t i = 1; i < m_Index; i++)
 			m_Assets[i]->Show();
 	}
-	void Window::SetGrid(Grid* grid) 
-	{ 
-		this->m_grid = std::shared_ptr<Grid>(grid); 
+	void Window::SetGrid(Grid* grid)
+	{
+		this->m_grid = std::shared_ptr<Grid>(grid);
 		this->b_useGrid = TRUE;
 		this->AddComponents(this->m_grid->GetComponents());
+		std::vector<std::shared_ptr<Divider>> dividers = this->m_grid->GetDividers();
+
+		Divider_Init(m_hInstance, DIVIDER_CLASS_NAME, CreateSolidBrush(MUI::Color::GRAY), DIVIDER_NOTIFY_MSG);
+
+		m_grid->Reorder(m_hWnd,TRUE);
+
+		for (std::shared_ptr<Divider> divider : dividers)
+		{
+		    if(divider->isVertical)
+			{
+				divider->y = m_grid->m_rows[divider->row]->y;
+				divider->x = m_grid->m_columns[divider->column]->x;
+				for (size_t i = 0; i < m_grid->m_rows[divider->row]->components.size(); i++) {
+					UIComponent* comp = m_grid->m_rows[divider->row]->components[i];
+					comp->m_margin.top += DIVIDER_SIZE;
+				}
+			    divider->width = this->GetSize().cx - divider->x;
+				divider->height = DIVIDER_SIZE;
+			}
+			else
+			{
+				divider->x = m_grid->m_columns[divider->column]->x;
+				divider->y = m_grid->m_rows[divider->row]->y;
+				for (size_t i = 0; i < m_grid->m_columns[divider->column]->components.size(); i++) {
+					UIComponent* comp = m_grid->m_columns[divider->column]->components[i];
+					comp->m_margin.left += DIVIDER_SIZE;
+				}
+			    divider->height = this->GetSize().cy - divider->y;
+				divider->width = DIVIDER_SIZE;
+			}
+			divider->hwnd = CreateWindowEx(0,DIVIDER_CLASS_NAME,L"",WS_CLIPSIBLINGS | WS_CHILD,divider->x,divider->y,divider->width,divider->height,this->m_hWnd,0,m_hInstance,NULL);
+			ShowWindow(divider->hwnd, SW_SHOW);
+		}
 	}
 	void Window::SetMenuBar(MenuBar* menu)
 	{
@@ -278,6 +313,67 @@ namespace MUI
 				return window->OnColorButton(wParam);
 			case WM_DRAWITEM:
 				return window->OnDraw(wParam, lParam);
+			case DIVIDER_NOTIFY_MSG:
+			{
+				switch (Divider_GetState(lParam))
+				{
+				case DIVIDER_START:
+				{
+					std::vector<std::shared_ptr<Divider>> dividers = window->m_grid->GetDividers();
+					for (std::shared_ptr<Divider> div : dividers)
+					{
+						if (div->hwnd == (HWND)wParam)
+						{
+							div->strct = lParam;
+							div->start = Divider_GetPosition(lParam);
+							GridColumn* right = window->m_grid->m_columns[div->column].get(), * left = window->m_grid->m_columns[div->column - 1].get();
+							size_t fullWidth = right->width + left->width;
+							div->fullWidth = fullWidth;
+							ScreenToClient(hWnd, &div->start);
+						}
+					}
+				}
+				break;
+				case DIVIDER_MOVE:
+				{
+					std::vector<std::shared_ptr<Divider>> dividers = window->m_grid->GetDividers();
+					for (std::shared_ptr<Divider> div : dividers)
+					{
+						if(div->hwnd == (HWND)wParam)
+						{
+							POINT pnt = Divider_GetPosition(lParam);
+							ScreenToClient(hWnd, &pnt);
+							if(div->isVertical)
+							{
+								window->m_grid->m_rows[div->row]->y = pnt.y;
+							}
+							else
+							{
+								if (pnt.x > window->m_grid->m_columns[div->column]->x + window->m_grid->m_columns[div->column]->width + DIVIDER_SIZE)
+									div->x = window->m_grid->m_columns[div->column]->x + window->m_grid->m_columns[div->column]->width - DIVIDER_SIZE;
+								else
+									div->x = pnt.x;
+							}
+							break;
+						}
+					}
+					if (window->m_grid) {
+						window->m_grid->Reorder(window->m_hWnd);
+						for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
+							window->m_grid->Reposition(itm.get());
+					}
+					break;
+				}
+				case DIVIDER_END:
+					if (window->m_grid) {
+						window->m_grid->Reorder(window->m_hWnd);
+						for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
+							window->m_grid->Reposition(itm.get());
+					}
+					break;
+				}
+				break;
+			}
 			case WM_GETMINMAXINFO:
 			{
 				LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
@@ -288,11 +384,25 @@ namespace MUI
 			case WM_SIZE:
 			{
 				if (window->m_grid) {
-					window->m_grid->Reorder(window->m_hWnd);
+					std::vector<std::shared_ptr<Divider>> dividers = window->m_grid->GetDividers();
+					for (std::shared_ptr<Divider> divider : dividers)
+					{
+						if (divider->isVertical)
+						{
+							divider->width = window->GetSize().cx - divider->x;
+							divider->height = DIVIDER_SIZE;
+						}
+						else
+						{
+							divider->height = window->GetSize().cy - divider->y;
+							divider->width = DIVIDER_SIZE;
+						}
+					}
+					window->m_grid->Reorder(window->m_hWnd,TRUE);
 					for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
 						window->m_grid->Reposition(itm.get());
 				}
-				else 
+				else
 				{
 					RECT rect;
 					if (GetClientRect(window->m_hWnd, &rect))
@@ -303,11 +413,12 @@ namespace MUI
 								rect.right - rect.left);
 					}
 				}
+				
 				break;
 			}
 			case WM_CLOSE:
 			{
-				if (window->OnClose) 
+				if (window->OnClose)
 					window->OnClose(NULL,{});
 #ifdef DEBUG
 				GdiplusShutdown(window->gdiplusToken);
@@ -353,7 +464,7 @@ namespace MUI
 	LRESULT Window::OnColorEdit(WPARAM wParam) {
 		HDC hdcEdit = (HDC)wParam;
 		if (this->m_EditBacgkround) {
-			
+
 			if (this->m_EditTextColor)
 				SetTextColor(hdcEdit, this->m_EditTextColor);
 			SetBkColor(hdcEdit, this->m_EditBacgkround);
