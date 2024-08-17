@@ -326,9 +326,6 @@ namespace MUI
 						{
 							div->strct = lParam;
 							div->start = Divider_GetPosition(lParam);
-							GridColumn* right = window->m_grid->m_columns[div->column].get(), * left = window->m_grid->m_columns[div->column - 1].get();
-							size_t fullWidth = right->width + left->width;
-							div->fullWidth = fullWidth;
 							ScreenToClient(hWnd, &div->start);
 						}
 					}

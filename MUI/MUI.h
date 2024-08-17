@@ -298,7 +298,6 @@ namespace MUI {
 	    HWND hwnd;
 		LPARAM strct = NULL;
 		POINT start;
-		int fullWidth;
         int width;
         int height;
 		int row,column;

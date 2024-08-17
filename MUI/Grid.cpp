@@ -250,7 +250,7 @@ namespace MUI
 					&& wcscmp(m_columns[div->column-1]->text_width, L"*") == 0)
 				{
 					GridColumn* right = m_columns[div->column].get(), *left = m_columns[div->column - 1].get();
-					size_t fullWidth = /*right->width + left->width*/div->fullWidth;
+					size_t fullWidth = right->width + left->width;
 					LONG newPos = Divider_GetMovement(div->strct) + div->start.x;
 
 					if(newPos < left->x)
