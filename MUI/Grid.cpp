@@ -61,6 +61,7 @@ namespace MUI
 		}
 		divider->row = row;
 		divider->column = column;
+		divider->isVertical = isVertical;
 		rowColToDivider[row][column] = divider;
 	}
 
@@ -90,6 +91,7 @@ namespace MUI
 		GridRow* row = new GridRow();
 		row->y = y;
 		row->height = 0;
+		row->perc = 1;
 		row->text_height = height;
 		this->m_rows.push_back(std::shared_ptr<GridRow>(row));
 	}
@@ -197,12 +199,18 @@ namespace MUI
 			}
 			if (starRows.size() > 0)
 			{
-				int eachStarHeight = freeHeight / (int)starRows.size();
+				double maxPerc = 0;
+				for (int i = 0; i < starRows.size(); i++)
+				{
+					std::tuple<GridRow*, int> row = starRows[i];
+					GridRow* o_row = std::get<0>(row);
+					maxPerc += o_row->perc;
+				}
 				for (int i = 0; i < starRows.size(); i++)
 				{
 					std::tuple<GridRow*, int> column = starRows[i];
 					GridRow* o_row = std::get<0>(column);
-					o_row->height = eachStarHeight;
+					o_row->height = (o_row->perc / maxPerc) * freeHeight;;
 					size_t index = std::get<1>(column);
 					if (index + 1 < this->m_rows.size())
 						this->m_rows[index + 1]->y = o_row->height + o_row->y;
@@ -242,15 +250,42 @@ namespace MUI
 				continue;
 			if(div->isVertical)
 			{
+				if (wcscmp(m_rows[div->row]->text_height, L"*") == 0
+					&& div->row - 1 >= 0
+					&& wcscmp(m_rows[div->row - 1]->text_height, L"*") == 0
+					&& div->start.x != -1 && div->start.y != -1)
+				{
+					GridRow* bottom = m_rows[div->row].get(), * top = m_rows[div->row - 1].get();
+					size_t fullHeight = top->height + bottom->height;
+					double fullPerc = top->perc + bottom->perc;
+					LONG newPos = Divider_GetMovement(div->strct) + div->start.y;
+
+					if (newPos < top->y)
+						newPos = top->y;
+					else if (newPos > bottom->y + bottom->height - DIVIDER_SIZE)
+						newPos = bottom->y + bottom->height - DIVIDER_SIZE;
+
+					double topSide = newPos - top->y;
+					double bottomSide = (top->y + fullHeight) - newPos;
+
+					top->perc = (topSide / fullHeight) * fullPerc;
+					bottom->perc = (bottomSide / fullHeight) * fullPerc;
+
+					bottom->y = topSide + top->y;
+					bottom->height = bottomSide;
+					top->height = topSide;
+				}
 			}
 			else
 			{
 				if(wcscmp(m_columns[div->column]->text_width,L"*") == 0
 					&& div->column - 1 >= 0
-					&& wcscmp(m_columns[div->column-1]->text_width, L"*") == 0)
+					&& wcscmp(m_columns[div->column-1]->text_width, L"*") == 0
+					&& div->start.x != -1 && div->start.y != -1)
 				{
 					GridColumn* right = m_columns[div->column].get(), *left = m_columns[div->column - 1].get();
 					size_t fullWidth = right->width + left->width;
+					double fullPerc = right->perc + left->perc;
 					LONG newPos = Divider_GetMovement(div->strct) + div->start.x;
 
 					if(newPos < left->x)
@@ -261,8 +296,8 @@ namespace MUI
 					double leftSide = newPos - left->x;
 					double rightSide = (left->x + fullWidth) - newPos;
 
-					left->perc = leftSide / fullWidth;
-					right->perc = rightSide / fullWidth;
+					left->perc = (leftSide / fullWidth) * fullPerc;
+					right->perc = (rightSide / fullWidth) * fullPerc;
 
 					right->x = leftSide + left->x;
 					right->width = rightSide;
@@ -288,7 +323,7 @@ namespace MUI
 				height += this->m_rows[itm->row + i]->height;
 			comp->x = o_column->x;
 			comp->y = o_row->y;
-			comp->reposition(height, width);
+			comp->reposition(height, width,comp->x,comp->y);
 		}
 		InvalidateRect(itm->component->windowHandle, NULL, FALSE);
 		UpdateWindow(itm->component->windowHandle);

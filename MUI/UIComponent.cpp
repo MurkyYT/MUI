@@ -2,31 +2,35 @@
 
 namespace MUI
 {
-	void UIComponent::reposition(int h,int w)
+	void UIComponent::reposition(int h,int w,int x,int y)
 	{
 		POINT pos
 		{
 			x = this->x,
 			y = this->y
 		};
-		this->UpdateVerticalAligment(pos, h);
-		this->UpdateHorizontalAligment(pos, w);
+		h = h - this->m_margin.bottom - this->m_margin.top;
+		w = w - this->m_margin.left - this->m_margin.right;
+		this->UpdateVerticalAligment(pos, h, y);
+		this->UpdateHorizontalAligment(pos, w, x);
 		pos.x = pos.x - this->m_margin.right + this->m_margin.left;
 		pos.y = pos.y - this->m_margin.bottom + this->m_margin.top;
-		MoveWindow(this->handle, pos.x, pos.y, this->width - m_margin.left - m_margin.right, this->height - m_margin.top - m_margin.bottom, TRUE);
+		MoveWindow(this->handle, pos.x, pos.y, min(w,this->width), min(h,this->height), TRUE);
+		InvalidateRect(this->handle, NULL, FALSE);
+		UpdateWindow(this->handle);
 	}
-	void UIComponent::UpdateVerticalAligment(POINT& pos, int h)
+	void UIComponent::UpdateVerticalAligment(POINT& pos, int h,int y)
 	{
 		switch (this->m_vAligment)
 		{
 		case MUI::Top:
-			pos.y = 0;
+			pos.y = y;
 			break;
 		case MUI::Bottom:
-			pos.y = h - this->height;
+			pos.y = y + h - this->height;
 			break;
 		case MUI::Center:
-			pos.y = h / 2 - this->height / 2;
+			pos.y = y + h / 2 - this->height / 2;
 			break;
 		case MUI::Stretch:
 			//pos.y = 0;
@@ -34,18 +38,18 @@ namespace MUI
 			break;
 		}
 	}
-	void UIComponent::UpdateHorizontalAligment(POINT& pos, int w)
+	void UIComponent::UpdateHorizontalAligment(POINT& pos, int w,int x)
 	{
 		switch (this->m_hAligment)
 		{
 		case MUI::Left:
-			pos.x = 0;
+			pos.x = x;
 			break;
 		case MUI::Right:
-			pos.x = w - this->width;
+			pos.x = x + w - this->width;
 			break;
 		case MUI::Center:
-			pos.x = w / 2 - this->width / 2;
+			pos.x = x + w / 2 - this->width / 2;
 			break;
 		case MUI::Stretch:
 			//pos.x = 0;

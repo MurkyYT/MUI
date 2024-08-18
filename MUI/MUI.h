@@ -143,9 +143,9 @@ namespace MUI {
 			o->HandleEvents(uMsg,wParam,lParam);
 		}
 		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) {};
-		virtual void reposition(int h, int w);
-		void UpdateHorizontalAligment(POINT& pos, int w);
-		void UpdateVerticalAligment(POINT& pos, int h);
+		virtual void reposition(int h, int w,int x,int y);
+		void UpdateHorizontalAligment(POINT& pos, int w,int x);
+		void UpdateVerticalAligment(POINT& pos, int h,int y);
 		UIType type = Null;
 		Aligment m_hAligment = None;
 		Aligment m_vAligment = None;
@@ -259,6 +259,7 @@ namespace MUI {
 		int GetY() { return this->y; }
 	private:
 		int y;
+		double perc;
 		int height;
 		const wchar_t* text_height;
 		std::vector<UIComponent*> components;

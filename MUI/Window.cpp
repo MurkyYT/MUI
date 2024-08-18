@@ -342,7 +342,10 @@ namespace MUI
 							ScreenToClient(hWnd, &pnt);
 							if(div->isVertical)
 							{
-								window->m_grid->m_rows[div->row]->y = pnt.y;
+								if (pnt.y > window->m_grid->m_rows[div->row]->y + window->m_grid->m_rows[div->row]->height + DIVIDER_SIZE)
+									div->y = window->m_grid->m_rows[div->row]->y + window->m_grid->m_rows[div->row]->height - DIVIDER_SIZE;
+								else
+									div->y = pnt.y;
 							}
 							else
 							{
@@ -366,6 +369,14 @@ namespace MUI
 						window->m_grid->Reorder(window->m_hWnd);
 						for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
 							window->m_grid->Reposition(itm.get());
+					}
+					std::vector<std::shared_ptr<Divider>> dividers = window->m_grid->GetDividers();
+					for (std::shared_ptr<Divider> div : dividers)
+					{
+						if (div->hwnd == (HWND)wParam)
+						{
+							div->start = POINT{ -1,-1 };
+						}
 					}
 					break;
 				}
@@ -407,7 +418,7 @@ namespace MUI
 						for (size_t i = 1; i < window->m_Index; i++)
 							window->m_Assets[i]->reposition(
 								rect.bottom - rect.top,
-								rect.right - rect.left);
+								rect.right - rect.left,0,0);
 					}
 				}
 				
@@ -432,14 +443,14 @@ namespace MUI
 	}
 	void Window::RepositionComponents()
 	{
-		RECT rect;
+		/*RECT rect;
 		if (GetClientRect(this->m_hWnd, &rect))
 		{
 			int width = rect.right - rect.left;
 			int height = rect.bottom - rect.top;
 			for (auto& comp : this->m_Assets)
-				comp.second->reposition(height, width);
-		}
+				comp.second->reposition(height, width,);
+		}*/
 	}
 	LRESULT Window::OnColorButton(WPARAM wParam) {
 		HDC hdcButton = (HDC)wParam;
