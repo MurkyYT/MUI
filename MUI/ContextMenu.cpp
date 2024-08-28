@@ -3,6 +3,9 @@ namespace MUI
 {
 	ContextMenu::~ContextMenu()
 	{
+		for (UIComponent* comp : m_childs)
+			delete comp;
+
 		m_Assets.clear();
 		m_childs.clear();
 		m_menus.clear();

@@ -211,12 +211,14 @@ namespace MUI {
 		BOOL IsChecked();
 		void SetChecked(BOOL checked);
 		void SetEnabled(BOOL enabled);
+		void Clear();
 		EventCallback_t OnClick;
 	private:
 		BOOL used = FALSE;
 		HMENU m_hMenu;
 		HMENU m_ParentHMENU;
 		UINT m_Index = 1;
+		BOOL onlySeparatorsClear = FALSE;
 		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<Menu*> m_menus;
 		std::vector<Separator*> m_separators;

@@ -10,8 +10,10 @@ namespace MUI
 	}
 	MenuBar::~MenuBar()
 	{
-		for (size_t i = 0; i < m_menus.size(); i++)
+		for (size_t i = 0; i < m_menus.size(); i++) {
+			m_menus[i]->onlySeparatorsClear = TRUE;
 			delete m_menus[i];
+		}
 	}
 	Separator::Separator()
 	{
@@ -20,14 +22,21 @@ namespace MUI
 	}
 	Menu::~Menu() 
 	{
-		for (size_t i = 0; i < m_separators.size(); i++)
-			delete m_separators[i];
+		Clear();
 	}
 	Menu::Menu(LPCWSTR text)
 	{
 		this->m_WindowName = text;
 		this->type = UIMenu;
 		this->style = MF_STRING;
+	}
+	void Menu::Clear()
+	{
+		for (size_t i = 0; i < m_separators.size(); i++)
+			delete m_separators[i];
+		if(!onlySeparatorsClear)
+			for (size_t i = 0; i < m_childs.size(); i++)
+				delete m_childs[i];
 	}
 	void Menu::Add(Menu* menu)
 	{
