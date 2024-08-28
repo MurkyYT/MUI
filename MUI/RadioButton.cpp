@@ -14,16 +14,23 @@ namespace MUI
 	}
 	void RadioButton::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		switch (HIWORD(wParam))
+		switch (uMsg)
 		{
-		case BN_CLICKED:
+		case WM_COMMAND:
 		{
-			if (OnClick)
-				OnClick(this,{uMsg,wParam,lParam});
+			switch (HIWORD(wParam))
+			{
+			case BN_CLICKED:
+			{
+				if (OnClick)
+					OnClick(this, { uMsg,wParam,lParam });
 
+			}
+			}
+			if (this->parent)
+				S_HandleEvents(this->parent, uMsg, wParam, lParam);
 		}
+		break;
 		}
-		if (this->parent)
-			S_HandleEvents(this->parent,uMsg, wParam,lParam);
 	}
 }

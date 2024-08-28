@@ -3,6 +3,9 @@ namespace MUI
 {
 	void MenuBar::Add(Menu* menu)
 	{
+		if (menu->used)
+			throw std::exception("Can't reuse same object more then once\n");
+		menu->used = TRUE;
 		this->m_menus.push_back(menu);
 	}
 	MenuBar::~MenuBar()
@@ -28,6 +31,9 @@ namespace MUI
 	}
 	void Menu::Add(Menu* menu)
 	{
+		if (menu->used)
+			throw std::exception("Can't reuse same object more then once\n");
+		menu->used = TRUE;
 		this->m_childs.push_back(menu);
 		this->m_menus.push_back(menu);
 	}
@@ -51,37 +57,43 @@ namespace MUI
 	}
 	void Menu::SetChecked(BOOL checked)
 	{
-		MENUITEMINFOW itmInfo = {};
-		ZeroMemory(&itmInfo, sizeof(MENUITEMINFOW));
-		itmInfo.fMask = MIIM_STATE;
-		itmInfo.cbSize = sizeof(itmInfo);
-		GetMenuItemInfoW(this->m_ParentHMENU, this->id, FALSE, &itmInfo);
-		DWORD error = GetLastError();
-		if (!error || !this->m_ParentHMENU)
-		{
-			if (checked) {
-				itmInfo.fState = itmInfo.fState | MF_CHECKED;
-				this->SetStyle(this->GetStyle() | MF_CHECKED);
-			}
-			else {
-				itmInfo.fState = itmInfo.fState & ~MF_CHECKED;
-				this->SetStyle(this->GetStyle() & ~MF_CHECKED);
-			}
-			SetMenuItemInfoW(this->m_ParentHMENU,this->id, FALSE, &itmInfo);
+		if (!checked) {
+			this->SetStyle(this->GetStyle() & ~MF_CHECKED);
 		}
+		else {
+			this->SetStyle(this->GetStyle() | MF_CHECKED);
+		}
+		ModifyMenu(this->m_ParentHMENU, this->id, MF_BYCOMMAND | this->GetStyle(), this->id, this->m_WindowName);
+	}
+	void Menu::SetEnabled(BOOL enabled)
+	{
+		if (enabled) {
+			this->SetStyle(this->GetStyle() & ~MF_DISABLED);
+		}
+		else {
+			this->SetStyle(this->GetStyle() | MF_DISABLED);
+		}
+		ModifyMenu(this->m_ParentHMENU, this->id, MF_BYCOMMAND | this->GetStyle(), this->id, this->m_WindowName);
 	}
 	void Menu::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		switch (HIWORD(wParam))
+		switch (uMsg)
 		{
-		case BN_CLICKED:
+		case WM_COMMAND:
 		{
-			if (OnClick)
-				OnClick(this,{uMsg,wParam,lParam});
+			switch (HIWORD(wParam))
+			{
+			case BN_CLICKED:
+			{
+				if (OnClick)
+					OnClick(this, { uMsg,wParam,lParam });
 
+			}
+			}
+			if (this->parent)
+				S_HandleEvents(this->parent, uMsg, wParam, lParam);
 		}
+		break;
 		}
-		if (this->parent)
-			S_HandleEvents(this->parent,uMsg, wParam,lParam);
 	}
 }

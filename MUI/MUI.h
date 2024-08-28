@@ -202,6 +202,7 @@ namespace MUI {
 	{
 		friend class Window;
 		friend class ContextMenu;
+		friend class MenuBar;
 	public:
 		~Menu();
 		Menu(LPCWSTR text);
@@ -209,10 +210,13 @@ namespace MUI {
 		void Add(Separator* sep);
 		BOOL IsChecked();
 		void SetChecked(BOOL checked);
+		void SetEnabled(BOOL enabled);
 		EventCallback_t OnClick;
 	private:
+		BOOL used = FALSE;
 		HMENU m_hMenu;
 		HMENU m_ParentHMENU;
+		UINT m_Index = 1;
 		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<Menu*> m_menus;
 		std::vector<Separator*> m_separators;
@@ -223,6 +227,7 @@ namespace MUI {
 		friend class Window;
 	public:
 		~ContextMenu();
+		ContextMenu();
 		void Add(Menu* menu);
 		void Add(Separator* sep);
 		void Open();
@@ -233,6 +238,7 @@ namespace MUI {
 		static LRESULT CALLBACK SubclassWndProc(HWND hwnd, UINT wm, WPARAM wParam, LPARAM lParam);
 		void AppendChilds(Menu* menu, HMENU hMenu);
 		UINT m_Index = 1;
+		HMENU m_hPopUp;
 	};
 	class MenuBar /*: public MUI::UIComponent*/
 	{
@@ -374,7 +380,9 @@ namespace MUI {
 		void DeleteItemAt(int i);
 		void ClearItems();
 		void Clear();
+		EventCallback_t RightClick{ NULL };
 	private:
+		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<ListItem*> m_Items;
 		UINT columnIndex;
 		BOOL autoWidth;

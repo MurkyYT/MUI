@@ -24,10 +24,12 @@ namespace MUI
 		default:
 			break;
 		}*/
-		if (OnChange)
-			OnChange(this,{uMsg,wParam,lParam});
-		if (this->parent)
-			S_HandleEvents(this->parent,uMsg, wParam,lParam);
+		if (uMsg == WM_COMMAND) {
+			if (OnChange)
+				OnChange(this, { uMsg,wParam,lParam });
+			if (this->parent)
+				S_HandleEvents(this->parent, uMsg, wParam, lParam);
+		}
 	}
 	int RadioGroup::CurrentRadioButton()
 	{

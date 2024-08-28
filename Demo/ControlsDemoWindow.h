@@ -10,7 +10,10 @@ private:
 	RadioGroup* group;
 	TextBlock* radioBlock;
 	TextBox* textBox;
+	Menu* test3;
+	ContextMenu* menu;
 	void RadioGroupChanged();
+	void Test2Clicked(UIComponent* sender);
 	void ButtonClick();
 	void ContextMenuOpen();
 	void InitializeComponent()

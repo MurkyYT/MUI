@@ -131,4 +131,21 @@ namespace MUI
 		this->m_Items.push_back(item);
 		return GetLastError() == 0;
 	}
+	void ListView::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg)
+		{
+		case WM_NOTIFY:
+		{
+			switch (((LPNMHDR)lParam)->code)
+			{
+			case NM_RCLICK:
+				if (this->RightClick)
+					RightClick(this, { uMsg,wParam,lParam });
+				break;
+			}
+		}
+		break;
+		}
+	}
 }

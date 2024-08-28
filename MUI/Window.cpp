@@ -299,6 +299,15 @@ namespace MUI
 			case WM_COMMAND:
 				window->OnCommand(uMsg,wParam, lParam);
 				break;
+			case WM_NOTIFY:
+			{
+				if (window->m_Assets.find(((LPNMHDR)lParam)->idFrom) != window->m_Assets.end())
+				{
+					UIComponent* comp = window->m_Assets[(UINT)wParam].get();
+					comp->HandleEvents(uMsg, wParam, lParam);
+				}
+			}
+			break;
 			case WM_CREATE:
 				window->OnCreate();
 				return 0;
@@ -510,10 +519,8 @@ namespace MUI
 		}
 		return TRUE;
 	}
-	void Window::OnCommand(UINT uMsg,WPARAM wParam, LPARAM lParam) {
-		(void)wParam;
-		(void)lParam;
-
+	void Window::OnCommand(UINT uMsg,WPARAM wParam, LPARAM lParam) 
+	{
 		if(this->m_Assets.find((UINT)wParam) != m_Assets.end())
 		{
 			UIComponent* comp = this->m_Assets[(UINT)wParam].get();

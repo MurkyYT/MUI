@@ -15,16 +15,26 @@ namespace MUI {
 	}
 	void Button::HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		switch (HIWORD(wParam))
+		switch (uMsg)
 		{
-		case BN_CLICKED:
+		case WM_COMMAND:
 		{
-			if (this->OnClick)
-				OnClick(this, { uMsg,wParam,lParam });
-			
+			switch (HIWORD(wParam))
+			{
+			case BN_CLICKED:
+			{
+				if (this->OnClick)
+					OnClick(this, { uMsg,wParam,lParam });
+
+			}
+			}
+			if (this->parent)
+				S_HandleEvents(this->parent, uMsg, wParam, lParam);
 		}
+		break;
+		default:
+			break;
 		}
-		if (this->parent)
-			S_HandleEvents(this->parent, uMsg, wParam,lParam);
+		
 	}
 }
