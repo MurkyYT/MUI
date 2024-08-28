@@ -30,7 +30,6 @@ void ControlsDemoWindow::ButtonClick()
 void ControlsDemoWindow::ContextMenuOpen()
 {
     menu->Open();
-    delete menu;
 }
 void ControlsDemoWindow::RadioGroupChanged()
 {
