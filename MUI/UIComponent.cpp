@@ -16,8 +16,6 @@ namespace MUI
 		pos.x = pos.x - this->m_margin.right + this->m_margin.left;
 		pos.y = pos.y - this->m_margin.bottom + this->m_margin.top;
 		MoveWindow(this->handle, pos.x, pos.y, min(w,this->width), min(h,this->height), TRUE);
-		InvalidateRect(this->handle, NULL, FALSE);
-		UpdateWindow(this->handle);
 	}
 	void UIComponent::UpdateVerticalAligment(POINT& pos, int h,int y)
 	{

@@ -247,6 +247,8 @@ namespace MUI {
 	struct GridItem
 	{
 		friend class Grid;
+	public:
+		UIComponent* GetComponent() { return component; }
 	private:
 		int row;
 		int column;

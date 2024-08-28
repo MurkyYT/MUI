@@ -369,6 +369,12 @@ namespace MUI
 						window->m_grid->Reorder(window->m_hWnd);
 						for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
 							window->m_grid->Reposition(itm.get());
+						for (std::shared_ptr<GridItem> itm : window->m_grid->GetItems())
+						{
+							InvalidateRect(itm->GetComponent()->handle, NULL, FALSE);
+							UpdateWindow(itm->GetComponent()->handle);
+						}
+						
 					}
 					std::vector<std::shared_ptr<Divider>> dividers = window->m_grid->GetDividers();
 					for (std::shared_ptr<Divider> div : dividers)
