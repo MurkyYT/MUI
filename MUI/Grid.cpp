@@ -164,7 +164,7 @@ namespace MUI
 				{
 					std::tuple<GridColumn*, int> column = starColumns[i];
 					GridColumn* o_column = std::get<0>(column);
-					o_column->width = (o_column->perc / maxPerc) * freeWidth;
+					o_column->width = (int)((o_column->perc / maxPerc) * freeWidth);
 					size_t index = std::get<1>(column);
 					if (index + 1 < this->m_columns.size())
 						this->m_columns[index + 1]->x = o_column->width + o_column->x;
@@ -210,7 +210,7 @@ namespace MUI
 				{
 					std::tuple<GridRow*, int> column = starRows[i];
 					GridRow* o_row = std::get<0>(column);
-					o_row->height = (o_row->perc / maxPerc) * freeHeight;;
+					o_row->height = (int)((o_row->perc / maxPerc) * freeHeight);
 					size_t index = std::get<1>(column);
 					if (index + 1 < this->m_rows.size())
 						this->m_rows[index + 1]->y = o_row->height + o_row->y;
@@ -226,9 +226,9 @@ namespace MUI
 			if(!firstRun)
 				CalculateStarPercentages();
 
-			for (size_t row = 0; row < m_rows.size(); row++)
+			for (int row = 0; row < m_rows.size(); row++)
 			{
-				for (size_t column = 0; column < m_columns.size(); column++)
+				for (int column = 0; column < m_columns.size(); column++)
 				{
 					if (rowColToDivider[row].find(column) != rowColToDivider[row].end()) {
 						rowColToDivider[row][column]->x = m_columns[column]->x;
@@ -266,14 +266,14 @@ namespace MUI
 						newPos = bottom->y + bottom->height - DIVIDER_SIZE;
 
 					double topSide = newPos - top->y;
-					double bottomSide = (top->y + fullHeight) - newPos;
+					double bottomSide = (double)((top->y + fullHeight) - newPos);
 
 					top->perc = (topSide / fullHeight) * fullPerc;
 					bottom->perc = (bottomSide / fullHeight) * fullPerc;
 
-					bottom->y = topSide + top->y;
-					bottom->height = bottomSide;
-					top->height = topSide;
+					bottom->y = (int)(topSide + top->y);
+					bottom->height = (int)bottomSide;
+					top->height = (int)topSide;
 				}
 			}
 			else
@@ -294,14 +294,14 @@ namespace MUI
 						newPos = right->x + right->width - DIVIDER_SIZE;
 
 					double leftSide = newPos - left->x;
-					double rightSide = (left->x + fullWidth) - newPos;
+					double rightSide = (double)((left->x + fullWidth) - newPos);
 
 					left->perc = (leftSide / fullWidth) * fullPerc;
 					right->perc = (rightSide / fullWidth) * fullPerc;
 
-					right->x = leftSide + left->x;
-					right->width = rightSide;
-					left->width = leftSide;
+					right->x = (int)(leftSide + left->x);
+					right->width = (int)rightSide;
+					left->width = (int)leftSide;
 				}
 			}
 		}
