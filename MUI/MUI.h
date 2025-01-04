@@ -378,6 +378,8 @@ namespace MUI {
 		BOOL AddIcon(HICON icon);
 		ListItem* GetSelected();
 		ListItem* GetItemAt(int i);
+		std::vector<ListItem*> Items() { return m_Items; }
+		int ItemsCount() { return (int)this->m_Items.size(); }
 		int GetSelectedIndex();
 		int FreeItemIndex() { return this->itemIndex; }
 		void HideColumns()
