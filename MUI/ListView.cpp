@@ -143,6 +143,10 @@ namespace MUI
 				if (this->RightClick)
 					RightClick(this, { uMsg,wParam,lParam });
 				break;
+			case NM_DBLCLK:
+				if (this->DoubleClick)
+					DoubleClick(this, { uMsg,wParam,lParam });
+				break;
 			}
 		}
 		break;

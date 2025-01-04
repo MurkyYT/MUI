@@ -383,6 +383,7 @@ namespace MUI {
 		void ClearItems();
 		void Clear();
 		EventCallback_t RightClick{ NULL };
+		EventCallback_t DoubleClick{ NULL };
 	private:
 		void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		std::vector<ListItem*> m_Items;
