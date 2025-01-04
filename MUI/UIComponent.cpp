@@ -89,4 +89,25 @@ namespace MUI
 	void UIComponent::Hide() { ShowWindow(this->handle, SW_HIDE); }
 	void UIComponent::Show() { ShowWindow(this->handle, SW_SHOW); }
 	BOOL UIComponent::IsHidden() { return !IsWindowVisible(this->handle); }
+	
+	LRESULT CALLBACK UIComponent::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
+		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+	{
+		UIComponent* comp = (UIComponent*)uIdSubclass;
+		switch (uMsg)
+		{
+		case WM_KEYDOWN:
+			if (comp->parentWindow->OnKeyDown)
+				comp->parentWindow->OnKeyDown(comp, { uMsg,wParam,lParam });
+			break;
+		case WM_KEYUP:
+			if (comp->parentWindow->OnKeyUp)
+				comp->parentWindow->OnKeyUp(comp, { uMsg,wParam,lParam });
+			break;
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(hWnd, CustomProc, uIdSubclass);
+			break;
+		}
+		return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+	}
 }

@@ -226,6 +226,11 @@ namespace MUI
 		this->m_Assets[index] = std::shared_ptr<UIComponent>(comp);
 		if(!this->b_useGrid)
 			this->RepositionComponents();
+
+		comp->parentWindow = this;
+
+		SetWindowSubclass(comp->handle, UIComponent::CustomProc, (UINT_PTR)comp, NULL);
+
 		return TRUE;
 	}
 	void Window::v_RegisterClass(const wchar_t* name, DWORD iconId)

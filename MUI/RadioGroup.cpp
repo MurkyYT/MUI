@@ -25,10 +25,10 @@ namespace MUI
 			break;
 		}*/
 		if (uMsg == WM_COMMAND) {
-			if (OnChange)
-				OnChange(this, { uMsg,wParam,lParam });
 			if (this->parent)
 				S_HandleEvents(this->parent, uMsg, wParam, lParam);
+			if (OnChange)
+				OnChange(this, { uMsg,wParam,lParam });
 		}
 	}
 	int RadioGroup::CurrentRadioButton()

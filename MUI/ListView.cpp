@@ -19,7 +19,7 @@ namespace MUI
 		this->height = height;
 		this->autoWidth = autoWidth;
 		this->style = WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT |
-			 WS_EX_CLIENTEDGE | WS_CLIPSIBLINGS;
+			 WS_EX_CLIENTEDGE | WS_CLIPSIBLINGS | LVS_SINGLESEL;
 		this->hLarge = ImageList_Create(32,
 			32,
 			ILC_COLOR32, 3, 0);

@@ -142,6 +142,9 @@ namespace MUI {
 		{
 			o->HandleEvents(uMsg,wParam,lParam);
 		}
+		static LRESULT CALLBACK CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
+				LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+
 		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) {};
 		virtual void reposition(int h, int w,int x,int y);
 		void UpdateHorizontalAligment(POINT& pos, int w,int x);
@@ -158,6 +161,7 @@ namespace MUI {
 		DWORD style = NULL;
 		COLORREF backgroundColor = NULL;
 		UIComponent* parent = NULL;
+		Window* parentWindow;
 		int x, y, width, height = 0;
 		int columnSpan = 0;
 		int rowSpan = 0;
@@ -376,6 +380,18 @@ namespace MUI {
 		ListItem* GetItemAt(int i);
 		int GetSelectedIndex();
 		int FreeItemIndex() { return this->itemIndex; }
+		void HideColumns()
+		{
+			HWND hHeader = ListView_GetHeader(handle);
+			LONG_PTR styles = GetWindowLongPtr(hHeader, GWL_STYLE);
+			SetWindowLongPtr(hHeader, GWL_STYLE, styles | HDS_HIDDEN);
+		}
+		void ShowColumns()
+		{
+			HWND hHeader = ListView_GetHeader(handle);
+			LONG_PTR styles = GetWindowLongPtr(hHeader, GWL_STYLE);
+			SetWindowLongPtr(hHeader, GWL_STYLE, styles ^ HDS_HIDDEN);
+		}
 		void DeleteIconAt(int i);
 		void ClearIcons();
 		void ClearColumns();

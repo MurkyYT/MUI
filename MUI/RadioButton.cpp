@@ -18,6 +18,9 @@ namespace MUI
 		{
 		case WM_COMMAND:
 		{
+			if (this->parent)
+				S_HandleEvents(this->parent, uMsg, wParam, lParam);
+
 			switch (HIWORD(wParam))
 			{
 			case BN_CLICKED:
@@ -27,8 +30,6 @@ namespace MUI
 
 			}
 			}
-			if (this->parent)
-				S_HandleEvents(this->parent, uMsg, wParam, lParam);
 		}
 		break;
 		}
