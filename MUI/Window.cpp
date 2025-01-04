@@ -443,16 +443,6 @@ namespace MUI
 				
 				break;
 			}
-			case WM_CLOSE:
-			{
-				if (window->OnClose)
-					window->OnClose(window,{uMsg,wParam,lParam});
-#ifdef DEBUG
-				GdiplusShutdown(window->gdiplusToken);
-#endif // DEBUG
-				break;
-
-			}
 			case WM_KEYDOWN:
 			{
 				if(window->OnKeyDown)
@@ -553,6 +543,13 @@ namespace MUI
 			m_Index = 1;
 			m_Windows--;
 			m_Destroyed = TRUE;
+
+			if (OnClose)
+				OnClose(this, { });
+#ifdef DEBUG
+			GdiplusShutdown(gdiplusToken);
+#endif // DEBUG
+
 #if EXIT_ON_CLOSE
 			if (m_Windows <= 0)
 				PostQuitMessage(0);

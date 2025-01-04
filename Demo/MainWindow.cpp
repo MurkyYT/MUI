@@ -2,6 +2,8 @@
 MainWindow::MainWindow()
 {
     InitializeComponent();
+
+    SetWindowLongPtr(this->GetHWND(), GWL_STYLE, WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME);
 }
 void MainWindow::OpenGridExample()
 {
@@ -26,7 +28,7 @@ void MainWindow::OpenControlsDemo()
 }
 void MainWindow::ShowAbout()
 {
-    MessageBoxW(this->GetHWND(),L"MUI - UI Framework built on top of win32 API", L"MUI", MB_OK|MB_ICONINFORMATION);
+    MessageBoxW(this->GetHWND(),L"MUI - GUI framework built on top of Win32 API", L"MUI", MB_OK|MB_ICONINFORMATION);
 }
 void MainWindow::Exit()
 {
