@@ -224,8 +224,6 @@ namespace MUI
 		comp->id = (DWORD)index;
 		comp->windowHandle = this->m_hWnd;
 		this->m_Assets[index] = std::shared_ptr<UIComponent>(comp);
-		if(!this->b_useGrid)
-			this->RepositionComponents();
 
 		comp->parentWindow = this;
 
@@ -437,7 +435,7 @@ namespace MUI
 					if (GetClientRect(window->m_hWnd, &rect))
 					{
 						for (size_t i = 1; i < window->m_Index; i++)
-							window->m_Assets[i]->reposition(
+							window->m_Assets[i]->Reposition(
 								rect.bottom - rect.top,
 								rect.right - rect.left,0,0);
 					}
@@ -474,17 +472,7 @@ namespace MUI
 
 		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
-	void Window::RepositionComponents()
-	{
-		/*RECT rect;
-		if (GetClientRect(this->m_hWnd, &rect))
-		{
-			int width = rect.right - rect.left;
-			int height = rect.bottom - rect.top;
-			for (auto& comp : this->m_Assets)
-				comp.second->reposition(height, width,);
-		}*/
-	}
+
 	LRESULT Window::OnColorButton(WPARAM wParam) {
 		HDC hdcButton = (HDC)wParam;
 		if (this->m_ButtonBacgkround) {

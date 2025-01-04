@@ -2,7 +2,7 @@
 
 namespace MUI
 {
-	void UIComponent::reposition(int h,int w,int x,int y)
+	void UIComponent::Reposition(int h,int w,int x,int y)
 	{
 		POINT pos
 		{

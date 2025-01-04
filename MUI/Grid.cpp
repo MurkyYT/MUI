@@ -323,7 +323,7 @@ namespace MUI
 				height += this->m_rows[itm->row + i]->height;
 			comp->x = o_column->x;
 			comp->y = o_row->y;
-			comp->reposition(height, width,comp->x,comp->y);
+			comp->Reposition(height, width,comp->x,comp->y);
 		}
 		InvalidateRect(itm->component->windowHandle, NULL, FALSE);
 		UpdateWindow(itm->component->windowHandle);

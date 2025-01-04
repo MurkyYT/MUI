@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #pragma region Includes
+#include <vector>
 #include <Windows.h>
 #include <string>
 #include <unordered_map>
@@ -108,7 +108,7 @@ namespace MUI {
 		UIMenu,
 		UISeparator,
 		UIMenuBar,
-		UIComboBox
+		/*UIComboBox*/
 	};
 	/*
 	Base class for each UIComponent
@@ -146,7 +146,7 @@ namespace MUI {
 				LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 		virtual void HandleEvents(UINT uMsg, WPARAM wParam, LPARAM lParam) {};
-		virtual void reposition(int h, int w,int x,int y);
+		virtual void Reposition(int h, int w,int x,int y);
 		void UpdateHorizontalAligment(POINT& pos, int w,int x);
 		void UpdateVerticalAligment(POINT& pos, int h,int y);
 		UIType type = Null;
@@ -536,7 +536,6 @@ namespace MUI {
 		ULONG_PTR           gdiplusToken;
 #endif // DEBUG
 		void AppendChilds(Menu* menu, HMENU hMenu);
-		void RepositionComponents();
 		BOOL b_useGrid = FALSE;
 		const wchar_t* m_title;
 		int m_width, m_height;
