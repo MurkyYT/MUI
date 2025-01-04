@@ -14,7 +14,7 @@ ControlsDemoWindow::ControlsDemoWindow()
     menu->Add(new Separator());
     menu->Add(test3);
 }
-void ControlsDemoWindow::Test2Clicked(UIComponent* sender)
+void ControlsDemoWindow::Test2Clicked(void* sender)
 {
     BOOL checked = ((Menu*)sender)->IsChecked();
     ((Menu*)sender)->SetChecked(!checked);

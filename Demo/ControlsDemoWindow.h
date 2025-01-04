@@ -13,7 +13,7 @@ private:
 	Menu* test3;
 	ContextMenu* menu;
 	void RadioGroupChanged();
-	void Test2Clicked(UIComponent* sender);
+	void Test2Clicked(void* sender);
 	void ButtonClick();
 	void ContextMenuOpen();
 	void InitializeComponent()
