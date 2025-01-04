@@ -448,7 +448,7 @@ namespace MUI
 			case WM_CLOSE:
 			{
 				if (window->OnClose)
-					window->OnClose(NULL,{});
+					window->OnClose(window,{uMsg,wParam,lParam});
 #ifdef DEBUG
 				GdiplusShutdown(window->gdiplusToken);
 #endif // DEBUG
