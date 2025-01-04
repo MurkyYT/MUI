@@ -52,7 +52,7 @@ namespace MUI
 			0,
 			className.c_str(),
 			m_title,
-			WS_OVERLAPPEDWINDOW /*| WS_CLIPCHILDREN*/,
+			WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
 			m_width,
@@ -97,8 +97,6 @@ namespace MUI
 	}
 	void Window::SetGrid(Grid* grid)
 	{
-		SetWindowLongPtr(this->m_hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN);
-
 		this->m_grid = std::shared_ptr<Grid>(grid);
 		this->b_useGrid = TRUE;
 		this->AddComponents(this->m_grid->GetComponents());
@@ -450,6 +448,18 @@ namespace MUI
 #endif // DEBUG
 				break;
 
+			}
+			case WM_KEYDOWN:
+			{
+				if(window->OnKeyDown)
+					window->OnKeyDown(window, { uMsg,wParam,lParam });
+				break;
+			}
+			case WM_KEYUP:
+			{
+				if (window->OnKeyUp)
+					window->OnKeyUp(window, { uMsg,wParam,lParam });
+				break;
 			}
 			default:
 				return DefWindowProc(hWnd, uMsg, wParam, lParam);

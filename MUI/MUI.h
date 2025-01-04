@@ -168,7 +168,7 @@ namespace MUI {
 		WPARAM  wParam;
 		LPARAM  lParam;
 	} EventArgs_t;
-	typedef std::function<void(UIComponent* const sender, EventArgs_t info)> EventCallback_t;
+	typedef std::function<void(void* const sender, EventArgs_t info)> EventCallback_t;
 	class Separator : public MUI::UIComponent
 	{
 	public:
@@ -489,6 +489,8 @@ namespace MUI {
 		HINSTANCE GetHINSTACE() { return m_hInstance; }
 		void Close() { DestroyWindow(m_hWnd); }
 		EventCallback_t OnClose{ NULL };
+		EventCallback_t OnKeyDown{ NULL };
+		EventCallback_t OnKeyUp{ NULL };
 		SIZE GetSize()
 		{
 			RECT rect;
