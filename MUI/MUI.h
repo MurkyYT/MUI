@@ -123,6 +123,8 @@ namespace MUI {
 		friend class ContextMenu;
 	public:
 		virtual ~UIComponent() {};
+		INT GetWidth() { return width; }
+		INT GetHeight() { return height; }
 		BOOL SetStyle(DWORD newStyle);
 		DWORD GetStyle();
 		void SetColumnSpan(int span) { this->columnSpan = max(0, span); }
@@ -487,6 +489,11 @@ namespace MUI {
 			MaxSize.x = GetSystemMetrics(SM_CXMAXTRACK),
 			MaxSize.y = GetSystemMetrics(SM_CYMAXTRACK)
 		};
+
+		INT GetWidth();
+		INT GetHeight();
+		void SetWidth(INT width);
+		void SetHeight(INT width);
 		BOOL Create(const wchar_t* title, int width, int height, DWORD iconId);
 		BOOL Create(const wchar_t* title, DWORD iconId);
 		BOOL AddComponent(UIComponent* comp);

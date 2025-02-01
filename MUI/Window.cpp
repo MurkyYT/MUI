@@ -577,3 +577,31 @@ namespace MUI
 		return TRUE;
 	}
 }
+
+INT MUI::Window::GetWidth()
+{
+	RECT rect;
+	if (GetWindowRect(m_hWnd, &rect))
+		return rect.right - rect.left;
+
+	return -1;
+}
+
+INT MUI::Window::GetHeight()
+{
+	RECT rect;
+	if (GetWindowRect(m_hWnd, &rect))
+		return rect.bottom - rect.top;;
+
+	return -1;
+}
+
+void MUI::Window::SetHeight(INT height)
+{
+	SetWindowPos(m_hWnd, NULL, 0, 0, GetWidth(), height, SWP_NOMOVE);
+}
+
+void MUI::Window::SetWidth(INT width)
+{
+	SetWindowPos(m_hWnd, NULL, 0, 0, width , GetHeight(), SWP_NOMOVE);
+}
