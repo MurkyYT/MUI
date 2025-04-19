@@ -525,6 +525,8 @@ namespace MUI
 	}
 	void Window::OnDestroy() {
 		if (!m_Destroyed) {
+			DestroyWindow(m_hWnd);
+			SetWindowLongPtr(m_hWnd, GWLP_USERDATA, NULL);
 			DeleteObject(this->m_hFont);
 			DeleteObject(this->m_hBrushBackground);
 			/*for (size_t i = 1; i < this->m_Index; i++)
