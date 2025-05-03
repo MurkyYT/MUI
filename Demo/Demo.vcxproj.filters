@@ -2,38 +2,5 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="GridDemoWindow.cpp">
-      <Filter>Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="MainWindow.cpp">
-      <Filter>Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="ControlsDemoWindow.cpp">
-      <Filter>Windows</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="GridDemoWindow.h">
-      <Filter>Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="MainWindow.h">
-      <Filter>Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="ControlsDemoWindow.h">
-      <Filter>Windows</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Demo.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Demo.bmp" />
-    <Image Include="icon1.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Windows">
-      <UniqueIdentifier>{c6b99d0b-89dc-417c-9a6f-1d1b51ac28c1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
 </Project>

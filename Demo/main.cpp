@@ -1,21 +1,16 @@
-#include "..\MUI\MUI.h"
-#include "resource.h"
-#include "GridDemoWindow.h"
-#include "MainWindow.h"
+#include <MUI.h>
 
+using namespace mui;
 
-INT WINAPI WinMain(
-	_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine,
-	_In_ int nShowCmd
-)
+INT WINAPI WinMain(\
+	_In_ HINSTANCE hInstance, \
+	_In_opt_ HINSTANCE hPrevInstance, \
+	_In_ LPSTR lpCmdLine, \
+	_In_ int nShowCmd)
 {
-	(void)hPrevInstance;
-	(void)lpCmdLine;
 
-	MainWindow* mainWind = new MainWindow();
-	mainWind->Show();
+	Window wind(L"Test");
+	wind.Show();
 
 	MSG msg = {};
 

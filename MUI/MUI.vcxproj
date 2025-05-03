@@ -135,30 +135,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DarkMode.h" />
-    <ClInclude Include="Divider.h" />
     <ClInclude Include="MUI.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Button.cpp" />
-    <ClCompile Include="Divider.cpp" />
-    <ClCompile Include="CheckBox.cpp" />
-    <ClCompile Include="ComboBox.cpp" />
-    <ClCompile Include="ContextMenu.cpp" />
-    <ClCompile Include="Grid.cpp" />
-    <ClCompile Include="Image.cpp" />
-    <ClCompile Include="ListItem.cpp" />
-    <ClCompile Include="ListView.cpp" />
-    <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="RadioButton.cpp" />
-    <ClCompile Include="RadioGroup.cpp" />
-    <ClCompile Include="TextBox.cpp" />
-    <ClCompile Include="TextBlock.cpp" />
-    <ClCompile Include="UIComponent.cpp" />
     <ClCompile Include="Window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
