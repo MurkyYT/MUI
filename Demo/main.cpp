@@ -8,8 +8,12 @@ INT WINAPI WinMain(\
 	_In_ LPSTR lpCmdLine, \
 	_In_ int nShowCmd)
 {
-
 	Window wind(L"Test");
+
+	StackLayout* layout = new StackLayout(StackLayoutOrientation::Horizontal);
+
+	wind.SetContent(layout);
+
 	wind.Show();
 
 	MSG msg = {};
