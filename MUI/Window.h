@@ -12,7 +12,7 @@ namespace mui
 	public:
 		Window(const wchar_t* title, size_t height = 500, size_t width = 500);
 		void Show();
-		void SetContent(UIElement* element);
+		void SetContent(const std::shared_ptr<UIElement>& element);
 		size_t GetHeight();
 		size_t GetWidth();
 		POINT GetTopLeft();
@@ -20,7 +20,7 @@ namespace mui
 	private:
 		HWND m_hWnd;
 		HFONT m_hFont;
-		std::unique_ptr<UIElement> m_content;
+		std::shared_ptr<UIElement> m_content = NULL;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	};
 }

@@ -5,7 +5,7 @@
 
 mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 {
-	std::wstring className = std::wstring(title) + std::to_wstring((ULONG_PTR)this);
+	std::wstring className = L"MUI_Window&" + std::to_wstring((ULONG_PTR)this);
 
 	WNDCLASSEX wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -72,15 +72,14 @@ RECT mui::Window::GetRect()
 	return rect;
 }
 
-void mui::Window::SetContent(UIElement* element)
+void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 {
 	if (m_content) 
-	{
 		DestroyWindow(m_content->m_hWnd);
 
-	}
-
-	element->m_hWnd = CreateWindowEx(
+	element->m_parenthWnd = this->m_hWnd;
+	element->m_id = (DWORD)1;
+	HWND hWnd = CreateWindowEx(
 		0,
 		element->m_class,
 		element->m_name,
@@ -89,20 +88,24 @@ void mui::Window::SetContent(UIElement* element)
 		this->m_hWnd,
 		(HMENU)1,
 		GetModuleHandle(NULL),
-		0
+		element.get()
 	);
+
+	element->SetHWND(hWnd);
+
 	SendMessage(
 		element->m_hWnd,
 		WM_SETFONT,
 		(WPARAM)this->m_hFont,
 		TRUE
 	);
-	element->m_id = (DWORD)1;
-	element->m_parenthWnd = this->m_hWnd;
-	m_content = std::unique_ptr<UIElement>(element);
+
+	m_content = element;
 
 	if(element->m_subclass)
-		SetWindowSubclass(element->m_hWnd, UIElement::CustomProc, (UINT_PTR)element, NULL);
+		SetWindowSubclass(element->m_hWnd, UIElement::CustomProc, (UINT_PTR)element.get(), NULL);
+
+	ShowWindow(element->m_hWnd, SW_SHOW);
 }
 
 LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
@@ -116,9 +119,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		window->m_hWnd = hWnd;
 	}
 	else 
-	{
 		window = (Window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	}
 
 	if (window) 
 	{
@@ -128,7 +129,36 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		case WM_CLOSE:
 		{
 			DeleteObject(window->m_hFont);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
 			window->m_content = NULL;
+		}
+		break;
+		case WM_SIZE:
+		{
+			if(window->m_content)
+			{
+				RECT rect{};
+				GetClientRect(hWnd, &rect);
+				window->m_content->m_availableSize = rect;
+				SetWindowPos(window->m_content->m_hWnd, NULL, 
+					(int)window->m_content->m_x, 
+					(int)window->m_content->m_y,
+					(int)window->m_content->GetMinWidth(), 
+					(int)window->m_content->GetMinHeight() , 
+					NULL);
+			}
+		}
+		break;
+		case WM_COMMAND:
+		{
+			if (window->m_content && wParam == window->m_content->m_id)
+				window->m_content->HandleEvent(uMsg, wParam, lParam);
+		}
+		break;
+		case WM_NOTIFY:
+		{
+			if (window->m_content && ((LPNMHDR)lParam)->idFrom == window->m_content->m_id)
+				window->m_content->HandleEvent(uMsg, wParam, lParam);
 		}
 		break;
 		case WM_CREATE:

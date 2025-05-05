@@ -135,6 +135,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Events.h" />
     <ClInclude Include="MUI.h" />
     <ClInclude Include="StackLayout.h" />
     <ClInclude Include="UIElement.h" />
@@ -142,6 +144,7 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="StackLayout.cpp" />
     <ClCompile Include="UIElement.cpp" />
     <ClCompile Include="UIElementCollection.cpp" />

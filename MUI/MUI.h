@@ -6,7 +6,9 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #pragma comment (lib, "comctl32")
 
-#include "./StackLayout.h"
-#include "./UIElementCollection.h"
+#include "./Events.h"
 #include "./UIElement.h"
+#include "./UIElementCollection.h"
+#include "./StackLayout.h"
+#include "./Button.h"
 #include "./Window.h"
