@@ -12,10 +12,10 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		switch (uMsg)
 		{
 		case WM_KEYDOWN:
-			SendMessage(element->m_parenthWnd, uMsg, wParam, lParam);
+			PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case WM_KEYUP:
-			SendMessage(element->m_parenthWnd, uMsg, wParam, lParam);
+			PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case WM_NCDESTROY:
 			RemoveWindowSubclass(hWnd, CustomProc, uIdSubclass);

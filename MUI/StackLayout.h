@@ -26,6 +26,7 @@ namespace mui
 
 		UIElementCollection& Children();
 	private:
+		BOOL m_insideAnotherStackLayout = FALSE;
 		StackLayoutOrientation m_orientation;
 		UIElementCollection m_collection;
 

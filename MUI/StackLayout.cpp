@@ -34,6 +34,7 @@ mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	m_x = 0;
 	m_y = 0;
+	m_uiType = UIType::StackLayout;
 }
 
 mui::UIElementCollection& mui::StackLayout::Children()
@@ -82,22 +83,18 @@ size_t mui::StackLayout::CalcMinHeight()
 	if (m_orientation == StackLayoutOrientation::Vertical)
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
-		{
-			element->SetAvailableSize({ 0,height,m_availableSize.right, m_availableSize.bottom });
-			height += element->GetMinHeight();
-		}
+			height += (long)element->GetMinHeight();
 	}
 	else
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 		{
-			element->SetAvailableSize(m_availableSize);
 			size_t temp = element->GetMinHeight();
 			if (temp > height)
-				height = temp;
+				height = (long)temp;
 		}
 	}
-	return min(height, m_availableSize.bottom - m_availableSize.top);
+	return height;
 }
 
 size_t mui::StackLayout::CalcMinWidth()
@@ -106,22 +103,18 @@ size_t mui::StackLayout::CalcMinWidth()
 	if (m_orientation == StackLayoutOrientation::Horizontal)
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
-		{
-			element->SetAvailableSize({ width,0,m_availableSize.right, m_availableSize.bottom });
-			width += element->GetMinWidth();
-		}
+			width += (long)element->GetMinWidth();
 	}
 	else
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 		{
-			element->SetAvailableSize(m_availableSize);
 			size_t temp = element->GetMinWidth();
 			if (temp > width)
-				width = temp;
+				width = (long)temp;
 		}
 	}
-	return min(width, m_availableSize.right - m_availableSize.left);
+	return width;
 }
 
 size_t mui::StackLayout::CalcMaxHeight()
@@ -132,7 +125,7 @@ size_t mui::StackLayout::CalcMaxHeight()
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 		{
 			element->SetAvailableSize({ 0,height,m_availableSize.right, m_availableSize.bottom });
-			height += element->GetMaxHeight();
+			height += (long)element->GetMaxHeight();
 		}
 	}
 	else
@@ -142,7 +135,7 @@ size_t mui::StackLayout::CalcMaxHeight()
 			element->SetAvailableSize(m_availableSize);
 			size_t temp = element->GetMaxHeight();
 			if (temp > height)
-				height = temp;
+				height = (long)temp;
 		}
 	}
 	return max(height, m_availableSize.bottom - m_availableSize.top);
@@ -156,7 +149,7 @@ size_t mui::StackLayout::CalcMaxWidth()
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 		{
 			element->SetAvailableSize({ width,0 ,m_availableSize.right, m_availableSize.bottom });
-			width += element->GetMaxWidth();
+			width += (long)element->GetMaxWidth();
 		}
 	}
 	else
@@ -166,7 +159,7 @@ size_t mui::StackLayout::CalcMaxWidth()
 			element->SetAvailableSize(m_availableSize);
 			size_t temp = element->GetMaxWidth();
 			if (temp > width)
-				width = temp;
+				width = (long)temp;
 		}
 	}
 	return max(width, m_availableSize.right - m_availableSize.left);
@@ -200,34 +193,59 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			int y = 0;
 			for (const std::shared_ptr<UIElement>& element : layout->m_collection.Items())
 			{
-				element->SetAvailableSize({ x,y,layout->m_availableSize.right,layout->m_availableSize.bottom });
-				size_t height = element->GetMinHeight();
-				size_t width = element->GetMinWidth();
+				if (element->m_uiType == UIType::StackLayout)
+					((StackLayout*)element.get())->m_insideAnotherStackLayout = TRUE;
 
-				SetWindowPos(element->GetHWND(), NULL,
-					x,
-					y,
-					(int)width,
-					(int)height,
-					NULL);
+				element->SetAvailableSize({x,y, layout->m_availableSize.right,layout->m_availableSize.bottom });
 
-				if (layout->m_orientation == StackLayoutOrientation::Horizontal)
-					x += width;
+				if (layout->m_orientation == Vertical) 
+				{
+					size_t width = !layout->m_insideAnotherStackLayout &&
+						element->m_uiType != UIType::StackLayout
+						&& element->m_horizontalAligment == Fill && layout->m_orientation == Vertical
+						? element->GetMaxWidth() : element->GetMinWidth();
+
+					size_t height = element->GetMinHeight();
+
+					SetWindowPos(element->GetHWND(), NULL,
+						layout->m_insideAnotherStackLayout ? x : (int)element->GetX(),
+						y,
+						(int)width,
+						(int)height,
+						NULL);
+
+					y += (long)height;
+				}
 				else
-					y += height;
+				{
+					size_t width = element->GetMinWidth();
+					size_t height = !layout->m_insideAnotherStackLayout &&
+						element->m_uiType != UIType::StackLayout
+						&& element->m_verticalAligment == Fill && layout->m_orientation == Horizontal
+						? element->GetMaxHeight() : element->GetMinHeight();
+
+					SetWindowPos(element->GetHWND(), NULL,
+						x,
+						layout->m_insideAnotherStackLayout ? y : (int)element->GetY(),
+						(int)width,
+						(int)height,
+						NULL);
+
+					x += (long)width;
+				}
 			}
 		}
 		break;
 		case WM_COMMAND:
 		{
-			if (layout->Children().IDExists(wParam))
-				layout->Children().ItemByID(wParam)->HandleEvent(uMsg, wParam, lParam);
+			if (layout->Children().IDExists((DWORD)wParam))
+				layout->Children().ItemByID((DWORD)wParam)->HandleEvent(uMsg, wParam, lParam);
 		}
 		break;
 		case WM_NOTIFY:
 		{
-			if (layout->Children().IDExists(((LPNMHDR)lParam)->idFrom))
-				layout->Children().ItemByID(((LPNMHDR)lParam)->idFrom)->HandleEvent(uMsg, wParam, lParam);
+			if (layout->Children().IDExists((DWORD)((LPNMHDR)lParam)->idFrom))
+				layout->Children().ItemByID((DWORD)((LPNMHDR)lParam)->idFrom)->HandleEvent(uMsg, wParam, lParam);
 		}
 		break;
 		default:

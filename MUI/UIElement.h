@@ -4,12 +4,22 @@
 
 namespace mui
 {
+	enum LayoutAligment
+	{
+		Fill,
+		Start,
+		End,
+		Center
+	};
 
 	class UIElement
 	{
 		friend class Window;
+		friend class StackLayout;
 		friend class UIElementCollection;
+
 	public:
+
 		virtual void HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 		virtual size_t GetMinWidth() = 0;
 		virtual size_t GetMinHeight() = 0;
@@ -36,19 +46,63 @@ namespace mui
 			if (!m_hWnd)
 				return m_x;
 
-			RECT rect{};
-			GetWindowRect(m_hWnd, &rect);
-			return rect.left;
+			switch (m_horizontalAligment)
+			{
+			case mui::Fill:
+				return m_availableSize.left;
+			case mui::Start:
+				return m_availableSize.left;
+			case mui::End:
+				return m_availableSize.right - GetMinWidth();
+			case mui::Center:
+				return (m_availableSize.right - m_availableSize.left) / 2 - GetMinWidth() / 2;
+			}
+
+			return m_x;
 		}
 		virtual size_t GetY()
 		{
 			if (!m_hWnd)
 				return m_y;
 
-			RECT rect{};
-			GetWindowRect(m_hWnd, &rect);
-			return rect.top;
+			switch (m_verticalAligment)
+			{
+			case mui::Fill:
+				return m_availableSize.top;
+			case mui::Start:
+				return m_availableSize.top;
+			case mui::End:
+				return m_availableSize.bottom - GetMinHeight();
+			case mui::Center:
+				return (m_availableSize.bottom - m_availableSize.top) / 2 - GetMinHeight() / 2;
+			}
+
+			return m_y;
 		}
+
+		void SetHorizontalAligment(LayoutAligment aligment) 
+		{
+			m_horizontalAligment = aligment;
+		}
+
+		void SetVerticalAligment(LayoutAligment aligment)
+		{
+			m_verticalAligment = aligment;
+		}
+
+		HWND GetHWND() { return m_hWnd; }
+		const wchar_t* GetClass() { return m_class; }
+		const wchar_t* GetName() { return m_name; }
+		DWORD GetStyle() { return m_style; }
+		DWORD GetID() { return m_id; }
+		BOOL GetSubclass() { return m_subclass; }
+
+	protected:
+
+		enum UIType {
+			Button,
+			StackLayout
+		};
 
 		virtual void SetHWND(HWND hWnd)
 		{
@@ -65,14 +119,11 @@ namespace mui
 			m_availableSize = rect;
 		}
 
-		HWND GetHWND() { return m_hWnd; }
-		const wchar_t* GetClass() { return m_class; }
-		const wchar_t* GetName() { return m_name; }
-		DWORD GetStyle() { return m_style; }
-		DWORD GetID() { return m_id; }
-		BOOL GetSubclass() { return m_subclass; }
+		LayoutAligment m_verticalAligment = Fill;
+		LayoutAligment m_horizontalAligment = Fill;
 
-	protected:
+		UIType m_uiType;
+
 		HWND m_parenthWnd = NULL;
 		HWND m_hWnd = NULL;
 

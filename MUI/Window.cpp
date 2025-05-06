@@ -141,10 +141,10 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				GetClientRect(hWnd, &rect);
 				window->m_content->m_availableSize = rect;
 				SetWindowPos(window->m_content->m_hWnd, NULL, 
-					(int)window->m_content->m_x, 
-					(int)window->m_content->m_y,
-					(int)window->m_content->GetMinWidth(), 
-					(int)window->m_content->GetMinHeight() , 
+					(int)window->m_content->GetX(),
+					(int)window->m_content->GetY(),
+					(int)window->m_content->GetMaxWidth(),
+					(int)window->m_content->GetMaxHeight() , 
 					NULL);
 			}
 		}
