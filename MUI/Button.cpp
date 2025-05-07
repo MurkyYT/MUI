@@ -67,11 +67,12 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 		{
 			if (this->OnClick) OnClick(this, { uMsg,wParam,lParam });
 		}
+		break;
 		}
 	}
+	break;
 	case WM_CTLCOLORSTATIC:
 		return { TRUE , NULL };
-	break;
 	default:
 		break;
 	}

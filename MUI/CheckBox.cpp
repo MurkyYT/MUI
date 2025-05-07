@@ -135,11 +135,12 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
 		{
 			if (this->StateChanged) StateChanged(this, { uMsg,wParam,lParam });
 		}
+        break;
 		}
 	}
+    break;
     case WM_CTLCOLORSTATIC:
         return { TRUE , NULL };
-	break;
 	default:
 		break;
 	}
