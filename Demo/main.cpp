@@ -16,10 +16,10 @@ void BtnClick()
 		button->SetText(std::wstring(L"CheckBox " + std::to_wstring(layout3->Children().Count())).c_str());
 }
 
-INT WINAPI WinMain(
+INT WINAPI wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPSTR lpCmdLine,
+	_In_ LPWSTR lpCmdLine,
 	_In_ int nShowCmd)
 {
 	Window wind(L"Test");
