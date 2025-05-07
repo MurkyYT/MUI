@@ -15,8 +15,8 @@ namespace mui
 		~UIElementCollection() { DeleteObject(m_hFont); }
 		UIElementCollection();
 		HFONT GetFontHandle() { return m_hFont; }
-		void Add(std::shared_ptr<UIElement> element);
-		void Remove(std::shared_ptr<UIElement> element);
+		void Add(const std::shared_ptr<UIElement>& element);
+		void Remove(const std::shared_ptr<UIElement>& element);
 		std::shared_ptr<UIElement>& ItemByID(DWORD id);
 		BOOL IDExists(DWORD id);
 		void Clear();

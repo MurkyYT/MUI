@@ -22,7 +22,7 @@ std::shared_ptr<mui::UIElement>& mui::UIElementCollection::ItemByID(DWORD id)
 
 	throw std::runtime_error("ID Not found");
 }
-void mui::UIElementCollection::Add(std::shared_ptr<UIElement> element)
+void mui::UIElementCollection::Add(const std::shared_ptr<UIElement>& element)
 {
 	element->m_id = (DWORD)m_index;
 
@@ -63,7 +63,7 @@ void mui::UIElementCollection::Add(std::shared_ptr<UIElement> element)
 	m_index++;
 }
 
-void mui::UIElementCollection::Remove(std::shared_ptr<UIElement> element)
+void mui::UIElementCollection::Remove(const std::shared_ptr<UIElement>& element)
 {
 	auto it = std::find(m_items.begin(), m_items.end(), element);
 
