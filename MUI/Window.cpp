@@ -122,7 +122,7 @@ std::wstring mui::Window::GetTitle()
 {
 	std::wstring text;
 	text.resize(GetWindowTextLengthW(m_hWnd));
-	GetWindowTextW(m_hWnd, (LPWSTR)text.data(), text.size() + 1);
+	text.resize(GetWindowTextW(m_hWnd, (LPWSTR)text.data(), text.size() + 1));
 	return text;
 }
 
