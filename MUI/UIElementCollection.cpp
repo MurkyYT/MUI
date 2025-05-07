@@ -46,7 +46,7 @@ void mui::UIElementCollection::Add(std::shared_ptr<UIElement> element)
 			TRUE
 		);
 
-		element->UpdateMinSize();
+		element->UpdateIdealSize();
 
 		element->SetParentHWND(m_parenthWnd);
 
@@ -54,24 +54,13 @@ void mui::UIElementCollection::Add(std::shared_ptr<UIElement> element)
 			SetWindowSubclass(element->m_hWnd, UIElement::CustomProc, (UINT_PTR)element.get(), NULL);
 
 		ShowWindow(element->m_hWnd, SW_SHOW);
-		RedrawWindow();
+
+		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	}
 
 	m_items.push_back(element);
 	m_indexToItem[element->m_id] = element;
 	m_index++;
-}
-
-void mui::UIElementCollection::RedrawWindow()
-{
-	HWND parent;
-	HWND temp = m_parenthWnd;
-	while (temp)
-	{
-		parent = temp;
-		PostMessage(parent, WM_SIZE, NULL, NULL);
-		temp = GetParent(parent);
-	}
 }
 
 void mui::UIElementCollection::Remove(std::shared_ptr<UIElement> element)
@@ -83,20 +72,22 @@ void mui::UIElementCollection::Remove(std::shared_ptr<UIElement> element)
 		DestroyWindow(element->m_hWnd);
 		m_items.erase(it);
 		m_indexToItem.erase(element->m_id);
-		RedrawWindow();
+		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	}
 }
 
 void mui::UIElementCollection::Clear()
 {
-	HWND parenthWnd = NULL;
-	if(m_items.size() > 0)
-		parenthWnd = m_items[0]->m_parenthWnd;
+	for (const std::shared_ptr<UIElement>& element : m_items)
+	{
+		DestroyWindow(element->m_hWnd);
+		m_indexToItem.erase(element->m_id);
+	}
 
 	m_items.clear();
 
-	if(parenthWnd)
-		InvalidateRect(parenthWnd, NULL, TRUE);
+	if(m_parenthWnd)
+		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 }
 
 const std::vector<std::shared_ptr<mui::UIElement>>& mui::UIElementCollection::Items()

@@ -23,35 +23,35 @@ mui::Button::Button(const wchar_t* text) : Button(text, 0, 0, 0, 0)
 
 size_t mui::Button::GetMinHeight()
 {
-	return m_minimalSize.cy;
+	return m_idealSize.cy;
 }
 
 size_t mui::Button::GetMinWidth()
 {
-	return m_minimalSize.cx;
+	return m_idealSize.cx;
 }
 
 size_t mui::Button::GetMaxHeight()
 {
 	if (m_verticalAligment == Fill)
-		return max(m_minimalSize.cy, m_availableSize.bottom - m_availableSize.top);
+		return max(m_idealSize.cy, m_availableSize.bottom - m_availableSize.top);
 	else
-		return m_minimalSize.cy;
+		return m_idealSize.cy;
 }
 
 size_t mui::Button::GetMaxWidth()
 {
 	if (m_horizontalAligment == Fill)
-		return max(m_minimalSize.cx, m_availableSize.right - m_availableSize.left);
+		return max(m_idealSize.cx, m_availableSize.right - m_availableSize.left);
 	else
-		return m_minimalSize.cx;
+		return m_idealSize.cx;
 }
 
-void mui::Button::UpdateMinSize()
+void mui::Button::UpdateIdealSize()
 {
 	SIZE size{};
 	Button_GetIdealSize(m_hWnd, &size);
-	m_minimalSize = size;
+	m_idealSize = size;
 }
 
 mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)

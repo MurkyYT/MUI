@@ -24,7 +24,7 @@ namespace mui
 
 		EventCallback_t StateChanged{ NULL };
 	protected:
-		void UpdateMinSize() override;
+		void UpdateIdealSize() override;
 	private:
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};

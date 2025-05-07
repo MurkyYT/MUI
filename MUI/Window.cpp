@@ -101,7 +101,7 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 		TRUE
 	);
 
-	element->UpdateMinSize();
+	element->UpdateIdealSize();
 
 	element->SetParentHWND(m_hWnd);
 
@@ -138,6 +138,8 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			window->m_content = NULL;
 		}
 		break;
+		case MUI_WM_REDRAW:
+			// Intentional fall through
 		case WM_SIZE:
 		{
 			if(window->m_content)
@@ -151,6 +153,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 					(int)window->m_content->GetMaxWidth(),
 					(int)window->m_content->GetMaxHeight() , 
 					NULL);
+
 			}
 		}
 		break;

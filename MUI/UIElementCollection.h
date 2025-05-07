@@ -28,7 +28,6 @@ namespace mui
 		HWND m_parenthWnd = NULL;
 		HFONT m_hFont;
 		DWORD m_index = 1;
-		void RedrawWindow();
 	};
 
 }

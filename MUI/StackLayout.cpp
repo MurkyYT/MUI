@@ -75,7 +75,7 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 			TRUE
 		);
 
-		element->UpdateMinSize();
+		element->UpdateIdealSize();
 
 		element->SetParentHWND(m_hWnd);
 
@@ -205,6 +205,9 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 		case WM_KEYUP:
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;
+		case MUI_WM_REDRAW:
+			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
+			// Intentional fall through
 		case WM_SIZE:
 		{
 			int x = 0;

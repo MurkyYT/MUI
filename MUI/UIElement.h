@@ -4,6 +4,8 @@
 
 #include <string>
 
+#define MUI_WM_REDRAW (WM_APP + 7525)
+
 namespace mui
 {
 	enum LayoutAligment
@@ -112,7 +114,7 @@ namespace mui
 			m_hWnd = hWnd;
 		}
 
-		virtual void UpdateMinSize() {};
+		virtual void UpdateIdealSize() {};
 
 		virtual void SetParentHWND(HWND p_hWnd)
 		{
@@ -141,7 +143,7 @@ namespace mui
 		size_t m_width = 0;
 		size_t m_height = 0;
 
-		SIZE m_minimalSize = { 0,0 };
+		SIZE m_idealSize = { 0,0 };
 
 		int m_minWidth = -1;
 		int m_maxWidth = -1;

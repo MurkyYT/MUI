@@ -99,28 +99,28 @@ mui::CheckBox::CheckBox(const wchar_t* text) : CheckBox(text, 0, 0, 0, 0)
 
 size_t mui::CheckBox::GetMinHeight()
 {
-	return m_minimalSize.cy;
+	return m_idealSize.cy;
 }
 
 size_t mui::CheckBox::GetMinWidth()
 {
-	return m_minimalSize.cx;
+	return m_idealSize.cx;
 }
 
 size_t mui::CheckBox::GetMaxHeight()
 {
 	if (m_verticalAligment == Fill)
-		return max(m_minimalSize.cy, m_availableSize.bottom - m_availableSize.top);
+		return max(m_idealSize.cy, m_availableSize.bottom - m_availableSize.top);
 	else
-		return m_minimalSize.cy;
+		return m_idealSize.cy;
 }
 
 size_t mui::CheckBox::GetMaxWidth()
 {
 	if (m_horizontalAligment == Fill)
-		return max(m_minimalSize.cx, m_availableSize.right - m_availableSize.left);
+		return max(m_idealSize.cx, m_availableSize.right - m_availableSize.left);
 	else
-		return m_minimalSize.cx;
+		return m_idealSize.cx;
 }
 
 mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -148,9 +148,9 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
     return { FALSE, NULL };
 }
 
-void mui::CheckBox::UpdateMinSize()
+void mui::CheckBox::UpdateIdealSize()
 {
-    m_minimalSize = GetAccurateCheckboxSize(m_hWnd);
+    m_idealSize = GetAccurateCheckboxSize(m_hWnd);
 }
 
 BOOL mui::CheckBox::IsChecked()
