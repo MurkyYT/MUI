@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Button.h" />
+    <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="MUI.h" />
     <ClInclude Include="StackLayout.h" />
@@ -145,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="CheckBox.cpp" />
     <ClCompile Include="StackLayout.cpp" />
     <ClCompile Include="UIElement.cpp" />
     <ClCompile Include="UIElementCollection.cpp" />

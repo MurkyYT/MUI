@@ -36,6 +36,9 @@
     <ClInclude Include="Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CheckBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

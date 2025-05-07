@@ -19,8 +19,6 @@ namespace mui
 		friend class UIElementCollection;
 
 	public:
-
-		virtual void HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 		virtual size_t GetMinWidth() = 0;
 		virtual size_t GetMinHeight() = 0;
 		virtual size_t GetMaxWidth() = 0;
@@ -98,6 +96,14 @@ namespace mui
 		BOOL GetSubclass() { return m_subclass; }
 
 	protected:
+
+		struct EventHandlerResult
+		{
+			BOOL returnVal;
+			LRESULT value;
+		};
+
+		virtual EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
 		virtual void SetHWND(HWND hWnd)
 		{

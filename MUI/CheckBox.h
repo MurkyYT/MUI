@@ -6,22 +6,25 @@
 namespace mui
 {
 
-	class Button : public UIElement
+	class CheckBox : public UIElement
 	{
 	public:
-		Button(const wchar_t* text, int x, int y, int width, int height);
-		Button(const wchar_t* text, int x, int y);
-		Button(const wchar_t* text);
+		CheckBox(const wchar_t* text, int x, int y, int width, int height);
+		CheckBox(const wchar_t* text, int x, int y);
+		CheckBox(const wchar_t* text);
 
 		size_t GetMinWidth() override;
 		size_t GetMinHeight() override;
 		size_t GetMaxWidth() override;
 		size_t GetMaxHeight() override;
 
-		EventCallback_t OnClick{ NULL };
+		BOOL IsChecked();
+
+		void SetChecked(BOOL checked);
+
+		EventCallback_t StateChanged{ NULL };
 	private:
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 
 }
-

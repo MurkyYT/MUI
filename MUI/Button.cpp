@@ -25,8 +25,6 @@ size_t mui::Button::GetMinHeight()
 {
 	SIZE size{};
 	Button_GetIdealSize(m_hWnd, &size);
-	//if (m_availableSize.bottom - m_availableSize.top < size.cy)
-	//	return m_availableSize.bottom - m_availableSize.top;
 	return size.cy;
 }
 
@@ -34,8 +32,6 @@ size_t mui::Button::GetMinWidth()
 {
 	SIZE size{};
 	Button_GetIdealSize(m_hWnd, &size);
-	//if (m_availableSize.right - m_availableSize.left < size.cx)
-	//	return m_availableSize.right - m_availableSize.left;
 	return size.cx;
 }
 
@@ -59,7 +55,7 @@ size_t mui::Button::GetMaxWidth()
 		return size.cx;
 }
 
-void mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -78,4 +74,6 @@ void mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	default:
 		break;
 	}
+
+	return { FALSE,NULL };
 }

@@ -8,7 +8,7 @@ std::shared_ptr<Button> button2 = std::make_shared<Button>(L"Test budsadsadtton2
 
 void BtnClick()
 {
-	std::shared_ptr<Button> button = std::make_shared<Button>(L"Test button");
+	std::shared_ptr<CheckBox> button = std::make_shared<CheckBox>(L"Test button");
 	layout3->Children().Add(button);
 	layout->Children().Remove(button2);
 }

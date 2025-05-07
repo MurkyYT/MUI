@@ -43,6 +43,8 @@ void mui::StackLayout::SetParentHWND(HWND p_hWnd)
 
 	if (!lstrcmpW(buf, L"MUI_StackLayout"))
 		m_insideAnotherStackLayout = TRUE;
+
+	m_parenthWnd = p_hWnd;
 }
 
 mui::UIElementCollection& mui::StackLayout::Children()
@@ -173,9 +175,9 @@ size_t mui::StackLayout::CalcMaxWidth()
 	return max(width, m_availableSize.right - m_availableSize.left);
 }
 
-void mui::StackLayout::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+mui::UIElement::EventHandlerResult mui::StackLayout::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-
+	return { FALSE, NULL };
 }
 
 LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -195,6 +197,12 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
+		case WM_KEYDOWN:
+			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
+			break;
+		case WM_KEYUP:
+			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
+			break;
 		case WM_SIZE:
 		{
 			int x = 0;
@@ -244,13 +252,32 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 		case WM_COMMAND:
 		{
 			if (layout->Children().IDExists((DWORD)wParam))
-				layout->Children().ItemByID((DWORD)wParam)->HandleEvent(uMsg, wParam, lParam);
+			{
+				EventHandlerResult res = layout->Children().ItemByID((DWORD)wParam)->HandleEvent(uMsg, wParam, lParam);
+				if (res.returnVal)
+					return res.value;
+			}
 		}
 		break;
 		case WM_NOTIFY:
 		{
 			if (layout->Children().IDExists((DWORD)((LPNMHDR)lParam)->idFrom))
-				layout->Children().ItemByID((DWORD)((LPNMHDR)lParam)->idFrom)->HandleEvent(uMsg, wParam, lParam);
+			{
+				EventHandlerResult res = layout->Children().ItemByID((DWORD)((LPNMHDR)lParam)->idFrom)->HandleEvent(uMsg, wParam, lParam);
+				if (res.returnVal)
+					return res.value;
+			}
+		}
+		break;
+		case WM_DRAWITEM:
+		{
+			LPDRAWITEMSTRUCT dis = (LPDRAWITEMSTRUCT)lParam;
+			if (layout->Children().IDExists(dis->CtlID))
+			{
+				EventHandlerResult res = layout->Children().ItemByID(dis->CtlID)->HandleEvent(uMsg, wParam, lParam);
+				if (res.returnVal)
+					return res.value;
+			}
 		}
 		break;
 		default:

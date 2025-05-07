@@ -38,7 +38,7 @@ namespace mui
 		size_t CalcMaxHeight();
 
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-		void HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 
 }

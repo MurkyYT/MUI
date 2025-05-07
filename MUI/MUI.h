@@ -5,10 +5,13 @@ name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #pragma comment (lib, "comctl32")
+#pragma comment(lib, "uxtheme")
+#pragma comment(lib, "dwmapi")
 
 #include "./Events.h"
 #include "./UIElement.h"
 #include "./UIElementCollection.h"
 #include "./StackLayout.h"
 #include "./Button.h"
+#include "./CheckBox.h"
 #include "./Window.h"
