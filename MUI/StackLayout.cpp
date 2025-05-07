@@ -34,7 +34,15 @@ mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	m_x = 0;
 	m_y = 0;
-	m_uiType = UIType::StackLayout;
+}
+
+void mui::StackLayout::SetParentHWND(HWND p_hWnd)
+{
+	wchar_t buf[256];
+	GetClassNameW(p_hWnd, buf, 256);
+
+	if (!lstrcmpW(buf, L"MUI_StackLayout"))
+		m_insideAnotherStackLayout = TRUE;
 }
 
 mui::UIElementCollection& mui::StackLayout::Children()
@@ -193,15 +201,12 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			int y = 0;
 			for (const std::shared_ptr<UIElement>& element : layout->m_collection.Items())
 			{
-				if (element->m_uiType == UIType::StackLayout)
-					((StackLayout*)element.get())->m_insideAnotherStackLayout = TRUE;
-
 				element->SetAvailableSize({x,y, layout->m_availableSize.right,layout->m_availableSize.bottom });
 
 				if (layout->m_orientation == Vertical) 
 				{
 					size_t width = !layout->m_insideAnotherStackLayout &&
-						element->m_uiType != UIType::StackLayout
+						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
 						&& element->m_horizontalAligment == Fill && layout->m_orientation == Vertical
 						? element->GetMaxWidth() : element->GetMinWidth();
 
@@ -220,7 +225,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				{
 					size_t width = element->GetMinWidth();
 					size_t height = !layout->m_insideAnotherStackLayout &&
-						element->m_uiType != UIType::StackLayout
+						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
 						&& element->m_verticalAligment == Fill && layout->m_orientation == Horizontal
 						? element->GetMaxHeight() : element->GetMinHeight();
 

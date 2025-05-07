@@ -46,7 +46,7 @@ void mui::UIElementCollection::Add(std::shared_ptr<UIElement> element)
 			TRUE
 		);
 
-		element->m_parenthWnd = m_parenthWnd;
+		element->SetParentHWND(m_parenthWnd);
 
 		if (element->m_subclass)
 			SetWindowSubclass(element->m_hWnd, UIElement::CustomProc, (UINT_PTR)element.get(), NULL);

@@ -77,7 +77,7 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 	if (m_content) 
 		DestroyWindow(m_content->m_hWnd);
 
-	element->m_parenthWnd = this->m_hWnd;
+	element->SetParentHWND(m_hWnd);
 	element->m_id = (DWORD)1;
 	HWND hWnd = CreateWindowEx(
 		0,

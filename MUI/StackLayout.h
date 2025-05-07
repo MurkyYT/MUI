@@ -25,6 +25,8 @@ namespace mui
 		void SetHWND(HWND hWnd) override;
 
 		UIElementCollection& Children();
+	protected:
+		void SetParentHWND(HWND p_hWnd) override;
 	private:
 		BOOL m_insideAnotherStackLayout = FALSE;
 		StackLayoutOrientation m_orientation;

@@ -99,17 +99,12 @@ namespace mui
 
 	protected:
 
-		enum UIType {
-			Button,
-			StackLayout
-		};
-
 		virtual void SetHWND(HWND hWnd)
 		{
 			m_hWnd = hWnd;
 		}
 
-		void SetParentHWND(HWND p_hWnd)
+		virtual void SetParentHWND(HWND p_hWnd)
 		{
 			m_parenthWnd = p_hWnd;
 		}
@@ -121,8 +116,6 @@ namespace mui
 
 		LayoutAligment m_verticalAligment = Fill;
 		LayoutAligment m_horizontalAligment = Fill;
-
-		UIType m_uiType;
 
 		HWND m_parenthWnd = NULL;
 		HWND m_hWnd = NULL;

@@ -11,7 +11,6 @@ mui::Button::Button(const wchar_t* text, int x, int y, int width, int height)
 	m_width = width;
 	m_height = height;
 	m_style = WS_VISIBLE | ES_CENTER;
-	m_uiType = UIType::Button;
 }
 
 mui::Button::Button(const wchar_t* text, int x, int y) : Button(text,x,y,0,0)
