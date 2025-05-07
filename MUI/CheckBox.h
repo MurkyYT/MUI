@@ -23,6 +23,8 @@ namespace mui
 		void SetChecked(BOOL checked);
 
 		EventCallback_t StateChanged{ NULL };
+	protected:
+		void UpdateMinSize() override;
 	private:
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};

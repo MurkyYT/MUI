@@ -19,6 +19,8 @@ namespace mui
 		size_t GetMaxHeight() override;
 
 		EventCallback_t OnClick{ NULL };
+	protected:
+		void UpdateMinSize() override;
 	private:
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};

@@ -3,6 +3,8 @@
 #include <string>
 #include <stdexcept>
 
+#pragma comment (lib, "comctl32")
+
 mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 {
 	std::wstring className = L"MUI_Window&" + std::to_wstring((ULONG_PTR)this);
@@ -77,12 +79,11 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 	if (m_content) 
 		DestroyWindow(m_content->m_hWnd);
 
-	element->SetParentHWND(m_hWnd);
 	element->m_id = (DWORD)1;
 	HWND hWnd = CreateWindowEx(
 		0,
-		element->m_class,
-		element->m_name,
+		element->GetClass(),
+		element->GetName(),
 		element->m_style | WS_CHILD,
 		(int)element->m_x, (int)element->m_y, (int)element->m_width, (int)element->m_height,
 		this->m_hWnd,
@@ -99,6 +100,10 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 		(WPARAM)this->m_hFont,
 		TRUE
 	);
+
+	element->UpdateMinSize();
+
+	element->SetParentHWND(m_hWnd);
 
 	m_content = element;
 
@@ -161,6 +166,19 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				window->m_content->HandleEvent(uMsg, wParam, lParam);
 		}
 		break;
+		case WM_CTLCOLORSTATIC:
+		{
+			HWND hwnd = (HWND)lParam;
+			if (hwnd != NULL) {
+				int controlId = GetDlgCtrlID(hwnd);
+				if (window->m_content && controlId == window->m_content->m_id)
+				{
+					mui::UIElement::EventHandlerResult res = window->m_content->HandleEvent(uMsg, wParam, lParam);
+					if (res.returnVal)
+						return res.value;
+				}
+			}
+		}
 		case WM_CREATE:
 		{
 			NONCLIENTMETRICS ncm = {};

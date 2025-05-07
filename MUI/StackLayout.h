@@ -22,10 +22,9 @@ namespace mui
 		size_t GetMaxWidth() override { return CalcMaxWidth(); };
 		size_t GetMaxHeight() override { return CalcMaxHeight(); };
 
-		void SetHWND(HWND hWnd) override;
-
 		UIElementCollection& Children();
 	protected:
+		void SetHWND(HWND hWnd) override;
 		void SetParentHWND(HWND p_hWnd) override;
 	private:
 		BOOL m_insideAnotherStackLayout = FALSE;

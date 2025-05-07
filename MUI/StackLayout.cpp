@@ -75,6 +75,8 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 			TRUE
 		);
 
+		element->UpdateMinSize();
+
 		element->SetParentHWND(m_hWnd);
 
 		if (element->GetSubclass())
@@ -269,14 +271,17 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			}
 		}
 		break;
-		case WM_DRAWITEM:
+		case WM_CTLCOLORSTATIC: 
 		{
-			LPDRAWITEMSTRUCT dis = (LPDRAWITEMSTRUCT)lParam;
-			if (layout->Children().IDExists(dis->CtlID))
-			{
-				EventHandlerResult res = layout->Children().ItemByID(dis->CtlID)->HandleEvent(uMsg, wParam, lParam);
-				if (res.returnVal)
-					return res.value;
+			HWND hwnd = (HWND)lParam;
+			if (hwnd != NULL) {
+				int controlId = GetDlgCtrlID(hwnd);
+				if (layout->Children().IDExists(controlId))
+				{
+					EventHandlerResult res = layout->Children().ItemByID(controlId)->HandleEvent(uMsg, wParam, lParam);
+					if (res.returnVal)
+						return res.value;
+				}
 			}
 		}
 		break;

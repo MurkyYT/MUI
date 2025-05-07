@@ -23,36 +23,35 @@ mui::Button::Button(const wchar_t* text) : Button(text, 0, 0, 0, 0)
 
 size_t mui::Button::GetMinHeight()
 {
-	SIZE size{};
-	Button_GetIdealSize(m_hWnd, &size);
-	return size.cy;
+	return m_minimalSize.cy;
 }
 
 size_t mui::Button::GetMinWidth()
 {
-	SIZE size{};
-	Button_GetIdealSize(m_hWnd, &size);
-	return size.cx;
+	return m_minimalSize.cx;
 }
 
 size_t mui::Button::GetMaxHeight()
 {
-	SIZE size{};
-	Button_GetIdealSize(m_hWnd, &size);
 	if (m_verticalAligment == Fill)
-		return max(size.cy, m_availableSize.bottom - m_availableSize.top);
+		return max(m_minimalSize.cy, m_availableSize.bottom - m_availableSize.top);
 	else
-		return size.cy;
+		return m_minimalSize.cy;
 }
 
 size_t mui::Button::GetMaxWidth()
 {
+	if (m_horizontalAligment == Fill)
+		return max(m_minimalSize.cx, m_availableSize.right - m_availableSize.left);
+	else
+		return m_minimalSize.cx;
+}
+
+void mui::Button::UpdateMinSize()
+{
 	SIZE size{};
 	Button_GetIdealSize(m_hWnd, &size);
-	if (m_horizontalAligment == Fill)
-		return max(size.cx, m_availableSize.right - m_availableSize.left);
-	else
-		return size.cx;
+	m_minimalSize = size;
 }
 
 mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -70,6 +69,8 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 		}
 		}
 	}
+	case WM_CTLCOLORSTATIC:
+		return { TRUE , NULL };
 	break;
 	default:
 		break;

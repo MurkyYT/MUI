@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 
+#include <string>
+
 namespace mui
 {
 	enum LayoutAligment
@@ -89,8 +91,8 @@ namespace mui
 		}
 
 		HWND GetHWND() { return m_hWnd; }
-		const wchar_t* GetClass() { return m_class; }
-		const wchar_t* GetName() { return m_name; }
+		const wchar_t* GetClass() { return m_class.c_str(); }
+		const wchar_t* GetName() { return m_name.c_str(); }
 		DWORD GetStyle() { return m_style; }
 		DWORD GetID() { return m_id; }
 		BOOL GetSubclass() { return m_subclass; }
@@ -110,6 +112,8 @@ namespace mui
 			m_hWnd = hWnd;
 		}
 
+		virtual void UpdateMinSize() {};
+
 		virtual void SetParentHWND(HWND p_hWnd)
 		{
 			m_parenthWnd = p_hWnd;
@@ -126,8 +130,8 @@ namespace mui
 		HWND m_parenthWnd = NULL;
 		HWND m_hWnd = NULL;
 
-		const wchar_t* m_class = L"";
-		const wchar_t* m_name = L"";
+		std::wstring m_class = L"";
+		std::wstring m_name = L"";
 
 		DWORD m_style = 0;
 		DWORD m_id = 0;
@@ -136,6 +140,8 @@ namespace mui
 		size_t m_y = 0;
 		size_t m_width = 0;
 		size_t m_height = 0;
+
+		SIZE m_minimalSize = { 0,0 };
 
 		int m_minWidth = -1;
 		int m_maxWidth = -1;

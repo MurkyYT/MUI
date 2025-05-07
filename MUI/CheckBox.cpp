@@ -5,28 +5,31 @@
 #include <tchar.h>
 #include <dwmapi.h>
 
+#pragma comment(lib, "uxtheme")
+#pragma comment(lib, "dwmapi")
+
 #ifndef TMT_CONTENTMARGINS
 #define TMT_CONTENTMARGINS 3602
 #endif
 
-SIZE GetAccurateCheckboxSize(HWND hwnd)
+SIZE GetAccurateCheckboxSize(HWND hWnd)
 {
     SIZE total = { 0, 0 };
 
     wchar_t text[256];
-    GetWindowTextW(hwnd, text, 256);
+    GetWindowTextW(hWnd, text, 256);
 
-    HDC hdc = GetDC(hwnd);
-    HFONT hFont = (HFONT)SendMessageW(hwnd, WM_GETFONT, 0, 0);
+    HDC hdc = GetDC(hWnd);
+    HFONT hFont = (HFONT)SendMessageW(hWnd, WM_GETFONT, 0, 0);
     HFONT oldFont = (HFONT)SelectObject(hdc, hFont);
 
     SIZE textSize = {};
     GetTextExtentPoint32W(hdc, text, lstrlenW(text), &textSize);
     SelectObject(hdc, oldFont);
-    ReleaseDC(hwnd, hdc);
+    ReleaseDC(hWnd, hdc);
 
-    int check = (int)SendMessageW(hwnd, BM_GETCHECK, 0, 0);
-    BOOL enabled = IsWindowEnabled(hwnd);
+    int check = (int)SendMessageW(hWnd, BM_GETCHECK, 0, 0);
+    BOOL enabled = IsWindowEnabled(hWnd);
 
     int stateId = CBS_UNCHECKEDNORMAL;
     switch (check)
@@ -47,13 +50,13 @@ SIZE GetAccurateCheckboxSize(HWND hwnd)
     HMODULE hUser32 = GetModuleHandleW(L"user32.dll");
     if (hUser32) {
         auto pGetDpiForWindow = (UINT(WINAPI*)(HWND))GetProcAddress(hUser32, "GetDpiForWindow");
-        if (pGetDpiForWindow) dpi = pGetDpiForWindow(hwnd);
+        if (pGetDpiForWindow) dpi = pGetDpiForWindow(hWnd);
     }
 
     SIZE glyphSize = { 0, 0 };
     int spacing = 0;
 
-    HTHEME hTheme = OpenThemeData(hwnd, L"BUTTON");
+    HTHEME hTheme = OpenThemeData(hWnd, L"BUTTON");
     if (hTheme)
     {
         GetThemePartSize(hTheme, NULL, BP_CHECKBOX, stateId, NULL, TS_TRUE, &glyphSize);
@@ -77,7 +80,7 @@ SIZE GetAccurateCheckboxSize(HWND hwnd)
     total.cy = max(glyphSize.cy, textSize.cy);
     total.cx = glyphSize.cx + spacing + textSize.cx;
 
-    if (GetWindowLongW(hwnd, GWL_EXSTYLE) & WS_EX_LAYOUTRTL)
+    if (GetWindowLongW(hWnd, GWL_EXSTYLE) & WS_EX_LAYOUTRTL)
     {
         total.cx = textSize.cx + spacing + glyphSize.cx;
     }
@@ -106,32 +109,28 @@ mui::CheckBox::CheckBox(const wchar_t* text) : CheckBox(text, 0, 0, 0, 0)
 
 size_t mui::CheckBox::GetMinHeight()
 {
-    SIZE size = GetAccurateCheckboxSize(m_hWnd);
-	return size.cy;
+	return m_minimalSize.cy;
 }
 
 size_t mui::CheckBox::GetMinWidth()
 {
-    SIZE size = GetAccurateCheckboxSize(m_hWnd);
-	return size.cx;
+	return m_minimalSize.cx;
 }
 
 size_t mui::CheckBox::GetMaxHeight()
 {
-    SIZE size = GetAccurateCheckboxSize(m_hWnd);
 	if (m_verticalAligment == Fill)
-		return max(size.cy, m_availableSize.bottom - m_availableSize.top);
+		return max(m_minimalSize.cy, m_availableSize.bottom - m_availableSize.top);
 	else
-		return size.cy;
+		return m_minimalSize.cy;
 }
 
 size_t mui::CheckBox::GetMaxWidth()
 {
-    SIZE size = GetAccurateCheckboxSize(m_hWnd);
 	if (m_horizontalAligment == Fill)
-		return max(size.cx, m_availableSize.right - m_availableSize.left);
+		return max(m_minimalSize.cx, m_availableSize.right - m_availableSize.left);
 	else
-		return size.cx;
+		return m_minimalSize.cx;
 }
 
 mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -158,10 +157,16 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
     return { FALSE, NULL };
 }
 
+void mui::CheckBox::UpdateMinSize()
+{
+    m_minimalSize = GetAccurateCheckboxSize(m_hWnd);
+}
+
 BOOL mui::CheckBox::IsChecked()
 {
 	return IsDlgButtonChecked(m_parenthWnd, m_id);
 }
+
 void mui::CheckBox::SetChecked(BOOL checked)
 {
 	CheckDlgButton(m_parenthWnd, m_id, checked);

@@ -28,23 +28,25 @@ void mui::UIElementCollection::Add(std::shared_ptr<UIElement> element)
 
 	if (m_parenthWnd)
 	{
-		element->m_hWnd = CreateWindowEx(
+		element->SetHWND(CreateWindowEx(
 			0,
-			element->m_class,
-			element->m_name,
+			element->GetClass(),
+			element->GetName(),
 			element->m_style | WS_CHILD,
 			(int)element->m_x, (int)element->m_y, (int)element->m_width, (int)element->m_height,
 			m_parenthWnd,
 			(HMENU)element->m_id,
 			GetModuleHandle(NULL),
 			element.get()
-		);
+		));
 		SendMessage(
 			element->m_hWnd,
 			WM_SETFONT,
 			(WPARAM)m_hFont,
 			TRUE
 		);
+
+		element->UpdateMinSize();
 
 		element->SetParentHWND(m_parenthWnd);
 
