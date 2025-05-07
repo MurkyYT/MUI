@@ -21,6 +21,7 @@ namespace mui
 		std::wstring GetTitle();
 	private:
 		HWND m_hWnd;
+		HICON m_hIcon;
 		HFONT m_hFont;
 		std::shared_ptr<UIElement> m_content = NULL;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

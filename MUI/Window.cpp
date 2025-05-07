@@ -9,6 +9,11 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 {
 	std::wstring className = L"MUI_Window&" + std::to_wstring((ULONG_PTR)this);
 
+	WCHAR buffer[MAX_PATH] = { 0 };
+	GetModuleFileNameW(NULL, buffer, MAX_PATH);
+
+	ExtractIconExW(buffer, 0, &m_hIcon, NULL, 1);
+
 	WNDCLASSEX wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -17,6 +22,7 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wcex.lpszClassName = className.c_str();
+	wcex.hIcon = m_hIcon;
 
 	if (!RegisterClassEx(&wcex))
 		throw std::runtime_error("Class creation failed");
@@ -147,6 +153,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		case WM_CLOSE:
 		{
 			DeleteObject(window->m_hFont);
+			DestroyIcon(window->m_hIcon);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
 			window->m_content = NULL;
 		}
