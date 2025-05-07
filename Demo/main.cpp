@@ -32,6 +32,7 @@ INT WINAPI WinMain(
 		std::shared_ptr<Button> button4 = std::make_shared<Button>((std::wstring(L"Test button (") + std::to_wstring(i + 1) + L")").c_str());
 		button4->OnClick = std::bind(BtnClick);
 		layout2->Children().Add(button4);
+		wind.SetTitle((wind.GetTitle() + L" " + std::to_wstring(i + 1)).c_str());
 	}
 
 	button2->OnClick = std::bind(BtnClick);

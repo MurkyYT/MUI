@@ -18,6 +18,7 @@ namespace mui
 		POINT GetTopLeft();
 		RECT GetRect();
 		BOOL SetTitle(const wchar_t* title);
+		std::wstring GetTitle();
 	private:
 		HWND m_hWnd;
 		HFONT m_hFont;
