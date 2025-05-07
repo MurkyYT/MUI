@@ -21,6 +21,7 @@ namespace mui
 		BOOL IDExists(DWORD id);
 		void Clear();
 		void SetHWND(HWND hWnd) { m_parenthWnd = hWnd; };
+		size_t Count() { return m_items.size(); }
 		const std::vector<std::shared_ptr<UIElement>>& Items();
 	private:
 		std::vector<std::shared_ptr<UIElement>> m_items;

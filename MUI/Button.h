@@ -18,6 +18,8 @@ namespace mui
 		size_t GetMaxWidth() override;
 		size_t GetMaxHeight() override;
 
+		BOOL SetText(const wchar_t* text);
+
 		EventCallback_t OnClick{ NULL };
 	protected:
 		void UpdateIdealSize() override;

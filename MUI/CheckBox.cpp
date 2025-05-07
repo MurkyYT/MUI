@@ -162,3 +162,16 @@ void mui::CheckBox::SetChecked(BOOL checked)
 {
 	CheckDlgButton(m_parenthWnd, m_id, checked);
 }
+
+BOOL mui::CheckBox::SetText(const wchar_t* text)
+{
+    m_name = text;
+
+    if (!m_hWnd || !m_parenthWnd)
+        return TRUE;
+
+    BOOL res = SetDlgItemText(m_parenthWnd, m_id, m_name.c_str());
+    PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
+    UpdateIdealSize();
+    return res;
+}

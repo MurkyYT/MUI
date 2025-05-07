@@ -20,6 +20,8 @@ namespace mui
 
 		BOOL IsChecked();
 
+		BOOL SetText(const wchar_t* text);
+
 		void SetChecked(BOOL checked);
 
 		EventCallback_t StateChanged{ NULL };
