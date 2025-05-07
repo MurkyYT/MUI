@@ -17,6 +17,7 @@ namespace mui
 		size_t GetWidth();
 		POINT GetTopLeft();
 		RECT GetRect();
+		BOOL SetTitle(const wchar_t* title);
 	private:
 		HWND m_hWnd;
 		HFONT m_hFont;

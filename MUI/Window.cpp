@@ -113,6 +113,11 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 	ShowWindow(element->m_hWnd, SW_SHOW);
 }
 
+BOOL mui::Window::SetTitle(const wchar_t* title)
+{
+	return SetWindowText(m_hWnd, title);
+}
+
 LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
 	Window* window;
