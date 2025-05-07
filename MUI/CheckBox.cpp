@@ -46,12 +46,7 @@ SIZE GetAccurateCheckboxSize(HWND hWnd)
         break;
     }
 
-    UINT dpi = 96;
-    HMODULE hUser32 = GetModuleHandleW(L"user32.dll");
-    if (hUser32) {
-        auto pGetDpiForWindow = (UINT(WINAPI*)(HWND))GetProcAddress(hUser32, "GetDpiForWindow");
-        if (pGetDpiForWindow) dpi = pGetDpiForWindow(hWnd);
-    }
+    UINT dpi = GetDpiForWindow(hWnd);
 
     SIZE glyphSize = { 0, 0 };
     int spacing = 0;
@@ -79,11 +74,6 @@ SIZE GetAccurateCheckboxSize(HWND hWnd)
 
     total.cy = max(glyphSize.cy, textSize.cy);
     total.cx = glyphSize.cx + spacing + textSize.cx;
-
-    if (GetWindowLongW(hWnd, GWL_EXSTYLE) & WS_EX_LAYOUTRTL)
-    {
-        total.cx = textSize.cx + spacing + glyphSize.cx;
-    }
 
     return total;
 }
