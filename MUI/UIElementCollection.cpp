@@ -35,7 +35,7 @@ void mui::UIElementCollection::Add(const std::shared_ptr<UIElement>& element)
 			element->m_style | WS_CHILD,
 			(int)element->m_x, (int)element->m_y, (int)element->m_width, (int)element->m_height,
 			m_parenthWnd,
-			(HMENU)element->m_id,
+			(HMENU)(UINT64)element->m_id,
 			GetModuleHandle(NULL),
 			element.get()
 		));

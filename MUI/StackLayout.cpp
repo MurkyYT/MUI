@@ -64,7 +64,7 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 			element->GetStyle() | WS_CHILD,
 			(int)element->GetX(), (int)element->GetY(), (int)element->GetWidth(), (int)element->GetHeight(),
 			m_hWnd,
-			(HMENU)element->GetID(),
+			(HMENU)(UINT64)element->GetID(),
 			GetModuleHandle(NULL),
 			element.get()
 		));
