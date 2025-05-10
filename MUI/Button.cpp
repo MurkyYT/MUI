@@ -34,7 +34,7 @@ size_t mui::Button::GetMinWidth()
 size_t mui::Button::GetMaxHeight()
 {
 	if (m_verticalAligment == Fill)
-		return max(m_idealSize.cy, m_availableSize.bottom - m_availableSize.top);
+		return m_availableSize.bottom - m_availableSize.top;
 	else
 		return m_idealSize.cy;
 }
@@ -42,7 +42,7 @@ size_t mui::Button::GetMaxHeight()
 size_t mui::Button::GetMaxWidth()
 {
 	if (m_horizontalAligment == Fill)
-		return max(m_idealSize.cx, m_availableSize.right - m_availableSize.left);
+		return m_availableSize.right - m_availableSize.left;
 	else
 		return m_idealSize.cx;
 }

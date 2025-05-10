@@ -84,7 +84,7 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 
 		ShowWindow(element->GetHWND(), SW_SHOW);
 	}
-	InvalidateRect(m_hWnd, NULL, TRUE);
+	PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 
 	m_collection.SetHWND(hWnd);
 }
@@ -199,6 +199,9 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
+		case WM_DESTROY:
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
+			break;
 		case WM_KEYDOWN:
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;
@@ -206,7 +209,6 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case MUI_WM_REDRAW:
-			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			// Intentional fall through
 		case WM_SIZE:
 		{
@@ -251,6 +253,11 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 
 					x += (long)width;
 				}
+
+				InvalidateRect(element->GetHWND(), NULL, TRUE);
+
+				if(uMsg == MUI_WM_REDRAW)
+					PostMessage(layout->m_parenthWnd, uMsg, x, y);
 			}
 		}
 		break;

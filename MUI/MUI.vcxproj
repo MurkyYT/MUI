@@ -138,6 +138,7 @@
     <ClInclude Include="Button.h" />
     <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Events.h" />
+    <ClInclude Include="ListView.h" />
     <ClInclude Include="MUI.h" />
     <ClInclude Include="StackLayout.h" />
     <ClInclude Include="UIElement.h" />
@@ -147,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CheckBox.cpp" />
+    <ClCompile Include="ListView.cpp" />
     <ClCompile Include="StackLayout.cpp" />
     <ClCompile Include="UIElement.cpp" />
     <ClCompile Include="UIElementCollection.cpp" />

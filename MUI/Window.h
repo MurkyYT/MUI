@@ -10,7 +10,7 @@ namespace mui
 	class Window
 	{
 	public:
-		Window(const wchar_t* title, size_t height = 500, size_t width = 500);
+		Window(const wchar_t* title = L"", size_t height = 500, size_t width = 500);
 		void Show();
 		void SetContent(const std::shared_ptr<UIElement>& element);
 		size_t GetHeight();

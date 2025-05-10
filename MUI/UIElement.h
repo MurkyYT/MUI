@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 
+#include <CommCtrl.h>
+
 #include <string>
 
 #define MUI_WM_REDRAW (WM_APP + 7525)
@@ -100,6 +102,8 @@ namespace mui
 		BOOL GetSubclass() { return m_subclass; }
 
 	protected:
+
+		~UIElement() { if (m_subclass) RemoveWindowSubclass(m_hWnd, CustomProc, (UINT_PTR)this); }
 
 		struct EventHandlerResult
 		{

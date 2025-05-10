@@ -110,7 +110,7 @@ size_t mui::CheckBox::GetMinWidth()
 size_t mui::CheckBox::GetMaxHeight()
 {
 	if (m_verticalAligment == Fill)
-		return max(m_idealSize.cy, m_availableSize.bottom - m_availableSize.top);
+		return m_availableSize.bottom - m_availableSize.top;
 	else
 		return m_idealSize.cy;
 }
@@ -118,7 +118,7 @@ size_t mui::CheckBox::GetMaxHeight()
 size_t mui::CheckBox::GetMaxWidth()
 {
 	if (m_horizontalAligment == Fill)
-		return max(m_idealSize.cx, m_availableSize.right - m_availableSize.left);
+		return m_availableSize.right - m_availableSize.left;
 	else
 		return m_idealSize.cx;
 }
