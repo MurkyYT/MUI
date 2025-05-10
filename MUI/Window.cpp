@@ -159,17 +159,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		}
 		break;
 		case MUI_WM_REDRAW:
-		{
-			RECT rect{};
-			GetClientRect(hWnd, &rect);
-			if (window->m_content)
-			{
-				rect.top += (LONG)lParam;
-				rect.top += (LONG)wParam;
-			}
-			InvalidateRect(hWnd, &rect, TRUE);
 			// Intentional fall through
-		}
 		case WM_SIZE:
 		{
 			if(window->m_content)

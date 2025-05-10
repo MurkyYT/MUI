@@ -17,7 +17,7 @@ mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 #ifndef NDEBUG
 	wcex.hbrBackground = (HBRUSH)GetStockObject(DKGRAY_BRUSH);
 #else
-	wcex.hbrBackground = NULL;
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 #endif
 	wcex.lpszClassName = L"MUI_StackLayout";
 
@@ -209,6 +209,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case MUI_WM_REDRAW:
+			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			// Intentional fall through
 		case WM_SIZE:
 		{
@@ -216,9 +217,9 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			int y = 0;
 			for (const std::shared_ptr<UIElement>& element : layout->m_collection.Items())
 			{
-				element->SetAvailableSize({x,y, layout->m_availableSize.right,layout->m_availableSize.bottom });
+				element->SetAvailableSize({ x,y, layout->m_availableSize.right,layout->m_availableSize.bottom });
 
-				if (layout->m_orientation == Vertical) 
+				if (layout->m_orientation == Vertical)
 				{
 					size_t width = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
@@ -255,9 +256,6 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				}
 
 				InvalidateRect(element->GetHWND(), NULL, TRUE);
-
-				if(uMsg == MUI_WM_REDRAW)
-					PostMessage(layout->m_parenthWnd, uMsg, x, y);
 			}
 		}
 		break;
