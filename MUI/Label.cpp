@@ -16,7 +16,6 @@ SIZE GetLabelIdealSize(HWND hwndLabel)
         GetWindowText(hwndLabel, &text[0], len + 1);
 
         GetTextExtentPoint32(hdc, text.c_str(), len, &size);
-
         SelectObject(hdc, hOldFont);
         ReleaseDC(hwndLabel, hdc);
     }
@@ -48,11 +47,17 @@ void mui::Label::UpdateIdealSize()
 	m_idealSize = GetLabelIdealSize(m_hWnd);
 }
 
+void mui::Label::SetTextColor(COLORREF color)
+{
+    m_color = color;
+}
+
 mui::UIElement::EventHandlerResult mui::Label::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
     case WM_CTLCOLORSTATIC:
+        ::SetTextColor((HDC)wParam, m_color);
         return { TRUE , NULL };
     default:
         break;

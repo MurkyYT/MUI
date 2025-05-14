@@ -17,7 +17,10 @@ namespace mui
 
 		std::wstring GetText();
 
+		void SetTextColor(COLORREF color);
+
 	private:
+		COLORREF m_color = RGB(0,0,0);
 		void UpdateIdealSize() override;
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
