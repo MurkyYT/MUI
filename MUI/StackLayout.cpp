@@ -236,7 +236,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			}
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 		}
-		// Intentional fall through
+			// Intentional fall through
 		case WM_SIZE:
 		{
 			int x = 0;
@@ -308,6 +308,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 		}
 		break;
 		case WM_CTLCOLOREDIT:
+		case WM_CTLCOLORBTN:
 		case WM_CTLCOLORSTATIC: 
 		{
 			HWND hwnd = (HWND)lParam;

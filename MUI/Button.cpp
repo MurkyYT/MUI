@@ -45,7 +45,7 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 		}
 	}
 	break;
-	case WM_CTLCOLORSTATIC:
+	case WM_CTLCOLORBTN:
 		return { TRUE , NULL };
 	default:
 		break;

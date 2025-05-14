@@ -191,6 +191,8 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				window->m_content->HandleEvent(uMsg, wParam, lParam);
 		}
 		break;
+		case WM_CTLCOLORBTN:
+		case WM_CTLCOLOREDIT:
 		case WM_CTLCOLORSTATIC:
 		{
 			HWND hwnd = (HWND)lParam;
