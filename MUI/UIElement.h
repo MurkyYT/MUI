@@ -25,10 +25,28 @@ namespace mui
 		friend class UIElementCollection;
 
 	public:
-		virtual size_t GetMinWidth() = 0;
-		virtual size_t GetMinHeight() = 0;
-		virtual size_t GetMaxWidth() = 0;
-		virtual size_t GetMaxHeight() = 0;
+		virtual size_t GetMinWidth()
+		{
+			return m_idealSize.cx;
+		}
+		virtual size_t GetMinHeight()
+		{
+			return m_idealSize.cy;
+		}
+		virtual size_t GetMaxWidth() 
+		{
+			if (m_horizontalAligment == Fill)
+				return m_availableSize.right - m_availableSize.left;
+			else
+				return m_idealSize.cx;
+		}
+		virtual size_t GetMaxHeight()
+		{
+			if (m_verticalAligment == Fill)
+				return m_availableSize.bottom - m_availableSize.top;
+			else
+				return m_idealSize.cy;
+		}
 		virtual size_t GetHeight()
 		{
 			if (!m_hWnd)

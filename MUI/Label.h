@@ -11,11 +11,6 @@ namespace mui
 		Label(const wchar_t* text, int x, int y);
 		Label(const wchar_t* text);
 
-		size_t GetMinWidth() override;
-		size_t GetMinHeight() override;
-		size_t GetMaxWidth() override;
-		size_t GetMaxHeight() override;
-
 		BOOL SetText(const std::wstring& text);
 
 		BOOL SetTextAligment(LayoutAligment aligment);

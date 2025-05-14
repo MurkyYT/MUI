@@ -43,11 +43,6 @@ namespace mui
 		int GetSelectedIndex();
 		std::shared_ptr<ListItem> GetSelectedItem();
 
-		size_t GetMinWidth() override;
-		size_t GetMinHeight() override;
-		size_t GetMaxWidth() override;
-		size_t GetMaxHeight() override;
-
 	private:
 		void SetHWND(HWND hWnd) override;
 		void UpdateIdealSize() override;

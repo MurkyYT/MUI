@@ -13,11 +13,6 @@ namespace mui
 		CheckBox(const wchar_t* text, int x, int y);
 		CheckBox(const wchar_t* text);
 
-		size_t GetMinWidth() override;
-		size_t GetMinHeight() override;
-		size_t GetMaxWidth() override;
-		size_t GetMaxHeight() override;
-
 		BOOL IsChecked();
 
 		BOOL SetText(const std::wstring& text);

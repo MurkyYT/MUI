@@ -21,32 +21,6 @@ mui::Button::Button(const wchar_t* text) : Button(text, 0, 0, 0, 0)
 {
 }
 
-size_t mui::Button::GetMinHeight()
-{
-	return m_idealSize.cy;
-}
-
-size_t mui::Button::GetMinWidth()
-{
-	return m_idealSize.cx;
-}
-
-size_t mui::Button::GetMaxHeight()
-{
-	if (m_verticalAligment == Fill)
-		return m_availableSize.bottom - m_availableSize.top;
-	else
-		return m_idealSize.cy;
-}
-
-size_t mui::Button::GetMaxWidth()
-{
-	if (m_horizontalAligment == Fill)
-		return m_availableSize.right - m_availableSize.left;
-	else
-		return m_idealSize.cx;
-}
-
 void mui::Button::UpdateIdealSize()
 {
 	SIZE size{};

@@ -24,32 +24,6 @@ void mui::ListView::UpdateIdealSize()
 	m_idealSize = { LOWORD(res), HIWORD(res) };
 }
 
-size_t mui::ListView::GetMinHeight()
-{
-	return m_idealSize.cy;
-}
-
-size_t mui::ListView::GetMinWidth()
-{
-	return m_idealSize.cx;
-}
-
-size_t mui::ListView::GetMaxHeight()
-{
-	if (m_verticalAligment == Fill)
-		return m_availableSize.bottom - m_availableSize.top;
-	else
-		return m_idealSize.cy;
-}
-
-size_t mui::ListView::GetMaxWidth()
-{
-	if (m_horizontalAligment == Fill)
-		return m_availableSize.right - m_availableSize.left;
-	else
-		return m_idealSize.cx;
-}
-
 mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)

@@ -43,32 +43,6 @@ mui::Label::Label(const wchar_t* text) : Label(text, 0, 0, 0, 0)
 {
 }
 
-size_t mui::Label::GetMinHeight()
-{
-	return m_idealSize.cy;
-}
-
-size_t mui::Label::GetMinWidth()
-{
-	return m_idealSize.cx;
-}
-
-size_t mui::Label::GetMaxHeight()
-{
-	if (m_verticalAligment == Fill)
-		return m_availableSize.bottom - m_availableSize.top;
-	else
-		return m_idealSize.cy;
-}
-
-size_t mui::Label::GetMaxWidth()
-{
-	if (m_horizontalAligment == Fill)
-		return m_availableSize.right - m_availableSize.left;
-	else
-		return m_idealSize.cx;
-}
-
 void mui::Label::UpdateIdealSize()
 {
 	m_idealSize = GetLabelIdealSize(m_hWnd);
