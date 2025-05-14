@@ -17,6 +17,7 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		case WM_KEYUP:
 			PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
 			break;
+		case WM_DESTROY:
 		case WM_NCDESTROY:
 			RemoveWindowSubclass(hWnd, CustomProc, uIdSubclass);
 			break;

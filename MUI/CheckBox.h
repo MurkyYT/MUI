@@ -20,7 +20,7 @@ namespace mui
 
 		BOOL IsChecked();
 
-		BOOL SetText(const wchar_t* text);
+		BOOL SetText(const std::wstring& text);
 
 		void SetChecked(BOOL checked);
 

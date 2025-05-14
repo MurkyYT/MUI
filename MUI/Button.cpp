@@ -80,7 +80,7 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 	return { FALSE,NULL };
 }
 
-BOOL mui::Button::SetText(const wchar_t* text)
+BOOL mui::Button::SetText(const std::wstring& text)
 {
 	m_name = text;
 

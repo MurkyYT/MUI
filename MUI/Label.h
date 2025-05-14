@@ -1,17 +1,15 @@
 #pragma once
 
 #include "./UIElement.h"
-#include "./Events.h"
 
-namespace mui
+namespace mui 
 {
-
-	class Button : public UIElement
+	class Label : public UIElement
 	{
 	public:
-		Button(const wchar_t* text, int x, int y, int width, int height);
-		Button(const wchar_t* text, int x, int y);
-		Button(const wchar_t* text);
+		Label(const wchar_t* text, int x, int y, int width, int height);
+		Label(const wchar_t* text, int x, int y);
+		Label(const wchar_t* text);
 
 		size_t GetMinWidth() override;
 		size_t GetMinHeight() override;
@@ -20,11 +18,12 @@ namespace mui
 
 		BOOL SetText(const std::wstring& text);
 
-		EventCallback_t OnClick{ NULL };
+		BOOL SetTextAligment(LayoutAligment aligment);
+
+		std::wstring GetText();
+
 	private:
 		void UpdateIdealSize() override;
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
-
 }
-

@@ -163,7 +163,7 @@ void mui::CheckBox::SetChecked(BOOL checked)
 	CheckDlgButton(m_parenthWnd, m_id, checked);
 }
 
-BOOL mui::CheckBox::SetText(const wchar_t* text)
+BOOL mui::CheckBox::SetText(const std::wstring& text)
 {
     m_name = text;
 
