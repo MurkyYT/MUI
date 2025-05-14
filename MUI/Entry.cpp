@@ -52,7 +52,7 @@ mui::Entry::Entry(const wchar_t* text, int x, int y, int width, int height)
     m_y = y;
     m_width = width;
     m_height = height;
-    m_style = WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL;
+    m_style = WS_VISIBLE | ES_LEFT | ES_WANTRETURN | ES_AUTOVSCROLL | WS_BORDER;
 }
 
 mui::Entry::Entry(const wchar_t* text, int x, int y) : Entry(text, x, y, 0, 0)
@@ -184,7 +184,7 @@ BOOL mui::Entry::SetPlaceholder(const std::wstring& text)
     if (!m_hWnd)
         return TRUE;
 
-    return SendMessage(m_hWnd, EM_SETCUEBANNER, FALSE, (LPARAM)text.c_str());
+    return SendMessage(m_hWnd, EM_SETCUEBANNER, FALSE, (LPARAM)text.c_str()) > 0;
 }
 
 void mui::Entry::SetHWND(HWND hWnd)
