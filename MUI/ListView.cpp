@@ -122,6 +122,7 @@ BOOL mui::ListView::RemoveItem(const std::shared_ptr<ListItem>& item)
 
 	if (m_hWnd)
 	{
+		LockWindowUpdate(m_hWnd);
 		ListView_DeleteItem(m_hWnd, item->m_index);
 		BOOL hasImage = item->m_iconIndex != -1;
 
@@ -148,6 +149,8 @@ BOOL mui::ListView::RemoveItem(const std::shared_ptr<ListItem>& item)
 
 		InvalidateRect(m_hWnd, NULL, TRUE);
 
+		LockWindowUpdate(NULL);
+
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 
 		m_itemIndex--;
@@ -168,6 +171,7 @@ BOOL mui::ListView::AddItem(const std::shared_ptr<ListItem>& item)
 
 	if (m_hWnd) 
 	{
+		LockWindowUpdate(m_hWnd);
 		LVITEM lvi{};
 		BOOL suc = TRUE;
 		lvi.mask = LVIF_TEXT | LVIF_IMAGE;
@@ -201,6 +205,8 @@ BOOL mui::ListView::AddItem(const std::shared_ptr<ListItem>& item)
 		UpdateIdealSize();
 
 		InvalidateRect(m_hWnd, NULL, TRUE);
+
+		LockWindowUpdate(NULL);
 
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 
