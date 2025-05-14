@@ -158,6 +158,7 @@ namespace mui
 		std::wstring m_name = L"";
 
 		DWORD m_style = 0;
+		DWORD m_exStyle = 0;
 		DWORD m_id = 0;
 
 		size_t m_x = 0;

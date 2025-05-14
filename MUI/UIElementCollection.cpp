@@ -11,7 +11,7 @@ mui::UIElementCollection::UIElementCollection()
 
 	m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
 }
-BOOL  mui::UIElementCollection::IDExists(DWORD id)
+BOOL mui::UIElementCollection::IDExists(DWORD id)
 {
 	return m_indexToItem.find(id) != m_indexToItem.end();
 }
@@ -29,7 +29,7 @@ void mui::UIElementCollection::Add(const std::shared_ptr<UIElement>& element)
 	if (m_parenthWnd)
 	{
 		element->SetHWND(CreateWindowEx(
-			0,
+			element->m_exStyle,
 			element->GetClass(),
 			element->GetName(),
 			element->m_style | WS_CHILD,

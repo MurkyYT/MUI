@@ -1,9 +1,9 @@
 #pragma once
 
 #include "./UIElement.h"
+#include "./Events.h"
 
 #include <Windows.h>
-#include <commctrl.h>
 #include <string>
 #include <memory>
 #include <vector>
@@ -32,6 +32,9 @@ namespace mui
 	public:
 		ListView(int x = 0, int y = 0, int width = 0, int height = 0);
 
+		BOOL HideColumns();
+		BOOL ShowColumns();
+
 		BOOL AddColumn(const wchar_t* title);
 
 		BOOL AddItem(const std::shared_ptr<ListItem>& item);
@@ -43,6 +46,9 @@ namespace mui
 		int GetSelectedIndex();
 		std::shared_ptr<ListItem> GetSelectedItem();
 
+		EventCallback_t RightClick{ NULL };
+		EventCallback_t DoubleClick{ NULL };
+
 	private:
 		void SetHWND(HWND hWnd) override;
 		void UpdateIdealSize() override;
@@ -50,6 +56,7 @@ namespace mui
 		UINT m_itemIndex = 0;
 		UINT m_iconIndex = 0;
 		UINT m_columnIndex = 0;
+		BOOL m_columnsVisible = TRUE;
 		std::vector<std::shared_ptr<ListItem>> m_items;
 		std::vector<LVCOLUMN> m_columns;
 		HIMAGELIST m_hLargeIcons = NULL;

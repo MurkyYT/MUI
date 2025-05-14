@@ -134,7 +134,14 @@ BOOL mui::CheckBox::IsChecked()
 
 void mui::CheckBox::SetChecked(BOOL checked)
 {
+    m_checked = checked;
 	CheckDlgButton(m_parenthWnd, m_id, checked);
+}
+
+void mui::CheckBox::SetParentHWND(HWND hWnd)
+{
+    m_parenthWnd = hWnd;
+    SetChecked(m_checked);
 }
 
 BOOL mui::CheckBox::SetText(const std::wstring& text)

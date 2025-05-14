@@ -58,7 +58,7 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 	for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 	{
 		element->SetHWND(CreateWindowEx(
-			0,
+			element->m_exStyle,
 			element->GetClass(),
 			element->GetName(),
 			element->GetStyle() | WS_CHILD,
@@ -199,9 +199,6 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
-		case WM_DESTROY:
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
-			break;
 		case WM_KEYDOWN:
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;
@@ -217,6 +214,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			int y = 0;
 			for (const std::shared_ptr<UIElement>& element : layout->m_collection.Items())
 			{
+				LockWindowUpdate(element->GetHWND());
 				element->SetAvailableSize({ x,y, layout->m_availableSize.right,layout->m_availableSize.bottom });
 
 				if (layout->m_orientation == Vertical)
@@ -256,14 +254,15 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				}
 
 				InvalidateRect(element->GetHWND(), NULL, TRUE);
+				LockWindowUpdate(NULL);
 			}
 		}
 		break;
 		case WM_COMMAND:
 		{
-			if (layout->Children().IDExists((DWORD)wParam))
+			if (layout->Children().IDExists((DWORD)LOWORD(wParam)))
 			{
-				EventHandlerResult res = layout->Children().ItemByID((DWORD)wParam)->HandleEvent(uMsg, wParam, lParam);
+				EventHandlerResult res = layout->Children().ItemByID((DWORD)LOWORD(wParam))->HandleEvent(uMsg, wParam, lParam);
 				if (res.returnVal)
 					return res.value;
 			}
@@ -279,6 +278,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			}
 		}
 		break;
+		case WM_CTLCOLOREDIT:
 		case WM_CTLCOLORSTATIC: 
 		{
 			HWND hwnd = (HWND)lParam;

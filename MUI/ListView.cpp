@@ -9,6 +9,7 @@ mui::ListView::ListView(int x, int y, int width, int height)
 	m_class = WC_LISTVIEW;
 	m_name = L"";
 	m_style = WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | WS_CLIPSIBLINGS | LVS_SINGLESEL;
+	m_exStyle = TVS_EX_DOUBLEBUFFER;
 
 	m_hLargeIcons = ImageList_Create(32,
 		32,
@@ -23,6 +24,35 @@ void mui::ListView::UpdateIdealSize()
 	DWORD res = ListView_ApproximateViewRect(m_hWnd, -1, -1, -1);
 	m_idealSize = { LOWORD(res), HIWORD(res) };
 }
+BOOL mui::ListView::HideColumns()
+{
+	if (!m_hWnd)
+	{
+		m_columnsVisible = FALSE;
+		return FALSE;
+	}
+
+	HWND hHeader = ListView_GetHeader(m_hWnd);
+	LONG_PTR styles = GetWindowLongPtr(hHeader, GWL_STYLE);
+	BOOL res = SetWindowLongPtr(hHeader, GWL_STYLE, styles | HDS_HIDDEN) > 0;
+	UpdateIdealSize();
+	return res;
+}
+
+BOOL mui::ListView::ShowColumns()
+{
+	if (!m_hWnd)
+	{
+		m_columnsVisible = TRUE;
+		return TRUE;
+	}
+
+	HWND hHeader = ListView_GetHeader(m_hWnd);
+	LONG_PTR styles = GetWindowLongPtr(hHeader, GWL_STYLE);
+	BOOL res = SetWindowLongPtr(hHeader, GWL_STYLE, styles ^ HDS_HIDDEN) > 0;
+	UpdateIdealSize();
+	return res;
+}
 
 mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -33,12 +63,12 @@ mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM 
 		switch (((LPNMHDR)lParam)->code)
 		{
 		case NM_RCLICK:
-			/*if (this->RightClick)
-				RightClick(this, { uMsg,wParam,lParam });*/
+			if (this->RightClick)
+				RightClick(this, { uMsg,wParam,lParam });
 			break;
 		case NM_DBLCLK:
-			/*if (this->DoubleClick)
-				DoubleClick(this, { uMsg,wParam,lParam });*/
+			if (this->DoubleClick)
+				DoubleClick(this, { uMsg,wParam,lParam });
 			break;
 		}
 	}
@@ -183,6 +213,9 @@ BOOL mui::ListView::AddItem(const std::shared_ptr<ListItem>& item)
 void mui::ListView::SetHWND(HWND hWnd)
 {
 	m_hWnd = hWnd;
+
+	if (!m_columnsVisible)
+		HideColumns();
 
 	for (const LVCOLUMN& column : m_columns)
 		ListView_InsertColumn(m_hWnd, column.iSubItem, &column);

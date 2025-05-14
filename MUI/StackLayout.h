@@ -23,9 +23,6 @@ namespace mui
 		size_t GetMaxHeight() override { return CalcMaxHeight(); };
 
 		UIElementCollection& Children();
-	protected:
-		void SetHWND(HWND hWnd) override;
-		void SetParentHWND(HWND p_hWnd) override;
 	private:
 		BOOL m_insideAnotherStackLayout = FALSE;
 		StackLayoutOrientation m_orientation;
@@ -36,6 +33,8 @@ namespace mui
 		size_t CalcMinHeight();
 		size_t CalcMaxHeight();
 
+		void SetHWND(HWND hWnd) override;
+		void SetParentHWND(HWND p_hWnd) override;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};

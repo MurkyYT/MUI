@@ -22,13 +22,12 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 			RemoveWindowSubclass(hWnd, CustomProc, uIdSubclass);
 			break;
 		default:
-		{
-			EventHandlerResult res = element->HandleEvent(uMsg, wParam, lParam);
-			if (res.returnVal)
-				return res.value;
+			break;
 		}
-		break;
-		}
+
+		EventHandlerResult res = element->HandleEvent(uMsg, wParam, lParam);
+		if (res.returnVal)
+			return res.value;
 	}
 		
 	return DefSubclassProc(hWnd, uMsg, wParam, lParam);

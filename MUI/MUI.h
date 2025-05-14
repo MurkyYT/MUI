@@ -12,4 +12,5 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "./CheckBox.h"
 #include "./ListView.h"
 #include "./Label.h"
+#include "./Entry.h"
 #include "./Window.h"

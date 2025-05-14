@@ -87,7 +87,7 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 
 	element->m_id = (DWORD)1;
 	HWND hWnd = CreateWindowEx(
-		0,
+		element->m_exStyle,
 		element->GetClass(),
 		element->GetName(),
 		element->m_style | WS_CHILD,
@@ -127,7 +127,7 @@ BOOL mui::Window::SetTitle(const wchar_t* title)
 std::wstring mui::Window::GetTitle()
 {
 	std::wstring text;
-	text.resize(GetWindowTextLengthW(m_hWnd));
+	text.resize(GetWindowTextLengthW(m_hWnd) + 1);
 	text.resize(GetWindowTextW(m_hWnd, (LPWSTR)text.data(), (int)text.size() + 1));
 	return text;
 }
@@ -155,6 +155,8 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			DeleteObject(window->m_hFont);
 			DestroyIcon(window->m_hIcon);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
+			if(window->m_content)
+				SetWindowLongPtr(window->m_content->GetHWND(), GWLP_USERDATA, NULL);
 			window->m_content = NULL;
 		}
 		break;
@@ -179,7 +181,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		break;
 		case WM_COMMAND:
 		{
-			if (window->m_content && wParam == window->m_content->m_id)
+			if (window->m_content && LOWORD(wParam) == window->m_content->m_id)
 				window->m_content->HandleEvent(uMsg, wParam, lParam);
 		}
 		break;
