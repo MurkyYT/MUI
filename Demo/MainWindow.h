@@ -17,6 +17,11 @@ private:
 		label->SetText(L"List view example: " + std::to_wstring(listView->ItemCount()));
 		label->SetTextColor(RGB((1 * listView->ItemCount()) % 255, (5 * listView->ItemCount()) % 255, (15 * listView->ItemCount()) % 255));
 	}
+	void OnKeyDown(void* element, EventArgs_t args)
+	{
+		if (args.wParam == VK_DELETE)
+			RemoveItem();
+	}
 	void AddItem()
 	{
 		auto itm = std::make_shared<ListItem>(std::vector<std::wstring>{ entry->GetText() }, checkBox->IsChecked() ? LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)) : NULL);
@@ -28,10 +33,13 @@ private:
 			listView->HideColumns();
 		else
 			listView->ShowColumns();
+
+		entry->SetText(L"");
 	}
 	void InitializeComponent()
 	{
 		SetTitle(L"MUI Demo Window");
+		this->KeyDown = std::bind(&MainWindow::OnKeyDown, this, std::placeholders::_1, std::placeholders::_2);
 		auto layout = std::make_shared<StackLayout>(Vertical);
 		auto button = std::make_shared<Button>(L"Add item");
 		auto button2 = std::make_shared<Button>(L"Remove first item");

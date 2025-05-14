@@ -213,6 +213,18 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			window->m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
 		}
 		break;
+		case WM_KEYDOWN:
+		{
+			if (window->KeyDown)
+				window->KeyDown(window, { uMsg, wParam, lParam });
+		}
+		break;
+		case WM_KEYUP:
+		{
+			if (window->KeyUp)
+				window->KeyUp(window, { uMsg, wParam, lParam });
+		}
+		break;
 		default:
 			break;
 		}

@@ -30,7 +30,6 @@ namespace mui
 	private:
 		COLORREF m_color = RGB(0, 0, 0);
 		std::wstring m_placeholder = L"";
-		DWORD m_prevLineCount = 0;
 		void SetHWND(HWND hWnd) override;
 		void UpdateIdealSize() override;
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;

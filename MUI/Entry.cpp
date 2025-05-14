@@ -86,12 +86,8 @@ mui::UIElement::EventHandlerResult mui::Entry::HandleEvent(UINT uMsg, WPARAM wPa
             if (this->TextChanged)
                 this->TextChanged(this, { uMsg, wParam,lParam });
 
-            int lineCount = (int)SendMessage(m_hWnd, EM_GETLINECOUNT, 0, 0);
             UpdateIdealSize();
-            if (m_prevLineCount != lineCount)
-                PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
-
-            m_prevLineCount = lineCount;
+            PostMessage(m_parenthWnd, MUI_WM_REDRAW, (WPARAM)this, NULL);
         }
         break;
         default:

@@ -206,8 +206,37 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case MUI_WM_REDRAW:
+		{
+			UIElement* element = (UIElement*)wParam;
+			if(element)
+			{
+				if (layout->m_orientation == Vertical)
+				{
+					size_t width = !layout->m_insideAnotherStackLayout &&
+						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
+						&& element->m_horizontalAligment == Fill
+						? element->GetMaxWidth() : element->GetMinWidth();
+
+					size_t height = element->GetMinHeight();
+
+					if (height == element->GetHeight() && width == element->GetWidth())
+						break;
+				}
+				else
+				{
+					size_t width = element->GetMinWidth();
+					size_t height = !layout->m_insideAnotherStackLayout &&
+						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
+						&& element->m_verticalAligment == Fill
+						? element->GetMaxHeight() : element->GetMinHeight();
+					
+					if (height == element->GetHeight() && width == element->GetWidth())
+						break;
+				}
+			}
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
-			// Intentional fall through
+		}
+		// Intentional fall through
 		case WM_SIZE:
 		{
 			int x = 0;

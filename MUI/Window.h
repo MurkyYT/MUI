@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "./UIElement.h"
+#include "./Events.h"
 
 namespace mui
 {
@@ -19,6 +20,9 @@ namespace mui
 		RECT GetRect();
 		BOOL SetTitle(const wchar_t* title);
 		std::wstring GetTitle();
+
+		EventCallback_t KeyDown{ NULL };
+		EventCallback_t KeyUp{ NULL };
 	private:
 		HWND m_hWnd;
 		HICON m_hIcon;
