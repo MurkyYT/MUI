@@ -37,9 +37,12 @@ private:
 		this->KeyDown = std::bind(&MainWindow::OnKeyDown, this, std::placeholders::_1, std::placeholders::_2);
 		auto layout = std::make_shared<StackLayout>(Vertical);
 		auto button = std::make_shared<Button>(L"Add item");
+		//button->SetTextColor(RGB(255, 255, 255));
 		auto button2 = std::make_shared<Button>(L"Remove first item");
+		//button2->SetTextColor(RGB(255, 255, 255));
 		checkBox = std::make_shared<CheckBox>(L"Add item with icon");
-		label = std::make_shared<Label>(L"List view example: 1");
+		checkBox->SetTextColor(RGB(0, 0, 128));
+		label = std::make_shared<Label>(L"List view example: 0");
 		listView = std::make_shared<ListView>();
 		entry = std::make_shared<Entry>(L"");
 		entry->SetPlaceholder(L"Enter item text");

@@ -28,13 +28,87 @@ void mui::Button::UpdateIdealSize()
 	m_idealSize = size;
 }
 
+void mui::Button::SetTextColor(COLORREF color)
+{
+	m_textColor = color;
+}
+
+void mui::Button::SetBackgroundColor(COLORREF color)
+{
+	m_backgroundColor = color;
+}
+
+void mui::Button::SetRegularColor(COLORREF color)
+{
+	m_regularColor = color;
+}
+
+void mui::Button::SetHoverColor(COLORREF color)
+{
+	m_hoverColor = color;
+}
+
+void mui::Button::SetBorderColor(COLORREF color)
+{
+	m_borderColor = color;
+}
+
 mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+	case WM_NOTIFY:
+	{
+		switch (((LPNMHDR)lParam)->code)
+		{
+		case NM_CUSTOMDRAW:
+		{
+			int result = CDRF_DODEFAULT;
+			LPNMCUSTOMDRAW  customDrawItem = (LPNMCUSTOMDRAW)lParam;
+			switch (customDrawItem->dwDrawStage)
+			{
+			case CDDS_PREPAINT:
+				result = CDRF_NOTIFYPOSTPAINT;
+				break;
+
+			case CDDS_POSTPAINT:
+			{
+				HPEN pen = CreatePen(PS_INSIDEFRAME, 0, m_borderColor);
+				HBRUSH selectbrush = CreateSolidBrush(m_regularColor);
+
+				if (customDrawItem->uItemState & CDIS_HOT)
+				{
+					DeleteObject(selectbrush);
+					selectbrush = CreateSolidBrush(m_hoverColor);
+				}
+
+				HGDIOBJ old_pen = SelectObject(customDrawItem->hdc, pen);
+				HGDIOBJ old_brush = SelectObject(customDrawItem->hdc, selectbrush);
+
+				SetBkMode(customDrawItem->hdc, TRANSPARENT);
+				::SetTextColor(customDrawItem->hdc, m_textColor);
+				RoundRect(customDrawItem->hdc, customDrawItem->rc.left + 1, customDrawItem->rc.top + 1, customDrawItem->rc.right - 1, customDrawItem->rc.bottom - 1, 5, 5);
+				DrawText(customDrawItem->hdc, m_name.c_str(), -1, &customDrawItem->rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+
+				SelectObject(customDrawItem->hdc, old_pen);
+				SelectObject(customDrawItem->hdc, old_brush);
+				DeleteObject(pen);
+				DeleteObject(selectbrush);
+
+				result = CDRF_SKIPDEFAULT;
+			}
+			break;
+			}
+
+			return { TRUE, result };
+		}
+		default:
+			break;
+		}
+	}
+	break;
 	case WM_COMMAND:
 	{
-
 		switch (HIWORD(wParam))
 		{
 		case BN_CLICKED:
@@ -61,7 +135,10 @@ BOOL mui::Button::SetText(const std::wstring& text)
 	if (!m_hWnd || !m_parenthWnd)
 		return TRUE;
 
-	BOOL res = SetDlgItemText(m_parenthWnd, m_id, m_name.c_str());
+	LockWindowUpdate(m_hWnd);
+    BOOL res = SetDlgItemText(m_parenthWnd, m_id, m_name.c_str());
+    InvalidateRect(m_hWnd, NULL, TRUE);
+    LockWindowUpdate(NULL);
 	PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	UpdateIdealSize();
 	return res;

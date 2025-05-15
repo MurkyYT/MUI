@@ -28,7 +28,7 @@ namespace mui
 		EventCallback_t Completed{ NULL };
 
 	private:
-		COLORREF m_color = RGB(0, 0, 0);
+		COLORREF m_textColor = RGB(0, 0, 0);
 		std::wstring m_placeholder = L"";
 		void SetHWND(HWND hWnd) override;
 		void UpdateIdealSize() override;

@@ -243,7 +243,6 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 			int y = 0;
 			for (const std::shared_ptr<UIElement>& element : layout->m_collection.Items())
 			{
-				LockWindowUpdate(element->GetHWND());
 				element->SetAvailableSize({ x,y, layout->m_availableSize.right,layout->m_availableSize.bottom });
 
 				if (layout->m_orientation == Vertical)
@@ -283,7 +282,6 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				}
 
 				InvalidateRect(element->GetHWND(), NULL, TRUE);
-				LockWindowUpdate(NULL);
 			}
 		}
 		break;

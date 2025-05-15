@@ -70,7 +70,7 @@ void mui::Entry::UpdateIdealSize()
 
 void mui::Entry::SetTextColor(COLORREF color)
 {
-    m_color = color;
+    m_textColor = color;
 }
 
 mui::UIElement::EventHandlerResult mui::Entry::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -112,7 +112,7 @@ mui::UIElement::EventHandlerResult mui::Entry::HandleEvent(UINT uMsg, WPARAM wPa
     break;
     case WM_CTLCOLOREDIT:
     case WM_CTLCOLORSTATIC:
-        ::SetTextColor((HDC)wParam, m_color);
+        ::SetTextColor((HDC)wParam, m_textColor);
         return { TRUE , NULL };
     default:
         break;
@@ -127,7 +127,10 @@ BOOL mui::Entry::SetText(const std::wstring& text)
     if (!m_hWnd || !m_parenthWnd)
         return TRUE;
 
+    LockWindowUpdate(m_hWnd);
     BOOL res = SetDlgItemText(m_parenthWnd, m_id, m_name.c_str());
+    InvalidateRect(m_hWnd, NULL, TRUE);
+    LockWindowUpdate(NULL);
     PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
     UpdateIdealSize();
     return res;
@@ -156,7 +159,10 @@ BOOL mui::Entry::SetTextAligment(LayoutAligment aligment)
     if (!m_hWnd)
         return TRUE;
 
+    LockWindowUpdate(m_hWnd);
     LONG_PTR res = SetWindowLongPtr(m_hWnd, GWL_STYLE, m_style | WS_CHILD);
+    InvalidateRect(m_hWnd, NULL, TRUE);
+    LockWindowUpdate(NULL);
     PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
     UpdateIdealSize();
     return res > 0;

@@ -15,9 +15,20 @@ namespace mui
 
 		BOOL SetText(const std::wstring& text);
 
+		void SetTextColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color);
+		void SetHoverColor(COLORREF color);
+		void SetRegularColor(COLORREF color);
+		void SetBorderColor(COLORREF color);
+
 		EventCallback_t OnClick{ NULL };
 	private:
 		void UpdateIdealSize() override;
+		COLORREF m_textColor = RGB(0, 0, 0);
+		COLORREF m_borderColor = RGB(0, 120, 212);
+		COLORREF m_hoverColor = RGB(224, 238, 249);
+		COLORREF m_regularColor = RGB(255, 255, 255);
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 

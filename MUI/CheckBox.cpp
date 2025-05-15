@@ -12,7 +12,7 @@
 #define TMT_CONTENTMARGINS 3602
 #endif
 
-SIZE GetAccurateCheckboxSize(HWND hWnd)
+SIZE mui::CheckBox::GetAccurateCheckboxSize(HWND hWnd)
 {
     SIZE total = { 0, 0 };
 
@@ -75,6 +75,8 @@ SIZE GetAccurateCheckboxSize(HWND hWnd)
     total.cy = max(glyphSize.cy, textSize.cy);
     total.cx = glyphSize.cx + spacing + textSize.cx;
 
+    m_checkBoxOffset = glyphSize.cx + spacing - 1;
+
     return total;
 }
 
@@ -97,10 +99,50 @@ mui::CheckBox::CheckBox(const wchar_t* text) : CheckBox(text, 0, 0, 0, 0)
 {
 }
 
+void mui::CheckBox::SetTextColor(COLORREF color)
+{
+    m_textColor = color;
+}
+
+void mui::CheckBox::SetBackgroundColor(COLORREF color)
+{
+    m_backgroundColor = color;
+}
+
 mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
+    case WM_NOTIFY:
+    {
+        switch (((LPNMHDR)lParam)->code)
+        {
+        case NM_CUSTOMDRAW:
+        {
+            int result = CDRF_DODEFAULT;
+            LPNMCUSTOMDRAW  customDrawItem = (LPNMCUSTOMDRAW)lParam;
+            switch (customDrawItem->dwDrawStage)
+            {
+            case CDDS_PREPAINT:
+                result = CDRF_NOTIFYPOSTPAINT;
+                break;
+
+            case CDDS_POSTPAINT:
+                RECT rect = customDrawItem->rc;
+                rect.left += m_checkBoxOffset;
+                SetBkMode(customDrawItem->hdc, TRANSPARENT);
+                ::SetTextColor(customDrawItem->hdc, m_textColor);
+                DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+                result = CDRF_SKIPDEFAULT;
+                break;
+            }
+
+            return { TRUE, result };
+        }
+        default:
+            break;
+        }
+    }
 	case WM_COMMAND:
 	{
 		switch (HIWORD(wParam))
@@ -151,7 +193,10 @@ BOOL mui::CheckBox::SetText(const std::wstring& text)
     if (!m_hWnd || !m_parenthWnd)
         return TRUE;
 
+    LockWindowUpdate(m_hWnd);
     BOOL res = SetDlgItemText(m_parenthWnd, m_id, m_name.c_str());
+    InvalidateRect(m_hWnd, NULL, TRUE);
+    LockWindowUpdate(NULL);
     PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
     UpdateIdealSize();
     return res;
