@@ -63,44 +63,30 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 		{
 		case NM_CUSTOMDRAW:
 		{
-			int result = CDRF_DODEFAULT;
 			LPNMCUSTOMDRAW  customDrawItem = (LPNMCUSTOMDRAW)lParam;
-			switch (customDrawItem->dwDrawStage)
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, m_borderColor);
+			HBRUSH selectbrush = CreateSolidBrush(m_regularColor);
+
+			if (customDrawItem->uItemState & CDIS_HOT)
 			{
-			case CDDS_PREPAINT:
-				result = CDRF_NOTIFYPOSTPAINT;
-				break;
-
-			case CDDS_POSTPAINT:
-			{
-				HPEN pen = CreatePen(PS_INSIDEFRAME, 0, m_borderColor);
-				HBRUSH selectbrush = CreateSolidBrush(m_regularColor);
-
-				if (customDrawItem->uItemState & CDIS_HOT)
-				{
-					DeleteObject(selectbrush);
-					selectbrush = CreateSolidBrush(m_hoverColor);
-				}
-
-				HGDIOBJ old_pen = SelectObject(customDrawItem->hdc, pen);
-				HGDIOBJ old_brush = SelectObject(customDrawItem->hdc, selectbrush);
-
-				SetBkMode(customDrawItem->hdc, TRANSPARENT);
-				::SetTextColor(customDrawItem->hdc, m_textColor);
-				RoundRect(customDrawItem->hdc, customDrawItem->rc.left + 1, customDrawItem->rc.top + 1, customDrawItem->rc.right - 1, customDrawItem->rc.bottom - 1, 5, 5);
-				DrawText(customDrawItem->hdc, m_name.c_str(), -1, &customDrawItem->rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-
-				SelectObject(customDrawItem->hdc, old_pen);
-				SelectObject(customDrawItem->hdc, old_brush);
-				DeleteObject(pen);
 				DeleteObject(selectbrush);
-
-				result = CDRF_SKIPDEFAULT;
-			}
-			break;
+				selectbrush = CreateSolidBrush(m_hoverColor);
 			}
 
-			return { TRUE, result };
+			HGDIOBJ old_pen = SelectObject(customDrawItem->hdc, pen);
+			HGDIOBJ old_brush = SelectObject(customDrawItem->hdc, selectbrush);
+
+			SetBkMode(customDrawItem->hdc, TRANSPARENT);
+			::SetTextColor(customDrawItem->hdc, m_textColor);
+			RoundRect(customDrawItem->hdc, customDrawItem->rc.left + 1, customDrawItem->rc.top + 1, customDrawItem->rc.right - 1, customDrawItem->rc.bottom - 1, 5, 5);
+			DrawText(customDrawItem->hdc, m_name.c_str(), -1, &customDrawItem->rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+
+			SelectObject(customDrawItem->hdc, old_pen);
+			SelectObject(customDrawItem->hdc, old_brush);
+			DeleteObject(pen);
+			DeleteObject(selectbrush);
+
+			return { TRUE, CDRF_SKIPDEFAULT };
 		}
 		default:
 			break;
