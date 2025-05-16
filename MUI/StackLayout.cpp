@@ -14,11 +14,7 @@ mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 	wcex.lpfnWndProc = StackLayout::WindowProc;
 	wcex.hInstance = GetModuleHandle(NULL);
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-#ifndef NDEBUG
-	wcex.hbrBackground = (HBRUSH)GetStockObject(DKGRAY_BRUSH);
-#else
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-#endif
+	wcex.hbrBackground = NULL;
 	wcex.lpszClassName = L"MUI_StackLayout";
 
 	if (!RegisterClassEx(&wcex))
@@ -179,6 +175,12 @@ size_t mui::StackLayout::CalcMaxWidth()
 	return max(width, m_availableSize.right - m_availableSize.left);
 }
 
+
+void mui::StackLayout::SetBackgroundColor(COLORREF color)
+{
+	m_backgroundColor = color;
+}
+
 mui::UIElement::EventHandlerResult mui::StackLayout::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return { FALSE, NULL };
@@ -201,6 +203,17 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
+		case WM_ERASEBKGND:
+		{
+			HDC hdc = (HDC)wParam;
+			RECT rc;
+			GetClientRect(hWnd, &rc);
+			HBRUSH hBrush = CreateSolidBrush(layout->m_backgroundColor);
+			FillRect(hdc, &rc, hBrush);
+
+			DeleteObject(hBrush);
+			return 1;
+		}
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
 		case WM_LBUTTONDOWN:

@@ -54,7 +54,9 @@ void mui::Label::SetTextColor(COLORREF color)
 
 void mui::Label::SetBackgroundColor(COLORREF color)
 {
+    DeleteObject(m_backroundBrush);
     m_backgroundColor = color;
+    m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 }
 
 mui::UIElement::EventHandlerResult mui::Label::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -62,8 +64,9 @@ mui::UIElement::EventHandlerResult mui::Label::HandleEvent(UINT uMsg, WPARAM wPa
     switch (uMsg)
     {
     case WM_CTLCOLORSTATIC:
+        SetBkMode((HDC)wParam, TRANSPARENT);
         ::SetTextColor((HDC)wParam, m_textColor);
-        return { TRUE , NULL };
+        return { TRUE , (LRESULT)m_backroundBrush };
     default:
         break;
     }

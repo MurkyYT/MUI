@@ -35,7 +35,9 @@ void mui::Button::SetTextColor(COLORREF color)
 
 void mui::Button::SetBackgroundColor(COLORREF color)
 {
+	DeleteObject(m_backroundBrush);
 	m_backgroundColor = color;
+	m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 }
 
 void mui::Button::SetRegularColor(COLORREF color)
@@ -123,7 +125,7 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 	}
 	break;
 	case WM_CTLCOLORBTN:
-		return { TRUE , NULL };
+		return { TRUE , (LRESULT)m_backroundBrush };
 	default:
 		break;
 	}

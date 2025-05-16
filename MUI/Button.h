@@ -31,6 +31,7 @@ namespace mui
 		COLORREF m_pressedColor = RGB(204, 228, 247);
 		COLORREF m_regularColor = RGB(253, 253, 253);
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
+		HBRUSH m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};
 

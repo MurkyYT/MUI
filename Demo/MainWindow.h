@@ -3,9 +3,9 @@
 #include "resource.h"
 
 #include "StackLayoutTest1.h"
-#include "StackLayoutTest2.h"
 #include "StackLayoutTest3.h"
 #include "StackLayoutTest4.h"
+#include "DarkThemeWindow.h"
 #include "DisabledEnabledWindow.h"
 
 using namespace mui;
@@ -25,17 +25,6 @@ private:
 
 		stackLayoutTest1 = std::make_shared<StackLayoutTest1>();
 		stackLayoutTest1->Show();
-	}
-	void OpenStack2()
-	{
-		if (stackLayoutTest2)
-		{
-			stackLayoutTest2->Close();
-			stackLayoutTest2 = NULL;
-		}
-
-		stackLayoutTest2 = std::make_shared<StackLayoutTest2>();
-		stackLayoutTest2->Show();
 	}
 	void OpenStack3()
 	{
@@ -71,6 +60,17 @@ private:
 		disabledEnabled = std::make_shared<DisabledEnabledWindow>();
 		disabledEnabled->Show();
 	}
+	void OpenDarkTheme()
+	{
+		if (darkThemeWindow)
+		{
+			darkThemeWindow->Close();
+			darkThemeWindow = NULL;
+		}
+
+		darkThemeWindow = std::make_shared<DarkThemeWindow>();
+		darkThemeWindow->Show();
+	}
 	void InitializeComponent()
 	{
 		SetTitle(L"MUI Demo Window");
@@ -82,10 +82,6 @@ private:
 
 		auto button = std::make_shared<Button>(L"Stack Layout Test 1");
 		button->OnClick = std::bind(&MainWindow::OpenStack1, this);
-		layout2->Children().Add(button);
-
-		button = std::make_shared<Button>(L"Stack Layout Test 2");
-		button->OnClick = std::bind(&MainWindow::OpenStack2, this);
 		layout2->Children().Add(button);
 
 		button = std::make_shared<Button>(L"Stack Layout Test 3");
@@ -100,12 +96,16 @@ private:
 		button->OnClick = std::bind(&MainWindow::OpenDisabledEnabled, this);
 		layout3->Children().Add(button);
 
+		button = std::make_shared<Button>(L"Dark Theme Window");
+		button->OnClick = std::bind(&MainWindow::OpenDarkTheme, this);
+		layout3->Children().Add(button);
+
 		SetContent(layout);
 	}
 
 	std::shared_ptr<StackLayoutTest1> stackLayoutTest1;
-	std::shared_ptr<StackLayoutTest2> stackLayoutTest2;
 	std::shared_ptr<StackLayoutTest3> stackLayoutTest3;
 	std::shared_ptr<StackLayoutTest4> stackLayoutTest4;
 	std::shared_ptr<DisabledEnabledWindow> disabledEnabled;
+	std::shared_ptr<DarkThemeWindow> darkThemeWindow;
 };

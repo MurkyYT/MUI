@@ -46,6 +46,11 @@ namespace mui
 		int GetSelectedIndex();
 		std::shared_ptr<ListItem> GetSelectedItem();
 
+		void SetTextColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color);
+		void SetSeparatorColor(COLORREF color);
+		void SetHoverColor(COLORREF color);
+
 		EventCallback_t RightClick{ NULL };
 		EventCallback_t DoubleClick{ NULL };
 
@@ -57,10 +62,20 @@ namespace mui
 		UINT m_iconIndex = 0;
 		UINT m_columnIndex = 0;
 		BOOL m_columnsVisible = TRUE;
+		int m_hotHeaderColumn = -1;
+
+		COLORREF m_textColor = RGB(0, 0, 0);
+		COLORREF m_seperatorColor = RGB(229, 229, 229);
+		COLORREF m_hoverColor = RGB(217, 235, 249);
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
+
 		std::vector<std::shared_ptr<ListItem>> m_items;
 		std::vector<LVCOLUMN> m_columns;
 		HIMAGELIST m_hLargeIcons = NULL;
 		HIMAGELIST m_hSmallIcons = NULL;
+
+		static LRESULT CALLBACK HeaderSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam,
+			LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	};
 
 }

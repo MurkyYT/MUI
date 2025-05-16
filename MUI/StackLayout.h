@@ -23,6 +23,8 @@ namespace mui
 		size_t GetMaxHeight() override { return CalcMaxHeight(); };
 
 		UIElementCollection& Children();
+
+		void SetBackgroundColor(COLORREF color);
 	private:
 		BOOL m_insideAnotherStackLayout = FALSE;
 		StackLayoutOrientation m_orientation;
@@ -32,6 +34,8 @@ namespace mui
 		size_t CalcMaxWidth();
 		size_t CalcMinHeight();
 		size_t CalcMaxHeight();
+
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 
 		void SetHWND(HWND hWnd) override;
 		void SetParentHWND(HWND p_hWnd) override;

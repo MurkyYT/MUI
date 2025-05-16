@@ -114,7 +114,9 @@ void mui::CheckBox::SetTextColor(COLORREF color)
 
 void mui::CheckBox::SetBackgroundColor(COLORREF color)
 {
+    DeleteObject(m_backroundBrush);
     m_backgroundColor = color;
+    m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 }
 
 mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -166,7 +168,7 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
 	}
     break;
     case WM_CTLCOLORSTATIC:
-        return { TRUE , NULL };
+        return { TRUE , (LRESULT)m_backroundBrush };
 	default:
 		break;
 	}
