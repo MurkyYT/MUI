@@ -7,8 +7,13 @@
 #pragma comment (lib, "comctl32")
 #pragma comment (lib, "rpcrt4")
 
+BOOL mui::Window::s_dpiAware = SetProcessDPIAware();
+
 mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 {
+	if(!s_dpiAware)
+	 s_dpiAware = SetProcessDPIAware();
+
 	UUID uuid;
 	RPC_STATUS status = UuidCreate(&uuid);
 
