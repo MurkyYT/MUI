@@ -76,10 +76,15 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 			HGDIOBJ old_pen = SelectObject(customDrawItem->hdc, pen);
 			HGDIOBJ old_brush = SelectObject(customDrawItem->hdc, selectbrush);
 
+			RECT rc = customDrawItem->rc;
+			rc.left += 1;
+			rc.top += 1;
+			rc.right -= 1;
+			rc.bottom -= 1;
 			SetBkMode(customDrawItem->hdc, TRANSPARENT);
 			::SetTextColor(customDrawItem->hdc, m_textColor);
 			RoundRect(customDrawItem->hdc, customDrawItem->rc.left + 1, customDrawItem->rc.top + 1, customDrawItem->rc.right - 1, customDrawItem->rc.bottom - 1, 5, 5);
-			DrawText(customDrawItem->hdc, m_name.c_str(), -1, &customDrawItem->rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 
 			SelectObject(customDrawItem->hdc, old_pen);
 			SelectObject(customDrawItem->hdc, old_brush);

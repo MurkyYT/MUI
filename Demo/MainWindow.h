@@ -2,6 +2,11 @@
 
 #include "resource.h"
 
+#include "StackLayoutTest1.h"
+#include "StackLayoutTest2.h"
+#include "StackLayoutTest3.h"
+#include "StackLayoutTest4.h"
+
 using namespace mui;
 
 class MainWindow : public Window
@@ -9,69 +14,77 @@ class MainWindow : public Window
 public:
 	MainWindow();
 private:
-	void RemoveItem()
+	void OpenStack1()
 	{
-		if(listView->ItemCount())
-			listView->RemoveItemByIndex(0);
+		if (stackLayoutTest1)
+		{
+			stackLayoutTest1->Close();
+			stackLayoutTest1 = NULL;
+		}
 
-		label->SetText(L"List view example: " + std::to_wstring(listView->ItemCount()));
-		label->SetTextColor(RGB((1 * listView->ItemCount()) % 255, (5 * listView->ItemCount()) % 255, (15 * listView->ItemCount()) % 255));
+		stackLayoutTest1 = std::make_shared<StackLayoutTest1>();
+		stackLayoutTest1->Show();
 	}
-	void OnKeyDown(void* element, EventArgs_t args)
+	void OpenStack2()
 	{
-		if (args.wParam == VK_DELETE)
-			RemoveItem();
-	}
-	void AddItem()
-	{
-		auto itm = std::make_shared<ListItem>(std::vector<std::wstring>{ entry->GetText() }, checkBox->IsChecked() ? LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)) : NULL);
-		listView->AddItem(itm);
-		label->SetText(L"List view example: " + std::to_wstring(listView->ItemCount()));
-		label->SetTextColor(RGB((1 * listView->ItemCount()) % 255, (5 * listView->ItemCount()) % 255, (15 * listView->ItemCount()) % 255));
+		if (stackLayoutTest2)
+		{
+			stackLayoutTest2->Close();
+			stackLayoutTest2 = NULL;
+		}
 
-		entry->SetText(L"");
+		stackLayoutTest2 = std::make_shared<StackLayoutTest2>();
+		stackLayoutTest2->Show();
+	}
+	void OpenStack3()
+	{
+		if (stackLayoutTest3)
+		{
+			stackLayoutTest3->Close();
+			stackLayoutTest3 = NULL;
+		}
+
+		stackLayoutTest3 = std::make_shared<StackLayoutTest3>();
+		stackLayoutTest3->Show();
+	}
+	void OpenStack4()
+	{
+		if (stackLayoutTest4)
+		{
+			stackLayoutTest4->Close();
+			stackLayoutTest4 = NULL;
+		}
+
+		stackLayoutTest4 = std::make_shared<StackLayoutTest4>();
+		stackLayoutTest4->Show();
 	}
 	void InitializeComponent()
 	{
 		SetTitle(L"MUI Demo Window");
-		this->KeyDown = std::bind(&MainWindow::OnKeyDown, this, std::placeholders::_1, std::placeholders::_2);
-		auto layout = std::make_shared<StackLayout>(Vertical);
-		auto button = std::make_shared<Button>(L"Add item");
-		//button->SetTextColor(RGB(255, 255, 255));
-		auto button2 = std::make_shared<Button>(L"Remove first item");
-		//button2->SetTextColor(RGB(255, 255, 255));
-		checkBox = std::make_shared<CheckBox>(L"Add item with icon");
-		checkBox->SetTextColor(RGB(0, 0, 128));
-		label = std::make_shared<Label>(L"List view example: 0");
-		listView = std::make_shared<ListView>();
-		entry = std::make_shared<Entry>(L"");
-		entry->SetPlaceholder(L"Enter item text");
-		entry->Completed = std::bind(&MainWindow::AddItem, this);
+		auto layout = std::make_shared<StackLayout>(Horizontal);
+		auto layout2 = std::make_shared<StackLayout>(Vertical);
+		layout->Children().Add(layout2);
+		auto button = std::make_shared<Button>(L"Stack Layout Test 1");
+		button->OnClick = std::bind(&MainWindow::OpenStack1, this);
+		layout2->Children().Add(button);
 
-		checkBox->SetHorizontalAligment(Center);
-		checkBox->SetChecked(TRUE);
+		button = std::make_shared<Button>(L"Stack Layout Test 2");
+		button->OnClick = std::bind(&MainWindow::OpenStack2, this);
+		layout2->Children().Add(button);
 
-		listView->AddColumn(L"");
-		listView->HideColumns();
+		button = std::make_shared<Button>(L"Stack Layout Test 3");
+		button->OnClick = std::bind(&MainWindow::OpenStack3, this);
+		layout2->Children().Add(button);
 
-		layout->Children().Add(label);
-		layout->Children().Add(listView);
-
-		button->OnClick = std::bind(&MainWindow::AddItem, this);
-		button2->OnClick = std::bind(&MainWindow::RemoveItem, this);
-
-		layout->Children().Add(checkBox);
-		layout->Children().Add(entry);
-		layout->Children().Add(button);
-		layout->Children().Add(button2);
+		button = std::make_shared<Button>(L"Stack Layout Test 4");
+		button->OnClick = std::bind(&MainWindow::OpenStack4, this);
+		layout2->Children().Add(button);
 
 		SetContent(layout);
-
-		label->SetTextAligment(Center);
 	}
 
-	std::shared_ptr<ListView> listView;
-	std::shared_ptr<Label> label;
-	std::shared_ptr<CheckBox> checkBox;
-	std::shared_ptr<Entry> entry;
+	std::shared_ptr<StackLayoutTest1> stackLayoutTest1;
+	std::shared_ptr<StackLayoutTest2> stackLayoutTest2;
+	std::shared_ptr<StackLayoutTest3> stackLayoutTest3;
+	std::shared_ptr<StackLayoutTest4> stackLayoutTest4;
 };

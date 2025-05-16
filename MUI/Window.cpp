@@ -2,12 +2,34 @@
 #include <CommCtrl.h>
 #include <string>
 #include <stdexcept>
+#include <Rpc.h>
 
 #pragma comment (lib, "comctl32")
+#pragma comment (lib, "rpcrt4")
 
 mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 {
-	std::wstring className = L"MUI_Window&" + std::to_wstring((ULONG_PTR)this);
+	UUID uuid;
+	RPC_STATUS status = UuidCreate(&uuid);
+
+	if (status != RPC_S_OK && status != RPC_S_UUID_LOCAL_ONLY)
+	{
+		std::string err = std::string("Class creation failed: ") + std::to_string(status);
+		throw std::runtime_error(err);
+		return;
+	}
+
+	RPC_WSTR strUuid = NULL;
+	status = UuidToString(&uuid, &strUuid);
+
+	if (status != RPC_S_OK)
+	{
+		std::string err = std::string("Class creation failed: ") + std::to_string(status);
+		throw std::runtime_error(err);
+		return;
+	}
+
+	std::wstring className = L"MUI_Window [" + std::wstring((const wchar_t*)strUuid) + L"]";
 
 	WCHAR buffer[MAX_PATH] = { 0 };
 	GetModuleFileNameW(NULL, buffer, MAX_PATH);
@@ -20,12 +42,16 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 	wcex.lpfnWndProc = Window::WindowProc;
 	wcex.hInstance = GetModuleHandle(NULL);
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wcex.hbrBackground = NULL;
 	wcex.lpszClassName = className.c_str();
 	wcex.hIcon = m_hIcon;
 
-	if (!RegisterClassEx(&wcex))
-		throw std::runtime_error("Class creation failed");
+	if (!RegisterClassEx(&wcex)) 
+	{
+		std::string err = std::string("Class creation failed: ") + std::to_string(GetLastError());
+		throw std::runtime_error(err);
+		return;
+	}
 
 	m_hWnd = CreateWindowEx
 	(
@@ -47,6 +73,7 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 	{
 		DWORD err = GetLastError();
 		throw std::runtime_error("Window creation failed (" + std::to_string(err) + ")");
+		return;
 	}
 }
 
@@ -132,6 +159,31 @@ std::wstring mui::Window::GetTitle()
 	return text;
 }
 
+void mui::Window::Close()
+{
+	DestroyWindow(m_hWnd);
+}
+
+void mui::Window::SetMaxWidth(size_t width)
+{
+	m_maxSize.x = (LONG)width;
+}
+
+void mui::Window::SetMaxHeight(size_t height)
+{
+	m_maxSize.y = (LONG)height;
+}
+
+void mui::Window::SetMinWidth(size_t width)
+{
+	m_minSize.x = (LONG)width;
+}
+
+void mui::Window::SetMinHeight(size_t height)
+{
+	m_minSize.y = (LONG)height;
+}
+
 LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
 	Window* window;
@@ -179,6 +231,13 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			}
 		}
 		break;
+		case WM_GETMINMAXINFO:
+		{
+			LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+			lpMMI->ptMinTrackSize = window->m_minSize;
+			lpMMI->ptMaxTrackSize = window->m_maxSize;
+			break;
+		}
 		case WM_COMMAND:
 		{
 			if (window->m_content && LOWORD(wParam) == window->m_content->m_id)

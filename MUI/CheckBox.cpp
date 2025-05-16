@@ -46,7 +46,15 @@ SIZE mui::CheckBox::GetAccurateCheckboxSize(HWND hWnd)
         break;
     }
 
-    UINT dpi = GetDpiForWindow(hWnd);
+    UINT dpi = 96;
+    HMODULE hUser32 = LoadLibraryA("User32.dll");
+    if (hUser32) {
+        auto pGetDpiForWindow = (decltype(&GetDpiForWindow))GetProcAddress(hUser32, "GetDpiForWindow");
+        if (pGetDpiForWindow) {
+            dpi = pGetDpiForWindow(hWnd);
+        }
+        FreeLibrary(hUser32);
+    }
 
     SIZE glyphSize = { 0, 0 };
     int spacing = 0;
@@ -75,7 +83,7 @@ SIZE mui::CheckBox::GetAccurateCheckboxSize(HWND hWnd)
     total.cy = max(glyphSize.cy, textSize.cy);
     total.cx = glyphSize.cx + spacing + textSize.cx;
 
-    m_checkBoxOffset = glyphSize.cx + spacing - 1;
+    m_checkBoxOffset = glyphSize.cx + spacing - 2;
 
     return total;
 }

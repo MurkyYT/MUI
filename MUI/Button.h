@@ -27,7 +27,7 @@ namespace mui
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_borderColor = RGB(0, 120, 212);
 		COLORREF m_hoverColor = RGB(224, 238, 249);
-		COLORREF m_regularColor = RGB(255, 255, 255);
+		COLORREF m_regularColor = RGB(253, 253, 253);
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};

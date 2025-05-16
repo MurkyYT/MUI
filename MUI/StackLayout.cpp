@@ -199,6 +199,11 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+		case WM_LBUTTONDOWN:
+			SetFocus(hWnd);
+			break;
 		case WM_KEYDOWN:
 			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
 			break;

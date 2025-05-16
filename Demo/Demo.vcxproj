@@ -146,6 +146,10 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="StackLayoutTest1.cpp" />
+    <ClCompile Include="StackLayoutTest2.cpp" />
+    <ClCompile Include="StackLayoutTest3.cpp" />
+    <ClCompile Include="StackLayoutTest4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MUI\MUI.vcxproj">
@@ -155,6 +159,10 @@
   <ItemGroup>
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="StackLayoutTest1.h" />
+    <ClInclude Include="StackLayoutTest2.h" />
+    <ClInclude Include="StackLayoutTest3.h" />
+    <ClInclude Include="StackLayoutTest4.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Demo.rc" />
