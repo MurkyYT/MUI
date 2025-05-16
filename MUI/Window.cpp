@@ -143,6 +143,8 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 
 	element->SetParentHWND(m_hWnd);
 
+	EnableWindow(element->m_hWnd, element->m_enabled);
+
 	m_content = element;
 
 	if(element->m_subclass)

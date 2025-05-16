@@ -53,10 +53,22 @@ void mui::Button::SetBorderColor(COLORREF color)
 	m_borderColor = color;
 }
 
+void mui::Button::SetPressedColor(COLORREF color)
+{
+	m_pressedColor = color;
+}
+
 mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static BOOL isPressed = FALSE;
 	switch (uMsg)
 	{
+	case WM_LBUTTONDOWN:
+		isPressed = TRUE;
+		break;
+	case WM_LBUTTONUP:
+		isPressed = FALSE;
+		break;
 	case WM_NOTIFY:
 	{
 		switch (((LPNMHDR)lParam)->code)
@@ -64,13 +76,13 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 		case NM_CUSTOMDRAW:
 		{
 			LPNMCUSTOMDRAW  customDrawItem = (LPNMCUSTOMDRAW)lParam;
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, m_borderColor);
-			HBRUSH selectbrush = CreateSolidBrush(m_regularColor);
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, m_enabled ? m_borderColor : RGB(233,233,233));
+			HBRUSH selectbrush = m_enabled ? CreateSolidBrush(m_regularColor) : CreateSolidBrush(RGB(249,249,249));
 
-			if (customDrawItem->uItemState & CDIS_HOT)
+			if (customDrawItem->uItemState & CDIS_HOT && m_enabled)
 			{
 				DeleteObject(selectbrush);
-				selectbrush = CreateSolidBrush(m_hoverColor);
+				selectbrush = CreateSolidBrush(isPressed ? m_pressedColor : m_hoverColor);
 			}
 
 			HGDIOBJ old_pen = SelectObject(customDrawItem->hdc, pen);
@@ -82,7 +94,7 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 			rc.right -= 1;
 			rc.bottom -= 1;
 			SetBkMode(customDrawItem->hdc, TRANSPARENT);
-			::SetTextColor(customDrawItem->hdc, m_textColor);
+			::SetTextColor(customDrawItem->hdc, m_enabled ? m_textColor : RGB(131,131,131));
 			RoundRect(customDrawItem->hdc, customDrawItem->rc.left + 1, customDrawItem->rc.top + 1, customDrawItem->rc.right - 1, customDrawItem->rc.bottom - 1, 5, 5);
 			DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rc, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 

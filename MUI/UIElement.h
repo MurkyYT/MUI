@@ -112,6 +112,13 @@ namespace mui
 			m_verticalAligment = aligment;
 		}
 
+		void SetEnabled(BOOL enabled)
+		{
+			m_enabled = enabled;
+
+			EnableWindow(m_hWnd, enabled);
+		}
+
 		HWND GetHWND() { return m_hWnd; }
 		const wchar_t* GetClass() { return m_class.c_str(); }
 		const wchar_t* GetName() { return m_name.c_str(); }
@@ -175,6 +182,7 @@ namespace mui
 		int m_maxHeight = -1;
 
 		BOOL m_subclass = TRUE;
+		BOOL m_enabled = TRUE;
 
 		RECT m_availableSize = {0,0,0,0};
 

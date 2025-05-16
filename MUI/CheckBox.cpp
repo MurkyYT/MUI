@@ -83,7 +83,7 @@ SIZE mui::CheckBox::GetAccurateCheckboxSize(HWND hWnd)
     total.cy = max(glyphSize.cy, textSize.cy);
     total.cx = glyphSize.cx + spacing + textSize.cx;
 
-    m_checkBoxOffset = glyphSize.cx + spacing - 2;
+    m_checkBoxOffset = glyphSize.cx;
 
     return total;
 }
@@ -138,9 +138,11 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
             case CDDS_POSTPAINT:
                 RECT rect = customDrawItem->rc;
                 rect.left += m_checkBoxOffset;
+                HBRUSH brush = CreateSolidBrush(m_backgroundColor);
+                FillRect(customDrawItem->hdc, &rect, brush);
                 SetBkMode(customDrawItem->hdc, TRANSPARENT);
-                ::SetTextColor(customDrawItem->hdc, m_textColor);
-                DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+                ::SetTextColor(customDrawItem->hdc, m_enabled ? m_textColor : RGB(131, 131, 131));
+                DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_RIGHT);
                 result = CDRF_SKIPDEFAULT;
                 break;
             }

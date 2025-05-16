@@ -18,6 +18,7 @@ namespace mui
 		void SetTextColor(COLORREF color);
 		void SetBackgroundColor(COLORREF color);
 		void SetHoverColor(COLORREF color);
+		void SetPressedColor(COLORREF color);
 		void SetRegularColor(COLORREF color);
 		void SetBorderColor(COLORREF color);
 
@@ -27,6 +28,7 @@ namespace mui
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_borderColor = RGB(0, 120, 212);
 		COLORREF m_hoverColor = RGB(224, 238, 249);
+		COLORREF m_pressedColor = RGB(204, 228, 247);
 		COLORREF m_regularColor = RGB(253, 253, 253);
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;

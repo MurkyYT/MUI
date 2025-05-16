@@ -79,6 +79,8 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 
 		element->SetParentHWND(m_hWnd);
 
+		EnableWindow(element->m_hWnd, element->m_enabled);
+
 		if (element->GetSubclass())
 			SetWindowSubclass(element->GetHWND(), UIElement::CustomProc, (UINT_PTR)element.get(), NULL);
 
