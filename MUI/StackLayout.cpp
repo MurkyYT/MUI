@@ -89,7 +89,7 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 
 size_t mui::StackLayout::CalcMinHeight()
 {
-	long height = 0;
+	unsigned long height = 0;
 	if (m_orientation == StackLayoutOrientation::Vertical)
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
@@ -109,7 +109,7 @@ size_t mui::StackLayout::CalcMinHeight()
 
 size_t mui::StackLayout::CalcMinWidth()
 {
-	long width = 0;
+	unsigned long width = 0;
 	if (m_orientation == StackLayoutOrientation::Horizontal)
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
@@ -129,12 +129,12 @@ size_t mui::StackLayout::CalcMinWidth()
 
 size_t mui::StackLayout::CalcMaxHeight()
 {
-	long height = 0;
+	unsigned long height = 0;
 	if (m_orientation == StackLayoutOrientation::Vertical)
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 		{
-			element->SetAvailableSize({ 0,height,m_availableSize.right, m_availableSize.bottom });
+			element->SetAvailableSize({ 0,(long)height,m_availableSize.right, m_availableSize.bottom });
 			height += (long)element->GetMaxHeight();
 		}
 	}
@@ -148,17 +148,17 @@ size_t mui::StackLayout::CalcMaxHeight()
 				height = (long)temp;
 		}
 	}
-	return max(height, m_availableSize.bottom - m_availableSize.top);
+	return max((long)height, m_availableSize.bottom - m_availableSize.top);
 }
 
 size_t mui::StackLayout::CalcMaxWidth()
 {
-	long width = 0;
+	unsigned long width = 0;
 	if (m_orientation == StackLayoutOrientation::Horizontal)
 	{
 		for (const std::shared_ptr<UIElement>& element : m_collection.Items())
 		{
-			element->SetAvailableSize({ width,0 ,m_availableSize.right, m_availableSize.bottom });
+			element->SetAvailableSize({ (long)width,0 ,m_availableSize.right, m_availableSize.bottom });
 			width += (long)element->GetMaxWidth();
 		}
 	}
@@ -172,7 +172,7 @@ size_t mui::StackLayout::CalcMaxWidth()
 				width = (long)temp;
 		}
 	}
-	return max(width, m_availableSize.right - m_availableSize.left);
+	return max((long)width, m_availableSize.right - m_availableSize.left);
 }
 
 

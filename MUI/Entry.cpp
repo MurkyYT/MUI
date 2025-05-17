@@ -111,22 +111,22 @@ void UpdateEditScrollbars(HWND hEdit)
     BOOL needVScroll = (totalTextHeight > clientHeight);
     BOOL needHScroll = (maxLineWidth > clientWidth);
 
-    ShowScrollBar(hEdit, SB_VERT, needVScroll);
-    ShowScrollBar(hEdit, SB_HORZ, needHScroll);
+    LONG_PTR style = GetWindowLongPtr(hEdit, GWL_STYLE);
 
-    LONG style = GetWindowLongW(hEdit, GWL_STYLE);
+    ShowScrollBar(hEdit, SB_VERT, needVScroll && style & ES_MULTILINE);
+    ShowScrollBar(hEdit, SB_HORZ, needHScroll && style & ES_MULTILINE);
 
-    if (needVScroll)
+    if (needVScroll && style & ES_MULTILINE)
         style |= WS_VSCROLL;
     else
         style &= ~WS_VSCROLL;
 
-    if (needHScroll)
+    if (needHScroll && style & ES_MULTILINE)
         style |= WS_HSCROLL;
     else
         style &= ~WS_HSCROLL;
 
-    SetWindowLongW(hEdit, GWL_STYLE, style);
+    SetWindowLongPtr(hEdit, GWL_STYLE, style);
 
     InvalidateRect(hEdit, NULL, TRUE);
 }
@@ -191,6 +191,7 @@ mui::UIElement::EventHandlerResult mui::Entry::HandleEvent(UINT uMsg, WPARAM wPa
     }
     break;
     case WM_SIZE:
+        UpdateEditScrollbars(m_hWnd);
         UpdateIdealSize();
         break;
     case WM_CHAR:
