@@ -1,6 +1,8 @@
+#pragma region GENERATED_INCLUDES
 #include <MUI.h>
 
 #include "resource.h"
+#pragma endregion
 
 #include "StackLayoutTest1.h"
 #include "StackLayoutTest2.h"
@@ -15,62 +17,20 @@ class MainWindow : public Window
 public:
 	MainWindow();
 private:
-	void OpenStack1()
-	{
-		if (stackLayoutTest1)
-		{
-			stackLayoutTest1->Close();
-			stackLayoutTest1 = NULL;
-		}
+	std::shared_ptr<StackLayoutTest1> stackLayoutTest1;
+	std::shared_ptr<TreeViewExample> treeViewExample;
+	std::shared_ptr<StackLayoutTest2> stackLayoutTest2;
+	std::shared_ptr<DisabledEnabledWindow> disabledEnabled;
+	std::shared_ptr<DarkThemeWindow> darkThemeWindow;
 
-		stackLayoutTest1 = std::make_shared<StackLayoutTest1>();
-		stackLayoutTest1->Show();
-	}
-	void OpenTreeView()
-	{
-		if (treeViewExample)
-		{
-			treeViewExample->Close();
-			treeViewExample = NULL;
-		}
+#pragma region GENERATED_CLASS
+private:
+	void OpenStack1();
+	void OpenStack2();
+	void OpenTreeView();
+	void OpenDisabledEnabled();
+	void OpenDarkTheme();
 
-		treeViewExample = std::make_shared<TreeViewExample>();
-		treeViewExample->Show();
-	}
-	void OpenStack2()
-	{
-		if (stackLayoutTest2)
-		{
-			stackLayoutTest2->Close();
-			stackLayoutTest2 = NULL;
-		}
-
-		stackLayoutTest2 = std::make_shared<StackLayoutTest2>();
-		stackLayoutTest2->Show();
-	}
-
-	void OpenDisabledEnabled()
-	{
-		if (disabledEnabled)
-		{
-			disabledEnabled->Close();
-			disabledEnabled = NULL;
-		}
-
-		disabledEnabled = std::make_shared<DisabledEnabledWindow>();
-		disabledEnabled->Show();
-	}
-	void OpenDarkTheme()
-	{
-		if (darkThemeWindow)
-		{
-			darkThemeWindow->Close();
-			darkThemeWindow = NULL;
-		}
-
-		darkThemeWindow = std::make_shared<DarkThemeWindow>();
-		darkThemeWindow->Show();
-	}
 	void InitializeComponent()
 	{
 		SetTitle(L"MUI Demo Window");
@@ -102,10 +62,5 @@ private:
 
 		SetContent(layout);
 	}
-
-	std::shared_ptr<StackLayoutTest1> stackLayoutTest1;
-	std::shared_ptr<TreeViewExample> treeViewExample;
-	std::shared_ptr<StackLayoutTest2> stackLayoutTest2;
-	std::shared_ptr<DisabledEnabledWindow> disabledEnabled;
-	std::shared_ptr<DarkThemeWindow> darkThemeWindow;
+#pragma endregion
 };
