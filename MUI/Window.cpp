@@ -225,6 +225,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		{
 			if(window->m_content)
 			{
+				LockWindowUpdate(window->m_content->m_hWnd);
 				RECT rect{};
 				GetClientRect(hWnd, &rect);
 				window->m_content->m_availableSize = rect;
@@ -234,7 +235,8 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 					(int)window->m_content->GetMaxWidth(),
 					(int)window->m_content->GetMaxHeight() , 
 					NULL);
-
+				InvalidateRect(window->m_content->m_hWnd, NULL, TRUE);
+				LockWindowUpdate(NULL);
 			}
 		}
 		break;

@@ -155,6 +155,13 @@ mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM 
 	{
 		switch (((LPNMHDR)lParam)->code)
 		{
+		case LVN_ITEMCHANGED:
+		{
+			LPNMLISTVIEW pnmv = (LPNMLISTVIEW)lParam;
+			if (pnmv->iItem != -1 && pnmv->uNewState & LVIS_SELECTED && SelectionChanged)
+				SelectionChanged(this, { uMsg, wParam, lParam });
+		}
+		break;
 		case NM_CUSTOMDRAW:
 		{
 			HWND hHeader = ListView_GetHeader(m_hWnd);

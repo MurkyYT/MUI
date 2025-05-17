@@ -53,6 +53,7 @@ namespace mui
 
 		EventCallback_t RightClick{ NULL };
 		EventCallback_t DoubleClick{ NULL };
+		EventCallback_t SelectionChanged{ NULL };
 
 	private:
 		void SetHWND(HWND hWnd) override;

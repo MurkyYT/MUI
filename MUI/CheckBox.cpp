@@ -144,7 +144,8 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
                 FillRect(customDrawItem->hdc, &rect, brush);
                 SetBkMode(customDrawItem->hdc, TRANSPARENT);
                 ::SetTextColor(customDrawItem->hdc, m_enabled ? m_textColor : RGB(131, 131, 131));
-                DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rect, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_RIGHT);
+                rect.left += 4;
+                DrawText(customDrawItem->hdc, m_name.c_str(), -1, &rect, DT_SINGLELINE | DT_VCENTER | DT_LEFT);
                 result = CDRF_SKIPDEFAULT;
                 break;
             }
