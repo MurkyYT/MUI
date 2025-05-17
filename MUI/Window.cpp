@@ -250,13 +250,21 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		case WM_COMMAND:
 		{
 			if (window->m_content && LOWORD(wParam) == window->m_content->m_id)
-				window->m_content->HandleEvent(uMsg, wParam, lParam);
+			{
+				UIElement::EventHandlerResult res = window->m_content->HandleEvent(uMsg, wParam, lParam);
+				if (res.returnVal)
+					return res.value;
+			}	
 		}
 		break;
 		case WM_NOTIFY:
 		{
 			if (window->m_content && ((LPNMHDR)lParam)->idFrom == window->m_content->m_id)
-				window->m_content->HandleEvent(uMsg, wParam, lParam);
+			{
+				UIElement::EventHandlerResult res = window->m_content->HandleEvent(uMsg, wParam, lParam);
+				if (res.returnVal)
+					return res.value;
+			}
 		}
 		break;
 		case WM_CTLCOLORBTN:

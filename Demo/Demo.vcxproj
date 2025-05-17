@@ -151,8 +151,8 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="StackLayoutTest1.cpp" />
     <ClCompile Include="DarkThemeWindow.cpp" />
-    <ClCompile Include="StackLayoutTest3.cpp" />
-    <ClCompile Include="StackLayoutTest4.cpp" />
+    <ClCompile Include="TreeViewExample.cpp" />
+    <ClCompile Include="StackLayoutTest2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MUI\MUI.vcxproj">
@@ -165,8 +165,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="StackLayoutTest1.h" />
     <ClInclude Include="DarkThemeWindow.h" />
-    <ClInclude Include="StackLayoutTest3.h" />
-    <ClInclude Include="StackLayoutTest4.h" />
+    <ClInclude Include="TreeViewExample.h" />
+    <ClInclude Include="StackLayoutTest2.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Demo.rc" />

@@ -5,8 +5,8 @@
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="StackLayoutTest1.cpp" />
     <ClCompile Include="DarkThemeWindow.cpp" />
-    <ClCompile Include="StackLayoutTest3.cpp" />
-    <ClCompile Include="StackLayoutTest4.cpp" />
+    <ClCompile Include="TreeViewExample.cpp" />
+    <ClCompile Include="StackLayoutTest2.cpp" />
     <ClCompile Include="DisabledEnabledWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -14,8 +14,8 @@
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="StackLayoutTest1.h" />
     <ClInclude Include="DarkThemeWindow.h" />
-    <ClInclude Include="StackLayoutTest3.h" />
-    <ClInclude Include="StackLayoutTest4.h" />
+    <ClInclude Include="TreeViewExample.h" />
+    <ClInclude Include="StackLayoutTest2.h" />
     <ClInclude Include="DisabledEnabledWindow.h" />
   </ItemGroup>
   <ItemGroup>

@@ -13,4 +13,5 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "./ListView.h"
 #include "./Label.h"
 #include "./Entry.h"
+#include "./TreeView.h"
 #include "./Window.h"

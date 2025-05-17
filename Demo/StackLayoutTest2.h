@@ -4,10 +4,10 @@
 
 using namespace mui;
 
-class StackLayoutTest4 : public Window
+class StackLayoutTest2 : public Window
 {
 public:
-	StackLayoutTest4();
+	StackLayoutTest2();
 private:
 	void BtnClick()
 	{
@@ -17,7 +17,7 @@ private:
 	}
 	void InitializeComponent()
 	{
-		SetTitle(L"StackLayoutTest4");
+		SetTitle(L"StackLayoutTest2");
 		std::shared_ptr<StackLayout> layout2 = std::make_shared<StackLayout>(StackLayoutOrientation::Vertical);
 		layout3 = std::make_shared<StackLayout>(StackLayoutOrientation::Vertical);
 		layout = std::make_shared<StackLayout>(StackLayoutOrientation::Horizontal);;
@@ -27,11 +27,11 @@ private:
 		std::shared_ptr<Button> button3 = std::make_shared<Button>(L"Test button 3");
 		for (int i = 0; i < 20; i++) {
 			std::shared_ptr<Button> button4 = std::make_shared<Button>((std::wstring(L"Test button (") + std::to_wstring(i + 1) + L")").c_str());
-			button4->OnClick = std::bind(&StackLayoutTest4::BtnClick, this);
+			button4->OnClick = std::bind(&StackLayoutTest2::BtnClick, this);
 			layout2->Children().Add(button4);
 		}
 
-		button2->OnClick = std::bind(&StackLayoutTest4::BtnClick, this);
+		button2->OnClick = std::bind(&StackLayoutTest2::BtnClick, this);
 
 		layout->Children().Add(layout3);
 		layout->Children().Add(layout2);

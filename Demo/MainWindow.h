@@ -3,8 +3,8 @@
 #include "resource.h"
 
 #include "StackLayoutTest1.h"
-#include "StackLayoutTest3.h"
-#include "StackLayoutTest4.h"
+#include "StackLayoutTest2.h"
+#include "TreeViewExample.h"
 #include "DarkThemeWindow.h"
 #include "DisabledEnabledWindow.h"
 
@@ -26,27 +26,27 @@ private:
 		stackLayoutTest1 = std::make_shared<StackLayoutTest1>();
 		stackLayoutTest1->Show();
 	}
-	void OpenStack3()
+	void OpenTreeView()
 	{
-		if (stackLayoutTest3)
+		if (treeViewExample)
 		{
-			stackLayoutTest3->Close();
-			stackLayoutTest3 = NULL;
+			treeViewExample->Close();
+			treeViewExample = NULL;
 		}
 
-		stackLayoutTest3 = std::make_shared<StackLayoutTest3>();
-		stackLayoutTest3->Show();
+		treeViewExample = std::make_shared<TreeViewExample>();
+		treeViewExample->Show();
 	}
-	void OpenStack4()
+	void OpenStack2()
 	{
-		if (stackLayoutTest4)
+		if (stackLayoutTest2)
 		{
-			stackLayoutTest4->Close();
-			stackLayoutTest4 = NULL;
+			stackLayoutTest2->Close();
+			stackLayoutTest2 = NULL;
 		}
 
-		stackLayoutTest4 = std::make_shared<StackLayoutTest4>();
-		stackLayoutTest4->Show();
+		stackLayoutTest2 = std::make_shared<StackLayoutTest2>();
+		stackLayoutTest2->Show();
 	}
 
 	void OpenDisabledEnabled()
@@ -84,13 +84,13 @@ private:
 		button->OnClick = std::bind(&MainWindow::OpenStack1, this);
 		layout2->Children().Add(button);
 
-		button = std::make_shared<Button>(L"Stack Layout Test 3");
-		button->OnClick = std::bind(&MainWindow::OpenStack3, this);
+		button = std::make_shared<Button>(L"Stack Layout Test 2");
+		button->OnClick = std::bind(&MainWindow::OpenStack2, this);
 		layout2->Children().Add(button);
 
-		button = std::make_shared<Button>(L"Stack Layout Test 4");
-		button->OnClick = std::bind(&MainWindow::OpenStack4, this);
-		layout2->Children().Add(button);
+		button = std::make_shared<Button>(L"Tree View Example");
+		button->OnClick = std::bind(&MainWindow::OpenTreeView, this);
+		layout3->Children().Add(button);
 
 		button = std::make_shared<Button>(L"Disabled/Enabled elements");
 		button->OnClick = std::bind(&MainWindow::OpenDisabledEnabled, this);
@@ -104,8 +104,8 @@ private:
 	}
 
 	std::shared_ptr<StackLayoutTest1> stackLayoutTest1;
-	std::shared_ptr<StackLayoutTest3> stackLayoutTest3;
-	std::shared_ptr<StackLayoutTest4> stackLayoutTest4;
+	std::shared_ptr<TreeViewExample> treeViewExample;
+	std::shared_ptr<StackLayoutTest2> stackLayoutTest2;
 	std::shared_ptr<DisabledEnabledWindow> disabledEnabled;
 	std::shared_ptr<DarkThemeWindow> darkThemeWindow;
 };
