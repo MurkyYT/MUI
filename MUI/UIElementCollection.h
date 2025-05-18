@@ -21,11 +21,13 @@ namespace mui
 		BOOL IDExists(DWORD id);
 		void Clear();
 		void SetHWND(HWND hWnd) { m_parenthWnd = hWnd; };
+		void SetParent(UIElement* element) { m_parent = element; }
 		size_t Count() { return m_items.size(); }
 		const std::vector<std::shared_ptr<UIElement>>& Items();
 	private:
 		std::vector<std::shared_ptr<UIElement>> m_items;
 		std::unordered_map<DWORD, std::shared_ptr<UIElement>> m_indexToItem;
+		UIElement* m_parent;
 		HWND m_parenthWnd = NULL;
 		HFONT m_hFont;
 		DWORD m_index = 1;

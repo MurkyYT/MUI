@@ -126,6 +126,10 @@ namespace mui
 		DWORD GetID() { return m_id; }
 		BOOL GetSubclass() { return m_subclass; }
 
+		virtual void SetBackgroundColor(COLORREF color) {
+			m_backgroundColor = color;
+		}
+
 	protected:
 
 		~UIElement() { if (m_subclass) RemoveWindowSubclass(m_hWnd, CustomProc, (UINT_PTR)this); }
@@ -157,6 +161,8 @@ namespace mui
 
 		LayoutAligment m_verticalAligment = Fill;
 		LayoutAligment m_horizontalAligment = Fill;
+
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 
 		HWND m_parenthWnd = NULL;
 		HWND m_hWnd = NULL;

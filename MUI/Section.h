@@ -11,6 +11,10 @@ namespace mui
 	public:
 		Section(const std::wstring& text);
 
+		void SetTextColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color) override;
+		void SetExpandButtonColor(COLORREF color);
+
 		UIElementCollection& Children() { return m_stack.Children(); }
 	private:
 		StackLayout m_stack;
@@ -22,7 +26,6 @@ namespace mui
 		void UpdateIdealSize() override;
 		void SetHWND(HWND hWnd) override;
 
-		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_expandColor = RGB(0, 0, 0);
 

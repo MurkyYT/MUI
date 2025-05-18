@@ -16,7 +16,7 @@ namespace mui
 		BOOL SetText(const std::wstring& text);
 
 		void SetTextColor(COLORREF color);
-		void SetBackgroundColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color) override;
 		void SetHoverColor(COLORREF color);
 		void SetPressedColor(COLORREF color);
 		void SetRegularColor(COLORREF color);
@@ -30,7 +30,6 @@ namespace mui
 		COLORREF m_hoverColor = RGB(224, 238, 249);
 		COLORREF m_pressedColor = RGB(204, 228, 247);
 		COLORREF m_regularColor = RGB(253, 253, 253);
-		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		HBRUSH m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 	};

@@ -50,15 +50,12 @@ private:
 
 		listView->AddColumn(L"Values");
 
-		listView->SetBackgroundColor(RGB(30, 30, 30));
 		listView->SetHoverColor(RGB(45, 45, 45));
 		listView->SetTextColor(RGB(230, 230, 230));
 		listView->SetSeparatorColor(RGB(128, 128, 128));
 
-		entry->SetBackgroundColor(RGB(30, 30, 30));
 		entry->SetTextColor(RGB(230, 230, 230));
 
-		button->SetBackgroundColor(RGB(30, 30, 30));
 		button->SetRegularColor(RGB(30, 30, 30));
 		button->SetHoverColor(RGB(45, 45, 45));
 		button->SetTextColor(RGB(230, 230, 230));
@@ -66,16 +63,13 @@ private:
 		button->SetPressedColor(RGB(65, 65, 65));
 
 		button2->SetRegularColor(RGB(30, 30, 30));
-		button2->SetBackgroundColor(RGB(30, 30, 30));
 		button2->SetHoverColor(RGB(45, 45, 45));
 		button2->SetTextColor(RGB(230, 230, 230));
 		button2->SetBorderColor(RGB(128, 128, 128));
 		button2->SetPressedColor(RGB(65, 65, 65));
 
 		checkBox->SetTextColor(RGB(230, 230, 230));
-		checkBox->SetBackgroundColor(RGB(30, 30, 30));
 
-		label->SetBackgroundColor(RGB(30, 30, 30));
 		label->SetTextColor(RGB(230, 230, 230));
 
 		layout->SetBackgroundColor(RGB(30, 30, 30));

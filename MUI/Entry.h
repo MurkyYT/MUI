@@ -23,14 +23,13 @@ namespace mui
 		std::wstring GetText();
 
 		void SetTextColor(COLORREF color);
-		void SetBackgroundColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color) override;
 
 		EventCallback_t TextChanged{ NULL };
 		EventCallback_t Completed{ NULL };
 
 	private:
 		COLORREF m_textColor = RGB(0, 0, 0);
-		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		HBRUSH m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 		std::wstring m_placeholder = L"";
 		void SetHWND(HWND hWnd) override;

@@ -21,6 +21,10 @@ private:
 
 		section->Children().Add(button);
 
+		section->SetTextColor(RGB(230, 230, 230));
+		section->SetBackgroundColor(RGB(30, 30, 30));
+		section->SetExpandButtonColor(RGB(214, 214, 214));
+
 		SetContent(section);
 	}
 };
