@@ -34,6 +34,7 @@ namespace mui
 		HFONT m_hFont;
 		POINT m_minSize = { GetSystemMetrics(SM_CXMINTRACK), GetSystemMetrics(SM_CYMINTRACK) };
 		POINT m_maxSize = { GetSystemMetrics(SM_CXMAXTRACK), GetSystemMetrics(SM_CYMAXTRACK) };
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		std::shared_ptr<UIElement> m_content = NULL;
 
 		static BOOL s_dpiAware;

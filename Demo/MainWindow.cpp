@@ -64,3 +64,15 @@ void MainWindow::OpenDarkTheme()
 	darkThemeWindow = std::make_shared<DarkThemeWindow>();
 	darkThemeWindow->Show();
 }
+
+void MainWindow::OpenSectionTest()
+{
+	if (sectionTest)
+	{
+		sectionTest->Close();
+		sectionTest = NULL;
+	}
+
+	sectionTest = std::make_shared<SectionTest>();
+	sectionTest->Show();
+}

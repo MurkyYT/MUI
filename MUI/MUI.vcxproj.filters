@@ -51,6 +51,9 @@
     <ClInclude Include="TreeView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Section.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Window.cpp">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TreeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Section.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

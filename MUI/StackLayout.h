@@ -14,6 +14,7 @@ namespace mui
 
 	class StackLayout : public UIElement
 	{
+		friend class Section;
 	public:
 		StackLayout(StackLayoutOrientation orientation);
 

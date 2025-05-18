@@ -2,6 +2,8 @@
 #include <MUI.h>
 
 #include "resource.h"
+
+using namespace mui;
 #pragma endregion
 
 #include "StackLayoutTest1.h"
@@ -9,8 +11,7 @@
 #include "TreeViewExample.h"
 #include "DarkThemeWindow.h"
 #include "DisabledEnabledWindow.h"
-
-using namespace mui;
+#include "SectionTest.h"
 
 class MainWindow : public Window
 {
@@ -18,8 +19,9 @@ public:
 	MainWindow();
 private:
 	std::shared_ptr<StackLayoutTest1> stackLayoutTest1;
-	std::shared_ptr<TreeViewExample> treeViewExample;
 	std::shared_ptr<StackLayoutTest2> stackLayoutTest2;
+	std::shared_ptr<SectionTest> sectionTest;
+	std::shared_ptr<TreeViewExample> treeViewExample;
 	std::shared_ptr<DisabledEnabledWindow> disabledEnabled;
 	std::shared_ptr<DarkThemeWindow> darkThemeWindow;
 
@@ -27,6 +29,7 @@ private:
 private:
 	void OpenStack1();
 	void OpenStack2();
+	void OpenSectionTest();
 	void OpenTreeView();
 	void OpenDisabledEnabled();
 	void OpenDarkTheme();
@@ -46,6 +49,10 @@ private:
 
 		button = std::make_shared<Button>(L"Stack Layout Test 2");
 		button->OnClick = std::bind(&MainWindow::OpenStack2, this);
+		layout2->Children().Add(button);
+
+		button = std::make_shared<Button>(L"Section Test");
+		button->OnClick = std::bind(&MainWindow::OpenSectionTest, this);
 		layout2->Children().Add(button);
 
 		button = std::make_shared<Button>(L"Tree View Example");

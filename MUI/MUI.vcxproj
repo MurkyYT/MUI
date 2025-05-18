@@ -144,6 +144,7 @@
     <ClInclude Include="Label.h" />
     <ClInclude Include="ListView.h" />
     <ClInclude Include="MUI.h" />
+    <ClInclude Include="Section.h" />
     <ClInclude Include="StackLayout.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="UIElement.h" />
@@ -156,6 +157,7 @@
     <ClCompile Include="Entry.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListView.cpp" />
+    <ClCompile Include="Section.cpp" />
     <ClCompile Include="StackLayout.cpp" />
     <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="UIElement.cpp" />

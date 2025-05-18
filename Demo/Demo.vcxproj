@@ -149,6 +149,7 @@
     <ClCompile Include="DisabledEnabledWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="SectionTest.cpp" />
     <ClCompile Include="StackLayoutTest1.cpp" />
     <ClCompile Include="DarkThemeWindow.cpp" />
     <ClCompile Include="TreeViewExample.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="DisabledEnabledWindow.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SectionTest.h" />
     <ClInclude Include="StackLayoutTest1.h" />
     <ClInclude Include="DarkThemeWindow.h" />
     <ClInclude Include="TreeViewExample.h" />

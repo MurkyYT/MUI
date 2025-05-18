@@ -208,6 +208,17 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	{
 		switch (uMsg)
 		{
+		case WM_ERASEBKGND:
+		{
+			HDC hdc = (HDC)wParam;
+			RECT rc;
+			GetClientRect(hWnd, &rc);
+			HBRUSH hBrush = CreateSolidBrush(window->m_backgroundColor);
+			FillRect(hdc, &rc, hBrush);
+
+			DeleteObject(hBrush);
+			return 1;
+		}
 		case WM_DESTROY:
 		case WM_CLOSE:
 		{
