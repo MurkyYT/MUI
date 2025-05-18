@@ -216,3 +216,18 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
+
+void mui::Section::SetTextColor(COLORREF color)
+{
+	m_textColor = color;
+}
+void mui::Section::SetBackgroundColor(COLORREF color)
+{
+	m_backgroundColor = color;
+
+	m_stack.SetBackgroundColor(color);
+}
+void mui::Section::SetExpandButtonColor(COLORREF color)
+{
+	m_expandColor = color;
+}

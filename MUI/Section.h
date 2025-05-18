@@ -12,6 +12,11 @@ namespace mui
 		Section(const std::wstring& text);
 
 		UIElementCollection& Children() { return m_stack.Children(); }
+
+		void SetTextColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color);
+		void SetExpandButtonColor(COLORREF color);
+
 	private:
 		StackLayout m_stack;
 		std::wstring m_text;
