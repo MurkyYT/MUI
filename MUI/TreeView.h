@@ -28,7 +28,7 @@ namespace mui
 		TreeViewItem* GetSelectedItem();
 
 		void SetTextColor(COLORREF color);
-		void SetBackgroundColor(COLORREF color) override;
+		void SetBackgroundColor(COLORREF color);
 		void SetExpandButtonColor(COLORREF color);
 		void SetSelectedColor(COLORREF color);
 
@@ -47,6 +47,7 @@ namespace mui
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_expandButtonColor = RGB(0, 0, 0);
 		COLORREF m_selectedColor = RGB(217, 235, 249);
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 
 		std::unordered_map<HICON, DWORD> m_iconToIndex;
 		std::vector<std::shared_ptr<TreeViewItem>> m_children;

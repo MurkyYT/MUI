@@ -158,7 +158,6 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			HFONT hOldFont = (HFONT)SelectObject(hdc, section->m_stack.m_collection.GetFontHandle());
 			::SetTextColor(hdc, section->m_textColor);
 			rc = { 16,0,section->m_idealSize.cx - 16,section->m_textSize.cy };
-			SetBkMode(hdc, TRANSPARENT);
 			DrawText(hdc, section->m_text.c_str(), (int)section->m_text.size(), &rc,DT_END_ELLIPSIS | DT_VCENTER | DT_LEFT);
 			SelectObject(hdc, hOldFont);
 			EndPaint(hWnd, &ps);
@@ -216,19 +215,4 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		}
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
-void mui::Section::SetTextColor(COLORREF color)
-{
-	m_textColor = color;
-}
-void mui::Section::SetBackgroundColor(COLORREF color)
-{
-	m_backgroundColor = color;
-
-	m_stack.SetBackgroundColor(color);
-}
-void mui::Section::SetExpandButtonColor(COLORREF color)
-{
-	m_expandColor = color;
 }

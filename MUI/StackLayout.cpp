@@ -30,8 +30,6 @@ mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	m_x = 0;
 	m_y = 0;
-
-	m_collection.SetParent(this);
 }
 
 void mui::StackLayout::SetParentHWND(HWND p_hWnd)
@@ -181,9 +179,6 @@ size_t mui::StackLayout::CalcMaxWidth()
 void mui::StackLayout::SetBackgroundColor(COLORREF color)
 {
 	m_backgroundColor = color;
-
-	for (const std::shared_ptr<UIElement>& element : m_collection.Items())
-		element->SetBackgroundColor(color);
 }
 
 mui::UIElement::EventHandlerResult mui::StackLayout::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)

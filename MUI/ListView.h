@@ -47,7 +47,7 @@ namespace mui
 		std::shared_ptr<ListItem> GetSelectedItem();
 
 		void SetTextColor(COLORREF color);
-		void SetBackgroundColor(COLORREF color) override;
+		void SetBackgroundColor(COLORREF color);
 		void SetSeparatorColor(COLORREF color);
 		void SetHoverColor(COLORREF color);
 
@@ -68,6 +68,7 @@ namespace mui
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_seperatorColor = RGB(229, 229, 229);
 		COLORREF m_hoverColor = RGB(217, 235, 249);
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 
 		std::vector<std::shared_ptr<ListItem>> m_items;
 		std::vector<LVCOLUMN> m_columns;

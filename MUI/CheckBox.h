@@ -21,7 +21,7 @@ namespace mui
 
 		void SetTextColor(COLORREF color);
 
-		void SetBackgroundColor(COLORREF color) override;
+		void SetBackgroundColor(COLORREF color);
 
 		EventCallback_t StateChanged{ NULL };
 	private:
@@ -29,6 +29,7 @@ namespace mui
 		SIZE GetAccurateCheckboxSize(HWND hWnd);
 		BOOL m_checked = FALSE;
 		COLORREF m_textColor = RGB(0, 0, 0);
+		COLORREF m_backgroundColor = RGB(255,255,255);
 		HBRUSH m_backroundBrush = CreateSolidBrush(m_backgroundColor);
 		int m_checkBoxOffset = 0;
 		void UpdateIdealSize() override;

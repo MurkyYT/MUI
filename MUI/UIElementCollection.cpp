@@ -25,7 +25,6 @@ std::shared_ptr<mui::UIElement>& mui::UIElementCollection::ItemByID(DWORD id)
 void mui::UIElementCollection::Add(const std::shared_ptr<UIElement>& element)
 {
 	element->m_id = (DWORD)m_index;
-	element->SetBackgroundColor(m_parent->m_backgroundColor);
 
 	if (m_parenthWnd)
 	{

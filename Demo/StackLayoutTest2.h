@@ -12,7 +12,6 @@ private:
 	void BtnClick()
 	{
 		std::shared_ptr<CheckBox> button = std::make_shared<CheckBox>(L"Test checkbox");
-		button->SetTextColor(RGB(230, 230, 230));
 		layout3->Children().Add(button);
 		layout->Children().Remove(button2);
 	}
@@ -24,7 +23,6 @@ private:
 		layout = std::make_shared<StackLayout>(StackLayoutOrientation::Horizontal);;
 		button2 = std::make_shared<Button>(L"Test button 2");;
 
-		layout->SetBackgroundColor(RGB(0, 0, 0));
 
 		std::shared_ptr<Button> button3 = std::make_shared<Button>(L"Test button 3");
 		for (int i = 0; i < 20; i++) {
