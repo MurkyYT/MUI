@@ -166,6 +166,16 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
 {
     switch (uMsg)
     {
+    case WM_CHAR:
+    {
+        if (wParam == VK_RETURN && GetSelectedItem() != NULL)
+        {
+            if (OnReturn)
+                OnReturn(this, { uMsg, wParam, lParam });
+            return { TRUE, 1 };
+        }
+    }
+    break;
     case WM_NOTIFY:
     {
         switch (((LPNMHDR)lParam)->code)

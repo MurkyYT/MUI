@@ -34,6 +34,7 @@ namespace mui
 
 		EventCallback_t RightClick{ NULL };
 		EventCallback_t DoubleClick{ NULL };
+		EventCallback_t OnReturn{ NULL };
 		EventCallback_t SelectionChanged{ NULL };
 	private:
 		void AddChilds(const std::vector<std::shared_ptr<mui::TreeViewItem>>& items, const std::shared_ptr<mui::TreeViewItem>& root);

@@ -30,6 +30,7 @@ private:
 		child->AddChild(child3);
 
 		tv->DoubleClick = std::bind(&TreeViewExample::DoubleClick, this);
+		tv->OnReturn = std::bind(&TreeViewExample::DoubleClick, this);
 
 		tv->SetBackgroundColor(RGB(30, 30, 30));
 		tv->SetTextColor(RGB(230, 230, 230));
