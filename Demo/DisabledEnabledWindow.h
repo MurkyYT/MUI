@@ -2,6 +2,8 @@
 
 #include <MUI.h>
 
+#include "resource.h"
+
 using namespace mui;
 
 class DisabledEnabledWindow : public Window
@@ -27,6 +29,19 @@ private:
 		listView->SetEnabled(FALSE);
 
 		mainLayout->Children().Add(listView);
+
+		auto treeView = std::make_shared<TreeView>();
+		auto treeItem = std::make_shared<TreeViewItem>(L"Enabled!", LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)));
+		treeView->AddChild(treeItem);
+
+		mainLayout->Children().Add(treeView);
+
+		treeView = std::make_shared<TreeView>();
+		treeItem = std::make_shared<TreeViewItem>(L"Disabled!", LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1)));
+		treeView->AddChild(treeItem);
+		treeView->SetEnabled(FALSE);
+
+		mainLayout->Children().Add(treeView);
 
 		auto horizontalLayout = std::make_shared<StackLayout>(StackLayoutOrientation::Horizontal);
 		auto layout = std::make_shared<StackLayout>(StackLayoutOrientation::Vertical);

@@ -14,8 +14,8 @@ private:
 	{
 		if(tv->Count() > 1)
 			tv->RemoveChild(tv->GetSelectedItem());
-		tv->AddChild(std::make_shared<TreeViewItem>(L"Test", LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1))));
-		tv->AddChild(std::make_shared<TreeViewItem>(L"Test", LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1))));
+		tv->AddChild(std::make_shared<TreeViewItem>(std::wstring(L"Test ") + std::to_wstring(tv->Count()), LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1))));
+		tv->AddChild(std::make_shared<TreeViewItem>(std::wstring(L"Test ") + std::to_wstring(tv->Count()), LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1))));
 	}
 	void InitializeComponent()
 	{
