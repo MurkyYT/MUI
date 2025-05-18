@@ -222,13 +222,17 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
                 HIMAGELIST hImageList = (HIMAGELIST)TreeView_GetImageList(m_hWnd, TVSIL_NORMAL);
 
                 if (hImageList)
-                    ImageList_Draw(hImageList, isSelected ? tvi.iSelectedImage : tvi.iImage, hdc, rc.left - 16, rc.top, ILD_NORMAL);
+                {
+                    ImageList_DrawEx(hImageList, isSelected ? tvi.iSelectedImage : tvi.iImage, hdc, rc.left - 16, rc.top, 0, 0,
+                        CLR_NONE, RGB(128, 128, 128),
+                        m_enabled ?  ILD_NORMAL : ILD_BLEND50 | ILD_TRANSPARENT);
+                }
 
                 RECT rcText = rc;
                 rcText.left += 4;
 
                 SetBkMode(hdc, TRANSPARENT);
-                ::SetTextColor(hdc, m_textColor);
+                ::SetTextColor(hdc, m_enabled ? m_textColor : RGB(109,109,109));
                 DrawText(hdc, szText, -1, &rcText, DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX);
 
                 DeleteObject(selectedBackground);
