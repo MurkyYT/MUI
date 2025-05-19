@@ -141,6 +141,7 @@
     <ClInclude Include="CheckBox.h" />
     <ClInclude Include="Entry.h" />
     <ClInclude Include="Events.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="Label.h" />
     <ClInclude Include="ListView.h" />
     <ClInclude Include="MUI.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="CheckBox.cpp" />
     <ClCompile Include="Entry.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Label.cpp" />
     <ClCompile Include="ListView.cpp" />
     <ClCompile Include="Section.cpp" />

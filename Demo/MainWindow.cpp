@@ -76,3 +76,15 @@ void MainWindow::OpenSectionTest()
 	sectionTest = std::make_shared<SectionTest>();
 	sectionTest->Show();
 }
+
+void MainWindow::OpenGrid()
+{
+	if (gridWindow)
+	{
+		gridWindow->Close();
+		gridWindow = NULL;
+	}
+
+	gridWindow = std::make_shared<GridWindow>();
+	gridWindow->Show();
+}

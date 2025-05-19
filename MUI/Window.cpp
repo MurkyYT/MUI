@@ -194,8 +194,11 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			DeleteObject(window->m_hFont);
 			DestroyIcon(window->m_hIcon);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
-			if(window->m_content)
+			if (window->m_content) 
+			{
+				DestroyWindow(window->m_content->GetHWND());
 				SetWindowLongPtr(window->m_content->GetHWND(), GWLP_USERDATA, NULL);
+			}
 			window->m_content = NULL;
 		}
 		break;

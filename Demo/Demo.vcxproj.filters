@@ -9,6 +9,7 @@
     <ClCompile Include="StackLayoutTest2.cpp" />
     <ClCompile Include="DisabledEnabledWindow.cpp" />
     <ClCompile Include="SectionTest.cpp" />
+    <ClCompile Include="GridWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -19,6 +20,7 @@
     <ClInclude Include="StackLayoutTest2.h" />
     <ClInclude Include="DisabledEnabledWindow.h" />
     <ClInclude Include="SectionTest.h" />
+    <ClInclude Include="GridWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Demo.rc" />

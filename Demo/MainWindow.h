@@ -12,6 +12,7 @@ using namespace mui;
 #include "DarkThemeWindow.h"
 #include "DisabledEnabledWindow.h"
 #include "SectionTest.h"
+#include "GridWindow.h"
 
 class MainWindow : public Window
 {
@@ -24,6 +25,7 @@ private:
 	std::shared_ptr<TreeViewExample> treeViewExample;
 	std::shared_ptr<DisabledEnabledWindow> disabledEnabled;
 	std::shared_ptr<DarkThemeWindow> darkThemeWindow;
+	std::shared_ptr<GridWindow> gridWindow;
 
 #pragma region GENERATED_CLASS
 private:
@@ -33,6 +35,7 @@ private:
 	void OpenTreeView();
 	void OpenDisabledEnabled();
 	void OpenDarkTheme();
+	void OpenGrid();
 
 	void InitializeComponent()
 	{
@@ -65,6 +68,10 @@ private:
 
 		button = std::make_shared<Button>(L"Dark Theme Window");
 		button->OnClick = std::bind(&MainWindow::OpenDarkTheme, this);
+		layout3->Children().Add(button);
+
+		button = std::make_shared<Button>(L"Grid Window");
+		button->OnClick = std::bind(&MainWindow::OpenGrid, this);
 		layout3->Children().Add(button);
 
 		SetContent(layout);

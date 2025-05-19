@@ -28,7 +28,9 @@ void mui::UIElementCollection::Add(const std::shared_ptr<UIElement>& element)
 
 	if (m_parenthWnd)
 	{
+		LockWindowUpdate(m_parenthWnd);
 		element->Initialize(m_parenthWnd, element->GetID(), m_hFont);
+		LockWindowUpdate(NULL);
 
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	}
@@ -44,9 +46,11 @@ void mui::UIElementCollection::Remove(const std::shared_ptr<UIElement>& element)
 
 	if (it != m_items.end())
 	{
+		LockWindowUpdate(m_parenthWnd);
 		DestroyWindow(element->GetHWND());
 		m_items.erase(it);
 		m_indexToItem.erase(element->GetID());
+		LockWindowUpdate(NULL);
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	}
 }
