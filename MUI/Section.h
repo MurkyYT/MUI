@@ -32,6 +32,7 @@ namespace mui
 		COLORREF m_expandColor = RGB(0, 0, 0);
 
 		SIZE m_textSize = { 0,0 };
+		SIZE m_expandSize = { 0,0 };
 		HFONT m_hFont = NULL;
 
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

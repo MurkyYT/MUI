@@ -40,9 +40,12 @@ namespace mui
 		void AddChilds(const std::vector<std::shared_ptr<mui::TreeViewItem>>& items, const std::shared_ptr<mui::TreeViewItem>& root);
 		void SetHWND(HWND hWnd) override;
 		void UpdateIdealSize() override;
+		RECT TreeView_ApproximateFullRect(HWND hwndTV);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		DWORD m_iconIndex = 0;
+
+		UINT m_dpi = 96;
 
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_expandButtonColor = RGB(0, 0, 0);

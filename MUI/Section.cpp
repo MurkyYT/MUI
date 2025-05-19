@@ -53,14 +53,32 @@ void mui::Section::UpdateIdealSize()
 {
 	HDC hdc = GetDC(m_hWnd);
 
+	HFONT hOldFont = (HFONT)SelectObject(hdc, m_hFont);
+
 	SIZE size{};
-	GetTextExtentPoint32(hdc, m_text.c_str(), (int)m_text.size(), &size);
+	GetTextExtentPoint32(hdc, m_text.c_str(), lstrlenW(m_text.c_str()), &size);
+
+	SelectObject(hdc, hOldFont);
+	ReleaseDC(m_hWnd, hdc);
 
 	m_textSize = size;
 
+	UINT dpi = 96;
+	HMODULE hUser32 = LoadLibraryA("User32.dll");
+	if (hUser32) {
+		auto pGetDpiForWindow = (decltype(&GetDpiForWindow))GetProcAddress(hUser32, "GetDpiForWindow");
+		if (pGetDpiForWindow) {
+			dpi = pGetDpiForWindow(m_hWnd);
+		}
+		FreeLibrary(hUser32);
+	}
+
 	size_t minWidth = m_content ? m_content->GetMinWidth() : 0;
 
-	size.cx = (LONG)(m_expanded ? max(minWidth + 16, size.cx + 16) : size.cx + 16);
+	m_expandSize.cx = MulDiv(16, dpi, 96);
+	m_expandSize.cy = MulDiv(16, dpi, 96);
+
+	size.cx = (LONG)(m_expanded ? max(minWidth + m_expandSize.cx, size.cx + m_expandSize.cx) : size.cx + m_expandSize.cx);
 
 	size.cy += (LONG)(m_expanded ? m_content->GetMinHeight() : 0);
 
@@ -80,16 +98,16 @@ void mui::Section::DrawTriangle(HDC hdc, RECT rc, bool expanded, COLORREF backgr
 
 	if (expanded)
 	{
-		pts[0] = { rc.right - 5, rc.top + 5 };
-		pts[1] = { rc.right - 5, rc.bottom - 6 };
-		pts[2] = { rc.right - 10, rc.bottom - 6 };
+		pts[0] = { (rc.right - rc.left) / 2 + MulDiv(2,m_expandSize.cx, 16) , (rc.bottom - rc.top) / 2 };
+		pts[1] = { (rc.right - rc.left) / 2 + MulDiv(2,m_expandSize.cx, 16) , (rc.bottom - rc.top) / 2 + MulDiv(4,m_expandSize.cx, 16) };
+		pts[2] = { (rc.right - rc.left) / 2 - MulDiv(2,m_expandSize.cx, 16) , (rc.bottom - rc.top) / 2 + MulDiv(4,m_expandSize.cx, 16) };
 		hBrush = CreateSolidBrush(triangleColor);
 	}
 	else
 	{
-		pts[0] = { rc.right - 10, rc.top + 3 };
-		pts[1] = { rc.right - 6, (rc.top + rc.bottom) / 2 - 1 };
-		pts[2] = { rc.right - 10, rc.bottom - 5 };
+		pts[0] = { (rc.right - rc.left) / 2 - MulDiv(2,m_expandSize.cx, 16), (rc.bottom - rc.top) / 2 - MulDiv(4,m_expandSize.cx, 16) };
+		pts[1] = { (rc.right - rc.left) / 2 + MulDiv(2,m_expandSize.cx, 16), (rc.bottom - rc.top) / 2 };
+		pts[2] = { (rc.right - rc.left) / 2 - MulDiv(2,m_expandSize.cx, 16), (rc.bottom - rc.top) / 2 + MulDiv(4,m_expandSize.cx, 16) };
 		hBrush = CreateSolidBrush(backgroundColor);
 	}
 
@@ -145,12 +163,12 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 		{
 			PAINTSTRUCT ps{};
 			HDC hdc = BeginPaint(hWnd, &ps);
-			RECT rc = { 0,0,16,16 };
+			RECT rc = { 0,0,section->m_expandSize.cx,section->m_textSize.cy };
 			section->DrawTriangle(hdc, rc, section->m_expanded, section->m_backgroundColor, section->m_expandColor);
 			HFONT hOldFont = (HFONT)SelectObject(hdc, section->m_hFont);
 			SetBkMode(hdc, TRANSPARENT);
 			::SetTextColor(hdc, section->m_textColor);
-			rc = { 16,0,section->m_idealSize.cx - 16,section->m_textSize.cy };
+			rc = { section-> m_expandSize.cx,0,section->m_idealSize.cx, section->m_textSize.cy };
 			DrawText(hdc, section->m_text.c_str(), (int)section->m_text.size(), &rc,DT_END_ELLIPSIS | DT_VCENTER | DT_LEFT);
 			SelectObject(hdc, hOldFont);
 			EndPaint(hWnd, &ps);
@@ -158,9 +176,9 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			if (section->m_content)
 			{
 				if (section->m_expanded)
-					SetWindowPos(section->m_content->GetHWND(), NULL, 16, section->m_textSize.cy, (int)section->m_content->GetMinWidth(), (int)section->m_content->GetMinHeight(), NULL);
+					SetWindowPos(section->m_content->GetHWND(), NULL, section->m_expandSize.cx, section->m_textSize.cy, (int)section->m_content->GetMinWidth(), (int)section->m_content->GetMinHeight(), NULL);
 				else
-					SetWindowPos(section->m_content->GetHWND(), NULL, 16, section->m_textSize.cy, 0, 0, NULL);
+					SetWindowPos(section->m_content->GetHWND(), NULL, section->m_expandSize.cx, section->m_textSize.cy, 0, 0, NULL);
 			}
 		}
 		break;

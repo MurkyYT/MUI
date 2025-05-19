@@ -44,7 +44,7 @@ void MeasureItem(HWND hwndTV, HDC hdc, HTREEITEM hItem, int depth,
     }
 }
 
-RECT TreeView_ApproximateFullRect(HWND hwndTV)
+RECT mui::TreeView::TreeView_ApproximateFullRect(HWND hwndTV)
 {
     RECT rc = { 0 };
 
@@ -112,6 +112,18 @@ RECT TreeView_ApproximateFullRect(HWND hwndTV)
     rc.top = 0;
     rc.right = finalWidth + glyphSize;
     rc.bottom = finalHeight;
+
+    UINT dpi = 96;
+    HMODULE hUser32 = LoadLibraryA("User32.dll");
+    if (hUser32) {
+        auto pGetDpiForWindow = (decltype(&GetDpiForWindow))GetProcAddress(hUser32, "GetDpiForWindow");
+        if (pGetDpiForWindow) {
+            dpi = pGetDpiForWindow(hwndTV);
+        }
+        FreeLibrary(hUser32);
+    }
+
+    m_dpi = dpi;
 
     return rc;
 }
@@ -233,13 +245,13 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
 
                 if (hImageList)
                 {
-                    ImageList_DrawEx(hImageList, isSelected ? tvi.iSelectedImage : tvi.iImage, hdc, rc.left - 16, rc.top, 0, 0,
+                    ImageList_DrawEx(hImageList, isSelected ? tvi.iSelectedImage : tvi.iImage, hdc, rc.left - MulDiv(16, m_dpi, 96), rc.top, 0, 0,
                         CLR_NONE, RGB(128, 128, 128),
                         m_enabled ?  ILD_NORMAL : ILD_BLEND50 | ILD_TRANSPARENT);
                 }
 
                 RECT rcText = rc;
-                rcText.left += 4;
+                rcText.left += MulDiv(4, m_dpi, 96);
 
                 SetBkMode(hdc, TRANSPARENT);
                 ::SetTextColor(hdc, m_enabled ? m_textColor : RGB(109,109,109));
