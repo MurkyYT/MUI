@@ -15,13 +15,25 @@ private:
 
 		auto button = std::make_shared<Button>(L"test button");
 
-		section->Children().Add(button);
+		auto layout = std::make_shared<StackLayout>(Horizontal);
+
+		layout->Children().Add(button);
 
 		button = std::make_shared<Button>(L"test button");
 
-		section->Children().Add(button);
+		layout->Children().Add(button);
+
+		section->SetHorizontalAligment(Start);
+		section->SetVerticalAligment(Center);
+
+		section->SetContent(layout);
 
 		SetContent(section);
+		layout->SetBackgroundColor(RGB(30, 30, 30));
+		section->SetBackgroundColor(RGB(30, 30, 30));
+		section->SetTextColor(RGB(230, 230, 230));
+		section->SetExpandButtonColor(RGB(219, 219, 219));
+		SetBackgroundColor(RGB(30, 30, 30));
 	}
 };
 

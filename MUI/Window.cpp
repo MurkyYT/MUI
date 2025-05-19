@@ -115,42 +115,11 @@ RECT mui::Window::GetRect()
 void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 {
 	if (m_content) 
-		DestroyWindow(m_content->m_hWnd);
-
-	element->m_id = (DWORD)1;
-	HWND hWnd = CreateWindowEx(
-		element->m_exStyle,
-		element->GetClass(),
-		element->GetName(),
-		element->m_style | WS_CHILD,
-		(int)element->m_x, (int)element->m_y, (int)element->m_width, (int)element->m_height,
-		this->m_hWnd,
-		(HMENU)1,
-		GetModuleHandle(NULL),
-		element.get()
-	);
-
-	element->SetHWND(hWnd);
-
-	SendMessage(
-		element->m_hWnd,
-		WM_SETFONT,
-		(WPARAM)this->m_hFont,
-		TRUE
-	);
-
-	element->UpdateIdealSize();
-
-	element->SetParentHWND(m_hWnd);
-
-	EnableWindow(element->m_hWnd, element->m_enabled);
+		DestroyWindow(m_content->GetHWND());
 
 	m_content = element;
 
-	if(element->m_subclass)
-		SetWindowSubclass(element->m_hWnd, UIElement::CustomProc, (UINT_PTR)element.get(), NULL);
-
-	ShowWindow(element->m_hWnd, SW_SHOW);
+	element->Initialize(m_hWnd, (DWORD)1, m_hFont);
 }
 
 BOOL mui::Window::SetTitle(const wchar_t* title)
@@ -236,17 +205,17 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		{
 			if(window->m_content)
 			{
-				LockWindowUpdate(window->m_content->m_hWnd);
+				LockWindowUpdate(window->m_content->GetHWND());
 				RECT rect{};
 				GetClientRect(hWnd, &rect);
-				window->m_content->m_availableSize = rect;
-				SetWindowPos(window->m_content->m_hWnd, NULL, 
+				window->m_content->SetAvailableSize(rect);
+				SetWindowPos(window->m_content->GetHWND(), NULL,
 					(int)window->m_content->GetX(),
 					(int)window->m_content->GetY(),
 					(int)window->m_content->GetMaxWidth(),
 					(int)window->m_content->GetMaxHeight() , 
 					NULL);
-				InvalidateRect(window->m_content->m_hWnd, NULL, TRUE);
+				InvalidateRect(window->m_content->GetHWND(), NULL, TRUE);
 				LockWindowUpdate(NULL);
 			}
 		}
@@ -260,7 +229,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		}
 		case WM_COMMAND:
 		{
-			if (window->m_content && LOWORD(wParam) == window->m_content->m_id)
+			if (window->m_content && LOWORD(wParam) == window->m_content->GetID())
 			{
 				UIElement::EventHandlerResult res = window->m_content->HandleEvent(uMsg, wParam, lParam);
 				if (res.returnVal)
@@ -270,7 +239,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		break;
 		case WM_NOTIFY:
 		{
-			if (window->m_content && ((LPNMHDR)lParam)->idFrom == window->m_content->m_id)
+			if (window->m_content && ((LPNMHDR)lParam)->idFrom == window->m_content->GetID())
 			{
 				UIElement::EventHandlerResult res = window->m_content->HandleEvent(uMsg, wParam, lParam);
 				if (res.returnVal)
@@ -285,7 +254,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			HWND hwnd = (HWND)lParam;
 			if (hwnd != NULL) {
 				int controlId = GetDlgCtrlID(hwnd);
-				if (window->m_content && controlId == window->m_content->m_id)
+				if (window->m_content && controlId == window->m_content->GetID())
 				{
 					mui::UIElement::EventHandlerResult res = window->m_content->HandleEvent(uMsg, wParam, lParam);
 					if (res.returnVal)

@@ -20,10 +20,6 @@ namespace mui
 
 	class UIElement
 	{
-		friend class Window;
-		friend class StackLayout;
-		friend class UIElementCollection;
-
 	public:
 		virtual size_t GetMinWidth()
 		{
@@ -123,12 +119,59 @@ namespace mui
 		const wchar_t* GetClass() { return m_class.c_str(); }
 		const wchar_t* GetName() { return m_name.c_str(); }
 		DWORD GetStyle() { return m_style; }
+		DWORD GetExStyle() { return m_exStyle; }
+		LayoutAligment GetVerticalAligment() { return m_verticalAligment; }
+		LayoutAligment GetHorizontalAligment() { return m_horizontalAligment; }
+		BOOL IsEnabled() { return m_enabled; }
+
+		virtual void SetBackgroundColor(COLORREF color) { m_backgroundColor = color; }
+
+		COLORREF GetBackgroundColor()  { return m_backgroundColor; }
+
 		DWORD GetID() { return m_id; }
-		BOOL GetSubclass() { return m_subclass; }
 
-	protected:
+		void SetID(DWORD id) { m_id = id; }
 
-		~UIElement() { if (m_subclass) RemoveWindowSubclass(m_hWnd, CustomProc, (UINT_PTR)this); }
+		void Initialize(HWND parenthWnd, DWORD id, HFONT font)
+		{
+			m_id = id;
+			HWND hWnd = CreateWindowEx(
+				m_exStyle,
+				GetClass(),
+				GetName(),
+				m_style | WS_CHILD,
+				(int)GetX(), (int)GetY(), (int)GetWidth(), (int)GetHeight(),
+				parenthWnd,
+				(HMENU)(INT64)id,
+				GetModuleHandle(NULL),
+				this
+			);
+
+			SetHWND(hWnd);
+
+			SendMessage(
+				m_hWnd,
+				WM_SETFONT,
+				(WPARAM)font,
+				TRUE
+			);
+
+			UpdateIdealSize();
+
+			SetParentHWND(parenthWnd);
+
+			if (m_subclass)
+				SetWindowSubclass(m_hWnd, UIElement::CustomProc, (UINT_PTR)this, NULL);
+
+			EnableWindow(m_hWnd, m_enabled);
+
+			ShowWindow(GetHWND(), SW_SHOW);
+		}
+
+		void SetAvailableSize(RECT rect)
+		{
+			m_availableSize = rect;
+		}
 
 		struct EventHandlerResult
 		{
@@ -138,25 +181,28 @@ namespace mui
 
 		virtual EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
+		virtual void UpdateIdealSize() {};
+
+	protected:
+
+		BOOL GetSubclass() { return m_subclass; }
+
 		virtual void SetHWND(HWND hWnd)
 		{
 			m_hWnd = hWnd;
 		}
-
-		virtual void UpdateIdealSize() {};
 
 		virtual void SetParentHWND(HWND p_hWnd)
 		{
 			m_parenthWnd = p_hWnd;
 		}
 
-		void SetAvailableSize(RECT rect)
-		{
-			m_availableSize = rect;
-		}
+		~UIElement() { if (m_subclass) RemoveWindowSubclass(m_hWnd, CustomProc, (UINT_PTR)this); }
 
 		LayoutAligment m_verticalAligment = Fill;
 		LayoutAligment m_horizontalAligment = Fill;
+
+		COLORREF m_backgroundColor = RGB(255, 255, 255);
 
 		HWND m_parenthWnd = NULL;
 		HWND m_hWnd = NULL;

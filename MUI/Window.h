@@ -26,6 +26,10 @@ namespace mui
 		BOOL SetTitle(const wchar_t* title);
 		std::wstring GetTitle();
 
+		void SetBackgroundColor(COLORREF color) { m_backgroundColor = color; }
+
+		COLORREF GetBackgroundColor() { return m_backgroundColor; }
+
 		EventCallback_t KeyDown{ NULL };
 		EventCallback_t KeyUp{ NULL };
 	private:

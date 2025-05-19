@@ -1,5 +1,7 @@
 #include "Label.h"
 
+#include "Window.h"
+
 SIZE GetLabelIdealSize(HWND hwndLabel)
 {
     HDC hdc = GetDC(hwndLabel);
@@ -54,19 +56,55 @@ void mui::Label::SetTextColor(COLORREF color)
 
 void mui::Label::SetBackgroundColor(COLORREF color)
 {
-    DeleteObject(m_backroundBrush);
     m_backgroundColor = color;
-    m_backroundBrush = CreateSolidBrush(m_backgroundColor);
+    m_customBackground = TRUE;
 }
 
 mui::UIElement::EventHandlerResult mui::Label::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    static HBRUSH backgroundBrush = NULL;
+    static INT64 backgroundColor = -1;
     switch (uMsg)
     {
     case WM_CTLCOLORSTATIC:
         SetBkMode((HDC)wParam, TRANSPARENT);
         ::SetTextColor((HDC)wParam, m_textColor);
-        return { TRUE , (LRESULT)m_backroundBrush };
+        if (m_customBackground)
+        {
+            if (m_backgroundColor != backgroundColor)
+            {
+                backgroundColor = m_backgroundColor;
+                DeleteObject(backgroundBrush);
+                backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+            }
+        }
+        else if (!GetParent(m_parenthWnd))
+        {
+            Window* window = (Window*)GetWindowLongPtr(m_parenthWnd, GWLP_USERDATA);
+            if (window)
+            {
+                if (window->GetBackgroundColor() != backgroundColor)
+                {
+                    backgroundColor = window->GetBackgroundColor();
+                    DeleteObject(backgroundBrush);
+                    backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+                }
+            }
+        }
+        else
+        {
+            UIElement* element = (UIElement*)GetWindowLongPtr(m_parenthWnd, GWLP_USERDATA);
+            if (element)
+            {
+                if (element->GetBackgroundColor() != backgroundColor)
+                {
+                    backgroundColor = element->GetBackgroundColor();
+                    DeleteObject(backgroundBrush);
+                    backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+                }
+            }
+        }
+        return { TRUE , (LRESULT)backgroundBrush };
     default:
         break;
     }

@@ -24,42 +24,17 @@ std::shared_ptr<mui::UIElement>& mui::UIElementCollection::ItemByID(DWORD id)
 }
 void mui::UIElementCollection::Add(const std::shared_ptr<UIElement>& element)
 {
-	element->m_id = (DWORD)m_index;
+	element->SetID((DWORD)m_index);
 
 	if (m_parenthWnd)
 	{
-		element->SetHWND(CreateWindowEx(
-			element->m_exStyle,
-			element->GetClass(),
-			element->GetName(),
-			element->m_style | WS_CHILD,
-			(int)element->m_x, (int)element->m_y, (int)element->m_width, (int)element->m_height,
-			m_parenthWnd,
-			(HMENU)(UINT64)element->m_id,
-			GetModuleHandle(NULL),
-			element.get()
-		));
-		SendMessage(
-			element->m_hWnd,
-			WM_SETFONT,
-			(WPARAM)m_hFont,
-			TRUE
-		);
-
-		element->UpdateIdealSize();
-
-		element->SetParentHWND(m_parenthWnd);
-
-		if (element->m_subclass)
-			SetWindowSubclass(element->m_hWnd, UIElement::CustomProc, (UINT_PTR)element.get(), NULL);
-
-		ShowWindow(element->m_hWnd, SW_SHOW);
+		element->Initialize(m_parenthWnd, element->GetID(), m_hFont);
 
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	}
 
 	m_items.push_back(element);
-	m_indexToItem[element->m_id] = element;
+	m_indexToItem[element->GetID()] = element;
 	m_index++;
 }
 
@@ -69,9 +44,9 @@ void mui::UIElementCollection::Remove(const std::shared_ptr<UIElement>& element)
 
 	if (it != m_items.end())
 	{
-		DestroyWindow(element->m_hWnd);
+		DestroyWindow(element->GetHWND());
 		m_items.erase(it);
-		m_indexToItem.erase(element->m_id);
+		m_indexToItem.erase(element->GetID());
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 	}
 }
@@ -80,8 +55,8 @@ void mui::UIElementCollection::Clear()
 {
 	for (const std::shared_ptr<UIElement>& element : m_items)
 	{
-		DestroyWindow(element->m_hWnd);
-		m_indexToItem.erase(element->m_id);
+		DestroyWindow(element->GetHWND());
+		m_indexToItem.erase(element->GetID());
 	}
 
 	m_items.clear();

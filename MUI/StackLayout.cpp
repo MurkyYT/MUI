@@ -52,36 +52,8 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 {
 	m_hWnd = hWnd;
 	for (const std::shared_ptr<UIElement>& element : m_collection.Items())
-	{
-		element->SetHWND(CreateWindowEx(
-			element->m_exStyle,
-			element->GetClass(),
-			element->GetName(),
-			element->GetStyle() | WS_CHILD,
-			(int)element->GetX(), (int)element->GetY(), (int)element->GetWidth(), (int)element->GetHeight(),
-			m_hWnd,
-			(HMENU)(UINT64)element->GetID(),
-			GetModuleHandle(NULL),
-			element.get()
-		));
-		SendMessage(
-			element->GetHWND(),
-			WM_SETFONT,
-			(WPARAM)m_collection.GetFontHandle(),
-			TRUE
-		);
+		element->Initialize(m_hWnd, element->GetID(), m_collection.GetFontHandle());
 
-		element->UpdateIdealSize();
-
-		element->SetParentHWND(m_hWnd);
-
-		EnableWindow(element->m_hWnd, element->m_enabled);
-
-		if (element->GetSubclass())
-			SetWindowSubclass(element->GetHWND(), UIElement::CustomProc, (UINT_PTR)element.get(), NULL);
-
-		ShowWindow(element->GetHWND(), SW_SHOW);
-	}
 	PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 
 	m_collection.SetHWND(hWnd);
@@ -175,12 +147,6 @@ size_t mui::StackLayout::CalcMaxWidth()
 	return max((long)width, m_availableSize.right - m_availableSize.left);
 }
 
-
-void mui::StackLayout::SetBackgroundColor(COLORREF color)
-{
-	m_backgroundColor = color;
-}
-
 mui::UIElement::EventHandlerResult mui::StackLayout::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return { FALSE, NULL };
@@ -234,7 +200,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				{
 					size_t width = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->m_horizontalAligment == Fill
+						&& element->GetHorizontalAligment() == Fill
 						? element->GetMaxWidth() : element->GetMinWidth();
 
 					size_t height = element->GetMinHeight();
@@ -247,7 +213,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 					size_t width = element->GetMinWidth();
 					size_t height = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->m_verticalAligment == Fill
+						&& element->GetVerticalAligment() == Fill
 						? element->GetMaxHeight() : element->GetMinHeight();
 					
 					if (height == element->GetHeight() && width == element->GetWidth())
@@ -269,7 +235,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				{
 					size_t width = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->m_horizontalAligment == Fill
+						&& element->GetHorizontalAligment() == Fill
 						? element->GetMaxWidth() : element->GetMinWidth();
 
 					size_t height = element->GetMinHeight();
@@ -288,7 +254,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 					size_t width = element->GetMinWidth();
 					size_t height = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->m_verticalAligment == Fill
+						&& element->GetVerticalAligment() == Fill
 						? element->GetMaxHeight() : element->GetMinHeight();
 
 					SetWindowPos(element->GetHWND(), NULL,

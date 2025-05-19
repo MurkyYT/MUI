@@ -1,5 +1,7 @@
 #include "CheckBox.h"
 
+#include "Window.h"
+
 #include <uxtheme.h>
 #include <vsstyle.h>
 #include <tchar.h>
@@ -112,15 +114,10 @@ void mui::CheckBox::SetTextColor(COLORREF color)
     m_textColor = color;
 }
 
-void mui::CheckBox::SetBackgroundColor(COLORREF color)
-{
-    DeleteObject(m_backroundBrush);
-    m_backgroundColor = color;
-    m_backroundBrush = CreateSolidBrush(m_backgroundColor);
-}
-
 mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    static HBRUSH backgroundBrush = NULL;
+    static INT64 backgroundColor = -1;
 	switch (uMsg)
 	{
     case WM_NOTIFY:
@@ -140,8 +137,7 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
             case CDDS_POSTPAINT:
                 RECT rect = customDrawItem->rc;
                 rect.left += m_checkBoxOffset;
-                HBRUSH brush = CreateSolidBrush(m_backgroundColor);
-                FillRect(customDrawItem->hdc, &rect, brush);
+                FillRect(customDrawItem->hdc, &rect, backgroundBrush);
                 SetBkMode(customDrawItem->hdc, TRANSPARENT);
                 ::SetTextColor(customDrawItem->hdc, m_enabled ? m_textColor : RGB(131, 131, 131));
                 rect.left += 4;
@@ -169,12 +165,53 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
 	}
     break;
     case WM_CTLCOLORSTATIC:
-        return { TRUE , (LRESULT)m_backroundBrush };
+        if(m_customBackground)
+        {
+            if (m_backgroundColor != backgroundColor)
+            {
+                backgroundColor = m_backgroundColor;
+                DeleteObject(backgroundBrush);
+                backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+            }
+        }
+        else if (!GetParent(m_parenthWnd))
+        {
+            Window* window = (Window*)GetWindowLongPtr(m_parenthWnd, GWLP_USERDATA);
+            if (window)
+            {
+                if (window->GetBackgroundColor() != backgroundColor)
+                {
+                    backgroundColor = window->GetBackgroundColor();
+                    DeleteObject(backgroundBrush);
+                    backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+                }
+            }
+        }
+        else
+        {
+            UIElement* element = (UIElement*)GetWindowLongPtr(m_parenthWnd, GWLP_USERDATA);
+            if (element)
+            {
+                if (element->GetBackgroundColor() != backgroundColor)
+                {
+                    backgroundColor = element->GetBackgroundColor();
+                    DeleteObject(backgroundBrush);
+                    backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+                }
+            }
+        }
+        return { TRUE , (LRESULT)backgroundBrush };
 	default:
 		break;
 	}
 
     return { FALSE, NULL };
+}
+
+void mui::CheckBox::SetBackgroundColor(COLORREF color)
+{
+    m_customBackground = TRUE;
+    m_backgroundColor = color;
 }
 
 void mui::CheckBox::UpdateIdealSize()

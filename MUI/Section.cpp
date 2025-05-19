@@ -1,8 +1,10 @@
 #include "Section.h"
 
+#include "Window.h"
+
 #include <stdexcept>
 
-mui::Section::Section(const std::wstring& text) : m_stack(Vertical)
+mui::Section::Section(const std::wstring& text)
 {
 	m_subclass = false;
 	m_text = text;
@@ -29,38 +31,22 @@ mui::Section::Section(const std::wstring& text) : m_stack(Vertical)
 	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	m_x = 0;
 	m_y = 0;
+
+	NONCLIENTMETRICS ncm = {};
+	ncm.cbSize = sizeof(NONCLIENTMETRICS);
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+
+	m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
 }	
 
 void mui::Section::SetHWND(HWND hWnd)
 {
 	m_hWnd = hWnd;
-	m_stack.SetHWND(CreateWindowEx(
-		NULL,
-		m_stack.GetClass(),
-		m_stack.GetName(),
-		m_stack.GetStyle() | WS_CHILD,
-		(int)m_stack.GetX(), (int)m_stack.GetY(), (int)m_stack.GetWidth(), (int)m_stack.GetHeight(),
-		m_hWnd,
-		(HMENU)(UINT64)m_stack.GetID(),
-		GetModuleHandle(NULL),
-		&m_stack
-	));
-	SendMessage(
-		m_stack.GetHWND(),
-		WM_SETFONT,
-		(WPARAM)m_stack.Children().GetFontHandle(),
-		TRUE
-	);
 
-	m_stack.SetParentHWND(m_hWnd);
-
-	m_stack.SetEnabled(m_enabled);
-
-	ShowWindow(m_stack.GetHWND(), SW_SHOW);
+	if (m_content) 
+		m_content->Initialize(m_hWnd, m_content->GetID(), m_hFont);
 
 	PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
-
-	m_stack.Children().SetHWND(hWnd);
 }
 
 void mui::Section::UpdateIdealSize() 
@@ -72,11 +58,11 @@ void mui::Section::UpdateIdealSize()
 
 	m_textSize = size;
 
-	size_t minStackWidth = m_stack.GetMinWidth();
+	size_t minWidth = m_content ? m_content->GetMinWidth() : 0;
 
-	size.cx = (LONG)(m_expanded ? max(minStackWidth + 16, size.cx + 16) : size.cx + 16);
+	size.cx = (LONG)(m_expanded ? max(minWidth + 16, size.cx + 16) : size.cx + 16);
 
-	size.cy += (LONG)(m_expanded ? m_stack.GetMinHeight() : 0);
+	size.cy += (LONG)(m_expanded ? m_content->GetMinHeight() : 0);
 
 	m_idealSize = size;
 }
@@ -138,6 +124,12 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 	{
 		switch (uMsg)
 		{
+		case WM_DESTROY:
+		{
+			DeleteObject(section->m_hFont);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
+			break;
+		}
 		case WM_ERASEBKGND:
 		{
 			HDC hdc = (HDC)wParam;
@@ -155,17 +147,21 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			HDC hdc = BeginPaint(hWnd, &ps);
 			RECT rc = { 0,0,16,16 };
 			section->DrawTriangle(hdc, rc, section->m_expanded, section->m_backgroundColor, section->m_expandColor);
-			HFONT hOldFont = (HFONT)SelectObject(hdc, section->m_stack.m_collection.GetFontHandle());
+			HFONT hOldFont = (HFONT)SelectObject(hdc, section->m_hFont);
+			SetBkMode(hdc, TRANSPARENT);
 			::SetTextColor(hdc, section->m_textColor);
 			rc = { 16,0,section->m_idealSize.cx - 16,section->m_textSize.cy };
 			DrawText(hdc, section->m_text.c_str(), (int)section->m_text.size(), &rc,DT_END_ELLIPSIS | DT_VCENTER | DT_LEFT);
 			SelectObject(hdc, hOldFont);
 			EndPaint(hWnd, &ps);
 
-			if (section->m_expanded)
-				SetWindowPos(section->m_stack.GetHWND(), NULL, 16, section->m_textSize.cy, (int)section->m_stack.GetMinWidth(), (int)section->m_stack.GetMinHeight(), NULL);
-			else
-				SetWindowPos(section->m_stack.GetHWND(), NULL, 16, section->m_textSize.cy, 0,0, NULL);
+			if (section->m_content)
+			{
+				if (section->m_expanded)
+					SetWindowPos(section->m_content->GetHWND(), NULL, 16, section->m_textSize.cy, (int)section->m_content->GetMinWidth(), (int)section->m_content->GetMinHeight(), NULL);
+				else
+					SetWindowPos(section->m_content->GetHWND(), NULL, 16, section->m_textSize.cy, 0, 0, NULL);
+			}
 		}
 		break;
 		case WM_RBUTTONDOWN:
@@ -188,10 +184,13 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			if(PtInRect(&rc,pt))
 				section->m_expanded = !section->m_expanded;
 
-			if(section->m_expanded)
-				section->m_stack.SetAvailableSize({ 0,0,  (long)section->m_stack.GetMinWidth(), (long)section->m_stack.GetMinHeight() });
-			else
-				section->m_stack.SetAvailableSize({ 0,0,0,0 });
+			if (section->m_content)
+			{
+				if (section->m_expanded)
+					section->m_content->SetAvailableSize({ 0,0,  (long)section->m_content->GetMinWidth(), (long)section->m_content->GetMinHeight() });
+				else
+					section->m_content->SetAvailableSize({ 0,0,0,0 });
+			}
 
 			section->UpdateIdealSize();
 
@@ -225,7 +224,9 @@ void mui::Section::SetBackgroundColor(COLORREF color)
 {
 	m_backgroundColor = color;
 
-	m_stack.SetBackgroundColor(color);
+	m_content->SetBackgroundColor(color);
+
+	m_customBackground = TRUE;
 }
 void mui::Section::SetExpandButtonColor(COLORREF color)
 {

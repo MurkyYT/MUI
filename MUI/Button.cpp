@@ -1,5 +1,7 @@
 #include "Button.h"
 
+#include "Window.h"
+
 #include <CommCtrl.h>
 
 mui::Button::Button(const wchar_t* text, int x, int y, int width, int height)
@@ -35,13 +37,6 @@ void mui::Button::SetTextColor(COLORREF color)
 
 void mui::Button::SetBackgroundColor(COLORREF color)
 {
-	DeleteObject(m_backroundBrush);
-	m_backgroundColor = color;
-	m_backroundBrush = CreateSolidBrush(m_backgroundColor);
-}
-
-void mui::Button::SetRegularColor(COLORREF color)
-{
 	m_regularColor = color;
 }
 
@@ -63,6 +58,8 @@ void mui::Button::SetPressedColor(COLORREF color)
 mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static BOOL isPressed = FALSE;
+	static HBRUSH backgroundBrush = NULL;
+	static INT64 backgroundColor = -1;
 	switch (uMsg)
 	{
 	case WM_LBUTTONDOWN:
@@ -125,7 +122,35 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 	}
 	break;
 	case WM_CTLCOLORBTN:
-		return { TRUE , (LRESULT)m_backroundBrush };
+	{
+		if (!GetParent(m_parenthWnd)) 
+		{
+			Window* window = (Window*)GetWindowLongPtr(m_parenthWnd, GWLP_USERDATA);
+			if (window)
+			{
+				if (window->GetBackgroundColor() != backgroundColor)
+				{
+					backgroundColor = window->GetBackgroundColor();
+					DeleteObject(backgroundBrush);
+					backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+				}
+			}
+		}
+		else
+		{
+			UIElement* element = (UIElement*)GetWindowLongPtr(m_parenthWnd, GWLP_USERDATA);
+			if (element) 
+			{
+				if (element->GetBackgroundColor() != backgroundColor)
+				{
+					backgroundColor = element->GetBackgroundColor();
+					DeleteObject(backgroundBrush);
+					backgroundBrush = CreateSolidBrush((COLORREF)backgroundColor);
+				}
+			}
+		}
+		return { TRUE , (LRESULT)backgroundBrush };
+	}
 	default:
 		break;
 	}

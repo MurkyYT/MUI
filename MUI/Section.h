@@ -11,14 +11,14 @@ namespace mui
 	public:
 		Section(const std::wstring& text);
 
-		UIElementCollection& Children() { return m_stack.Children(); }
+		void SetContent(const std::shared_ptr<UIElement>& content) { m_content = content; }
 
 		void SetTextColor(COLORREF color);
-		void SetBackgroundColor(COLORREF color);
+		void SetBackgroundColor(COLORREF color) override;
 		void SetExpandButtonColor(COLORREF color);
 
 	private:
-		StackLayout m_stack;
+		std::shared_ptr<UIElement> m_content = NULL;
 		std::wstring m_text;
 		BOOL m_expanded = FALSE;
 
@@ -27,11 +27,12 @@ namespace mui
 		void UpdateIdealSize() override;
 		void SetHWND(HWND hWnd) override;
 
-		COLORREF m_backgroundColor = RGB(255, 255, 255);
+		BOOL m_customBackground = FALSE;
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_expandColor = RGB(0, 0, 0);
 
-		SIZE m_textSize;
+		SIZE m_textSize = { 0,0 };
+		HFONT m_hFont = NULL;
 
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 		EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
