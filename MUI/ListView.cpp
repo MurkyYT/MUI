@@ -151,6 +151,16 @@ mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM 
 {
 	switch (uMsg)
 	{
+	case WM_DESTROY:
+	{
+		ImageList_Destroy(m_hLargeIcons);
+		m_hLargeIcons = NULL;
+		ImageList_Destroy(m_hSmallIcons);
+		m_hSmallIcons = NULL;
+		ListView_SetImageList(m_hWnd, m_hLargeIcons, LVSIL_NORMAL);
+		ListView_SetImageList(m_hWnd, m_hSmallIcons, LVSIL_SMALL);
+	}
+	break;
 	case WM_NOTIFY:
 	{
 		switch (((LPNMHDR)lParam)->code)

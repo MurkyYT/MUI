@@ -178,6 +178,13 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
 {
     switch (uMsg)
     {
+    case WM_DESTROY:
+    {
+        ImageList_Destroy(m_hImageList);
+        m_hImageList = NULL;
+        TreeView_SetImageList(m_hWnd, m_hImageList, TVSIL_NORMAL);
+    }
+    break;
     case WM_CHAR:
     {
         if (wParam == VK_RETURN && GetSelectedItem() != NULL)
