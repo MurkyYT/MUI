@@ -63,7 +63,7 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 		0,
 		className.c_str(),
 		title,
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		(int)height,
