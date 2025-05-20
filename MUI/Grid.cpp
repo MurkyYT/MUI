@@ -62,7 +62,7 @@ void mui::Grid::SetHWND(HWND hWnd)
 
 void mui::Grid::CalculateRowHeights()
 {
-	long totalHeight = m_lastRequestedHeight;
+	long totalHeight = (long)m_lastRequestedHeight;
 	double totalStar = 0;
 	long usedHeight = 0;
 	for (size_t i = 0; i < m_rows.size(); ++i)
@@ -98,7 +98,7 @@ void mui::Grid::CalculateRowHeights()
 
 void mui::Grid::CalculateColumnWidths()
 {
-	long totalWidth = m_lastRequestedWidth;
+	long totalWidth = (long)m_lastRequestedWidth;
 	double totalStar = 0;
 	long usedWidth = 0;
 	for (size_t i = 0; i < m_columns.size(); ++i)
