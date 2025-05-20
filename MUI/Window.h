@@ -15,14 +15,19 @@ namespace mui
 		void Show();
 		void Close();
 		void SetContent(const std::shared_ptr<UIElement>& element);
+		void SetWidth(size_t width);
+		void SetHeight(size_t width);
 		size_t GetHeight();
 		size_t GetWidth();
+		void Activate() { SetForegroundWindow(m_hWnd); SetFocus(m_hWnd); }
 		void SetMaxWidth(size_t width);
 		void SetMaxHeight(size_t width);
 		void SetMinWidth(size_t width);
 		void SetMinHeight(size_t width);
 		POINT GetTopLeft();
 		RECT GetRect();
+		HWND GetHWND() { return m_hWnd; }
+		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
 		BOOL SetTitle(const wchar_t* title);
 		std::wstring GetTitle();
 
@@ -32,6 +37,7 @@ namespace mui
 
 		EventCallback_t KeyDown{ NULL };
 		EventCallback_t KeyUp{ NULL };
+		EventCallback_t OnClose{ NULL };
 	private:
 		HWND m_hWnd;
 		HICON m_hIcon;

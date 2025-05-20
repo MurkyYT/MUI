@@ -241,6 +241,28 @@ mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM 
 	return { FALSE,NULL };
 }
 
+void mui::ListView::Clear()
+{
+	ImageList_RemoveAll(m_hLargeIcons);
+	ImageList_RemoveAll(m_hSmallIcons);
+	if (m_hLargeIcons)
+		ImageList_Destroy(m_hLargeIcons);
+	if (m_hSmallIcons)
+		ImageList_Destroy(m_hSmallIcons);
+	m_hLargeIcons = ImageList_Create(32,
+		32,
+		ILC_COLOR32, 3, 0);
+	m_hSmallIcons = ImageList_Create(32,
+		32,
+		ILC_COLOR32, 3, 0);
+
+	ListView_DeleteAllItems(m_hWnd);
+
+	m_items.clear();
+	m_itemIndex = 0;
+	m_iconIndex = 0;
+}
+
 int mui::ListView::GetSelectedIndex()
 {
 	return ListView_GetNextItem(m_hWnd, -1, LVNI_SELECTED);
@@ -249,7 +271,7 @@ int mui::ListView::GetSelectedIndex()
 std::shared_ptr<mui::ListItem> mui::ListView::GetSelectedItem()
 {
 	int index = GetSelectedIndex();
-	if (index > 0)
+	if (index >= 0)
 		return m_items[index];
 
 	return NULL;
@@ -386,6 +408,9 @@ void mui::ListView::SetHWND(HWND hWnd)
 	ListView_SetBkColor(hWnd, m_backgroundColor);
 	ListView_SetTextColor(hWnd, m_textColor);
 	ListView_SetTextBkColor(hWnd, CLR_NONE);
+
+	ListView_SetExtendedListViewStyle(m_hWnd,
+		ListView_GetExtendedListViewStyle(m_hWnd) | LVS_EX_DOUBLEBUFFER);
 
 	HWND hHeader = ListView_GetHeader(m_hWnd);
 	SetWindowSubclass(hHeader, (SUBCLASSPROC)HeaderSubclassProc, (UINT_PTR)this, NULL);

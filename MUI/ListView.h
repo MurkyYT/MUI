@@ -20,6 +20,8 @@ namespace mui
 			m_values = values;
 			m_hIcon = icon;
 		}
+
+		std::vector<std::wstring> GetValues() { return m_values; }
 	private:
 		std::vector<std::wstring> m_values;
 		HICON m_hIcon = NULL;
@@ -40,6 +42,8 @@ namespace mui
 		BOOL AddItem(const std::shared_ptr<ListItem>& item);
 		BOOL RemoveItem(const std::shared_ptr<ListItem>& item);
 		BOOL RemoveItemByIndex(size_t index) { return RemoveItem(m_items[index]); }
+
+		void Clear();
 
 		size_t ItemCount() { return m_items.size(); }
 

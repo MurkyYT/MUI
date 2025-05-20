@@ -57,6 +57,8 @@ namespace mui
 		size_t GetMaxHeight() override;
 
 	private:
+		size_t m_lastRequestedHeight;
+		size_t m_lastRequestedWidth;
 		UIElementCollection m_collection;
 		std::vector<RowDefinition> m_rows;
 		std::vector<ColumnDefinition> m_columns;

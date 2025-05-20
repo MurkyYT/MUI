@@ -140,6 +140,16 @@ void mui::Window::Close()
 	DestroyWindow(m_hWnd);
 }
 
+void mui::Window::SetWidth(size_t width)
+{
+	SetWindowPos(m_hWnd, NULL, 0, 0, (int)width, (int)GetHeight(), SWP_NOMOVE);
+}
+
+void mui::Window::SetHeight(size_t height)
+{
+	SetWindowPos(m_hWnd, NULL, 0, 0, (int)GetWidth(), (int)height, SWP_NOMOVE);
+}
+
 void mui::Window::SetMaxWidth(size_t width)
 {
 	m_maxSize.x = (LONG)width;
@@ -200,6 +210,8 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				SetWindowLongPtr(window->m_content->GetHWND(), GWLP_USERDATA, NULL);
 			}
 			window->m_content = NULL;
+			if (window->OnClose)
+				window->OnClose(window, { uMsg, wParam, lParam });
 		}
 		break;
 		case MUI_WM_REDRAW:

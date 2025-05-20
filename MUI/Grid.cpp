@@ -62,7 +62,7 @@ void mui::Grid::SetHWND(HWND hWnd)
 
 void mui::Grid::CalculateRowHeights()
 {
-	long totalHeight = m_availableSize.bottom - m_availableSize.top;
+	long totalHeight = m_lastRequestedHeight;
 	double totalStar = 0;
 	long usedHeight = 0;
 	for (size_t i = 0; i < m_rows.size(); ++i)
@@ -98,7 +98,7 @@ void mui::Grid::CalculateRowHeights()
 
 void mui::Grid::CalculateColumnWidths()
 {
-	long totalWidth = m_availableSize.right - m_availableSize.left;
+	long totalWidth = m_lastRequestedWidth;
 	double totalStar = 0;
 	long usedWidth = 0;
 	for (size_t i = 0; i < m_columns.size(); ++i)
@@ -185,6 +185,7 @@ size_t mui::Grid::GetMinWidth()
 	for (size_t size : columnToWidth)
 		minWidth += size;
 
+	m_lastRequestedWidth = minWidth;
 	return minWidth;
 }
 size_t mui::Grid::GetMinHeight()
@@ -206,10 +207,19 @@ size_t mui::Grid::GetMinHeight()
 	for (size_t size : rowToHeight)
 		minHeight += size;
 
+	m_lastRequestedHeight = minHeight;
 	return minHeight;
 }
-size_t mui::Grid::GetMaxWidth() { return m_availableSize.right - m_availableSize.left; }
-size_t mui::Grid::GetMaxHeight() { return m_availableSize.bottom - m_availableSize.top; }
+size_t mui::Grid::GetMaxWidth() 
+{ 
+	m_lastRequestedWidth = m_availableSize.right - m_availableSize.left;
+	return m_availableSize.right - m_availableSize.left; 
+}
+size_t mui::Grid::GetMaxHeight()
+{
+	m_lastRequestedHeight = m_availableSize.bottom - m_availableSize.top;
+	return m_availableSize.bottom - m_availableSize.top; 
+}
 
 mui::UIElement::EventHandlerResult mui::Grid::HandleEvent(UINT, WPARAM, LPARAM) { return { FALSE, 0 }; }
 LRESULT CALLBACK mui::Grid::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
