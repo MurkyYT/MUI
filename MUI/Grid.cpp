@@ -24,8 +24,6 @@ mui::Grid::Grid()
 	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	m_x = m_y = 0;
 	m_subclass = FALSE;
-	m_rows.push_back(RowDefinition{ GridLength(1.0f, GridUnitType::Star) });
-	m_columns.push_back(ColumnDefinition{ GridLength(1.0f, GridUnitType::Star) });
 }
 
 std::vector<mui::RowDefinition>& mui::Grid::RowDefinitions() { return m_rows; }
@@ -33,13 +31,9 @@ std::vector<mui::ColumnDefinition>& mui::Grid::ColumnDefinitions() { return m_co
 
 void mui::Grid::AddChild(const std::shared_ptr<UIElement>& element, size_t row, size_t column) 
 {
-	if (row >= m_rows.size() || row < 0)
-		return;
-
-	if (column >= m_columns.size() || column < 0)
-		return;
-
-	m_elementGridPosition[element.get()] = {row, column};
+	size_t realRow = min(m_rows.size(), row);
+	size_t realColumn = min(m_columns.size(), column);
+	m_elementGridPosition[element.get()] = { realRow, realColumn };
 
 	m_collection.Add(element);
 }
@@ -163,15 +157,59 @@ void mui::Grid::PerformLayout()
 		for (size_t i = 0; i < row; ++i)
 			y += (long)m_rows[i].actualHeight;
 
-		SetWindowPos(el->GetHWND(), NULL, x, y, (int)m_columns[col].actualWidth, (int)m_rows[row].actualHeight, SWP_NOZORDER);
+
+		el->SetAvailableSize({ 0,0,
+			m_columns.size() == 0 ? m_availableSize.right - m_availableSize.left : (int)m_columns[col].actualWidth, 
+			m_rows.size() == 0 ? m_availableSize.bottom - m_availableSize.top : (int)m_rows[row].actualHeight });
+		SetWindowPos(el->GetHWND(), NULL, x + (int)el->GetX(), y + (int)el->GetY(), (int)el->GetMaxWidth(), (int)el->GetMaxHeight(), SWP_NOZORDER);
 		InvalidateRect(el->GetHWND(), NULL, TRUE);
 	}
 }
 
-size_t mui::Grid::GetMinWidth() { return m_availableSize.right - m_availableSize.left; }
-size_t mui::Grid::GetMinHeight() { return m_availableSize.bottom - m_availableSize.top; }
-size_t mui::Grid::GetMaxWidth() { return GetMinWidth(); }
-size_t mui::Grid::GetMaxHeight() { return GetMinHeight(); }
+size_t mui::Grid::GetMinWidth()
+{
+	size_t minWidth = 0;
+	std::vector<size_t> columnToWidth;
+	columnToWidth.resize(m_columns.size() == 0 ? 1 : m_columns.size());
+	for (const auto& el : m_collection.Items())
+	{
+		size_t col = 0;
+		auto it = m_elementGridPosition.find(el.get());
+		if (it != m_elementGridPosition.end())
+			col = it->second.second;
+
+		if (columnToWidth[col] < el->GetMinWidth())
+			columnToWidth[col] = el->GetMinWidth();
+	}
+
+	for (size_t size : columnToWidth)
+		minWidth += size;
+
+	return minWidth;
+}
+size_t mui::Grid::GetMinHeight()
+{
+	size_t minHeight = 0;
+	std::vector<size_t> rowToHeight;
+	rowToHeight.resize(m_rows.size() == 0 ? 1 : m_rows.size());
+	for (const auto& el : m_collection.Items())
+	{
+		size_t row = 0;
+		auto it = m_elementGridPosition.find(el.get());
+		if (it != m_elementGridPosition.end())
+			row = it->second.first;
+
+		if(rowToHeight[row] < el->GetMinHeight())
+			rowToHeight[row] = el->GetMinHeight();
+	}
+
+	for (size_t size : rowToHeight)
+		minHeight += size;
+
+	return minHeight;
+}
+size_t mui::Grid::GetMaxWidth() { return m_availableSize.right - m_availableSize.left; }
+size_t mui::Grid::GetMaxHeight() { return m_availableSize.bottom - m_availableSize.top; }
 
 mui::UIElement::EventHandlerResult mui::Grid::HandleEvent(UINT, WPARAM, LPARAM) { return { FALSE, 0 }; }
 LRESULT CALLBACK mui::Grid::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -189,6 +227,11 @@ LRESULT CALLBACK mui::Grid::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	{
 		switch (uMsg)
 		{
+		case WM_DESTROY:
+		{
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
+		}
+		break;
 		case WM_ERASEBKGND:
 		{
 			HDC hdc = (HDC)wParam;

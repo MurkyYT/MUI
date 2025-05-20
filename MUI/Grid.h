@@ -42,8 +42,8 @@ namespace mui
 	public:
 		Grid();
 
-		void AddColumn(ColumnDefinition definition) { if (!m_addedColumn) m_columns.clear(); m_columns.push_back(definition); m_addedColumn = TRUE; }
-		void AddRow(RowDefinition definition) { if (!m_addedRow) m_rows.clear(); m_rows.push_back(definition); m_addedRow = TRUE; }
+		void AddColumn(ColumnDefinition definition) { m_columns.push_back(definition); }
+		void AddRow(RowDefinition definition) { m_rows.push_back(definition); }
 
 		std::vector<RowDefinition>& RowDefinitions();
 		std::vector<ColumnDefinition>& ColumnDefinitions();
@@ -57,8 +57,6 @@ namespace mui
 		size_t GetMaxHeight() override;
 
 	private:
-		BOOL m_addedColumn = FALSE;
-		BOOL m_addedRow = FALSE;
 		UIElementCollection m_collection;
 		std::vector<RowDefinition> m_rows;
 		std::vector<ColumnDefinition> m_columns;

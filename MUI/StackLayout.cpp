@@ -169,6 +169,11 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 	{
 		switch (uMsg)
 		{
+		case WM_DESTROY:
+		{
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, NULL);
+		}
+		break;
 		case WM_ERASEBKGND:
 		{
 			HDC hdc = (HDC)wParam;
@@ -240,6 +245,8 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 
 					size_t height = element->GetMinHeight();
 
+					element->SetAvailableSize({ 0,0, (int)width, (int)height });
+
 					SetWindowPos(element->GetHWND(), NULL,
 						layout->m_insideAnotherStackLayout ? x : (int)element->GetX(),
 						y,
@@ -256,6 +263,8 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
 						&& element->GetVerticalAligment() == Fill
 						? element->GetMaxHeight() : element->GetMinHeight();
+
+					element->SetAvailableSize({ 0,0, (int)width, (int)height });
 
 					SetWindowPos(element->GetHWND(), NULL,
 						x,

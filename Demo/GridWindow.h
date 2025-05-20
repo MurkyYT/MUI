@@ -15,18 +15,18 @@ private:
 
 		auto button = std::make_shared<Button>(L"Test");
 
-		grid->AddColumn(GridLength::Auto());
-		grid->AddColumn(GridLength::Star());
-		grid->AddColumn(GridLength::Auto());
+		grid->AddRow(GridLength::Auto());
+		grid->AddRow(GridLength::Star());
+		grid->AddRow(GridLength::Auto());
 
 		grid->AddChild(button, 0, 0);
 		auto lv = std::make_shared<ListView>();
 		lv->AddColumn(L"Hello!");
-		lv->AddItem(std::make_shared<ListItem>(std::vector<std::wstring>{L"Test!"}, (HICON)NULL));
+		lv->AddItem(std::make_shared<ListItem>(std::vector<std::wstring>{L"Test"}, (HICON)NULL));
 		button = std::make_shared<Button>(L"Test2");
 
-		grid->AddChild(lv, 0, 1);
-		grid->AddChild(button, 0, 2);
+		grid->AddChild(lv, 1, 0);
+		grid->AddChild(button, 2, 0);
 
 		SetContent(grid);
 	}

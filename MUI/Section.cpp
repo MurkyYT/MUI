@@ -78,7 +78,7 @@ void mui::Section::UpdateIdealSize()
 	m_expandSize.cx = MulDiv(16, dpi, 96);
 	m_expandSize.cy = MulDiv(16, dpi, 96);
 
-	size.cx = (LONG)(m_expanded ? max(minWidth + m_expandSize.cx, size.cx + m_expandSize.cx) : size.cx + m_expandSize.cx);
+	size.cx = (LONG)(m_expanded ? max((LONG)minWidth + m_expandSize.cx, size.cx + m_expandSize.cx) : size.cx + m_expandSize.cx);
 
 	size.cy += (LONG)(m_expanded ? m_content->GetMinHeight() : 0);
 
