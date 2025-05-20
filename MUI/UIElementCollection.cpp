@@ -73,3 +73,8 @@ const std::vector<std::shared_ptr<mui::UIElement>>& mui::UIElementCollection::It
 {
 	return m_items;
 }
+
+BOOL mui::UIElementCollection::ItemExists(const std::shared_ptr<UIElement>& element)
+{
+	return std::find(m_items.begin(), m_items.end(), element) != m_items.end();
+}

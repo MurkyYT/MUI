@@ -45,6 +45,9 @@ namespace mui
 		void AddColumn(ColumnDefinition definition) { m_columns.push_back(definition); }
 		void AddRow(RowDefinition definition) { m_rows.push_back(definition); }
 
+		void SetRow(const std::shared_ptr<UIElement>& element, size_t row);
+		void SetColumn(const std::shared_ptr<UIElement>& element, size_t column);
+
 		std::vector<RowDefinition>& RowDefinitions();
 		std::vector<ColumnDefinition>& ColumnDefinitions();
 
@@ -57,12 +60,18 @@ namespace mui
 		size_t GetMaxHeight() override;
 
 	private:
+		struct GridPlacement
+		{
+			size_t row;
+			size_t column;
+		};
+
 		size_t m_lastRequestedHeight;
 		size_t m_lastRequestedWidth;
 		UIElementCollection m_collection;
 		std::vector<RowDefinition> m_rows;
 		std::vector<ColumnDefinition> m_columns;
-		std::unordered_map<UIElement*, std::pair<size_t, size_t>> m_elementGridPosition;
+		std::unordered_map<UIElement*, GridPlacement> m_elementGridPlacement;
 
 		void PerformLayout();
 		void SetHWND(HWND hWnd) override;

@@ -19,6 +19,7 @@ namespace mui
 		void Remove(const std::shared_ptr<UIElement>& element);
 		std::shared_ptr<UIElement>& ItemByID(DWORD id);
 		BOOL IDExists(DWORD id);
+		BOOL ItemExists(const std::shared_ptr<UIElement>& element);
 		void Clear();
 		void SetHWND(HWND hWnd) { m_parenthWnd = hWnd; };
 		size_t Count() { return m_items.size(); }

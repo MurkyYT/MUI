@@ -33,18 +33,42 @@ void mui::Grid::AddChild(const std::shared_ptr<UIElement>& element, size_t row, 
 {
 	size_t realRow = min(m_rows.size(), row);
 	size_t realColumn = min(m_columns.size(), column);
-	m_elementGridPosition[element.get()] = { realRow, realColumn };
+	m_elementGridPlacement[element.get()] = { realRow, realColumn };
 
 	m_collection.Add(element);
 }
 
+void mui::Grid::SetRow(const std::shared_ptr<UIElement>& element, size_t row)
+{
+	size_t realRow = min(m_rows.size(), row);
+	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
+	{
+		m_elementGridPlacement[element.get()] = { realRow, 0 };
+		m_collection.Add(element);
+	}
+	else
+		m_elementGridPlacement[element.get()].row = realRow;
+}
+
+void mui::Grid::SetColumn(const std::shared_ptr<UIElement>& element, size_t column)
+{
+	size_t realColumn = min(m_columns.size(), column);
+	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
+	{
+		m_elementGridPlacement[element.get()] = { 0, realColumn };
+		m_collection.Add(element);
+	}
+	else
+		m_elementGridPlacement[element.get()].column = realColumn;
+}
+
 void mui::Grid::RemoveChild(const std::shared_ptr<UIElement>& element)
 {
-	auto it = m_elementGridPosition.find(element.get());
+	auto it = m_elementGridPlacement.find(element.get());
 
-	if(it != m_elementGridPosition.end())
+	if(it != m_elementGridPlacement.end())
 	{
-		m_elementGridPosition.erase(it);
+		m_elementGridPlacement.erase(it);
 		m_collection.Remove(element);
 	}
 
@@ -65,6 +89,8 @@ void mui::Grid::CalculateRowHeights()
 	long totalHeight = (long)m_lastRequestedHeight;
 	double totalStar = 0;
 	long usedHeight = 0;
+	std::vector<RowDefinition*> m_star;
+
 	for (size_t i = 0; i < m_rows.size(); ++i)
 	{
 		auto& row = m_rows[i];
@@ -73,9 +99,9 @@ void mui::Grid::CalculateRowHeights()
 		else if (row.height.unit == GridUnitType::Auto)
 		{
 			size_t maxHeight = 0;
-			for (const auto& item : m_elementGridPosition)
+			for (const auto& item : m_elementGridPlacement)
 			{
-				if (item.second.first == i)
+				if (item.second.row == i)
 					maxHeight = max(maxHeight, item.first->GetMinHeight());
 			}
 			row.actualHeight = (double)maxHeight;
@@ -84,15 +110,15 @@ void mui::Grid::CalculateRowHeights()
 		{
 			totalStar += row.height.value;
 			row.actualHeight = 0;
+			m_star.push_back(&row);
 		}
 		usedHeight += (long)row.actualHeight;
 	}
 	long remaining = totalHeight - usedHeight;
 	if (totalStar > 0)
 	{
-		for (auto& row : m_rows)
-			if (row.height.unit == GridUnitType::Star)
-				row.actualHeight = (double)((row.height.value / totalStar) * remaining);
+		for (auto& row : m_star)
+			row->actualHeight = (double)((row->height.value / totalStar) * remaining);
 	}
 }
 
@@ -101,6 +127,8 @@ void mui::Grid::CalculateColumnWidths()
 	long totalWidth = (long)m_lastRequestedWidth;
 	double totalStar = 0;
 	long usedWidth = 0;
+	std::vector<ColumnDefinition*> m_star;
+
 	for (size_t i = 0; i < m_columns.size(); ++i)
 	{
 		auto& col = m_columns[i];
@@ -109,9 +137,9 @@ void mui::Grid::CalculateColumnWidths()
 		else if (col.width.unit == GridUnitType::Auto)
 		{
 			size_t maxWidth = 0;
-			for (const auto& item : m_elementGridPosition)
+			for (const auto& item : m_elementGridPlacement)
 			{
-				if (item.second.second == i)
+				if (item.second.column == i)
 					maxWidth = max(maxWidth, item.first->GetMinWidth());
 			}
 			col.actualWidth = (double)maxWidth;
@@ -120,15 +148,15 @@ void mui::Grid::CalculateColumnWidths()
 		{
 			totalStar += col.width.value;
 			col.actualWidth = 0;
+			m_star.push_back(&col);
 		}
 		usedWidth += (long)col.actualWidth;
 	}
 	long remaining = totalWidth - usedWidth;
 	if (totalStar > 0)
 	{
-		for (auto& col : m_columns)
-			if (col.width.unit == GridUnitType::Star)
-				col.actualWidth = (double)((col.width.value / totalStar) * remaining);
+		for (auto& col : m_star)
+			col->actualWidth = (double)((col->width.value / totalStar) * remaining);
 	}
 }
 
@@ -140,11 +168,11 @@ void mui::Grid::PerformLayout()
 	for (const auto& el : m_collection.Items())
 	{
 		size_t row = 0, col = 0;
-		auto it = m_elementGridPosition.find(el.get());
-		if (it != m_elementGridPosition.end()) 
+		auto it = m_elementGridPlacement.find(el.get());
+		if (it != m_elementGridPlacement.end()) 
 		{
-			row = it->second.first;
-			col = it->second.second;
+			row = it->second.row;
+			col = it->second.column;
 		}
 		else
 			continue;
@@ -174,9 +202,9 @@ size_t mui::Grid::GetMinWidth()
 	for (const auto& el : m_collection.Items())
 	{
 		size_t col = 0;
-		auto it = m_elementGridPosition.find(el.get());
-		if (it != m_elementGridPosition.end())
-			col = it->second.second;
+		auto it = m_elementGridPlacement.find(el.get());
+		if (it != m_elementGridPlacement.end())
+			col = it->second.column;
 
 		if (columnToWidth[col] < el->GetMinWidth())
 			columnToWidth[col] = el->GetMinWidth();
@@ -196,9 +224,9 @@ size_t mui::Grid::GetMinHeight()
 	for (const auto& el : m_collection.Items())
 	{
 		size_t row = 0;
-		auto it = m_elementGridPosition.find(el.get());
-		if (it != m_elementGridPosition.end())
-			row = it->second.first;
+		auto it = m_elementGridPlacement.find(el.get());
+		if (it != m_elementGridPlacement.end())
+			row = it->second.row;
 
 		if(rowToHeight[row] < el->GetMinHeight())
 			rowToHeight[row] = el->GetMinHeight();
