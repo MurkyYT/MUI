@@ -84,6 +84,15 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 
 }
 
+void mui::Window::SetCustomIcon(HICON icon)
+{
+	DestroyIcon(m_hIcon);
+	m_hIcon = CopyIcon(icon);
+
+	SendMessage(m_hWnd, WM_SETICON, ICON_BIG, (LPARAM)m_hIcon);
+	SendMessage(m_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)m_hIcon);
+}
+
 void mui::Window::Activate()
 {
 	if (IsIconic(m_hWnd))
