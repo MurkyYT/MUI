@@ -66,8 +66,8 @@ namespace mui
 			size_t column;
 		};
 
-		size_t m_lastRequestedHeight;
-		size_t m_lastRequestedWidth;
+		size_t m_lastRequestedHeight = 0;
+		size_t m_lastRequestedWidth = 0;
 		UIElementCollection m_collection;
 		std::vector<RowDefinition> m_rows;
 		std::vector<ColumnDefinition> m_columns;

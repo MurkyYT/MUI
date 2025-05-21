@@ -17,6 +17,7 @@ namespace mui
 		void SetContent(const std::shared_ptr<UIElement>& element);
 		void SetWidth(size_t width);
 		void SetHeight(size_t width);
+		BOOL SetCaptionColor(COLORREF color);
 		size_t GetHeight();
 		size_t GetWidth();
 		void Activate() { SetForegroundWindow(m_hWnd); SetFocus(m_hWnd); }

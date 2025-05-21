@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <dwmapi.h>
 #include <CommCtrl.h>
 #include <string>
 #include <stdexcept>
@@ -11,8 +12,8 @@ BOOL mui::Window::s_dpiAware = SetProcessDPIAware();
 
 mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 {
-	if(!s_dpiAware)
-	 s_dpiAware = SetProcessDPIAware();
+	if (!s_dpiAware)
+		s_dpiAware = SetProcessDPIAware();
 
 	UUID uuid;
 	RPC_STATUS status = UuidCreate(&uuid);
@@ -51,7 +52,7 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 	wcex.lpszClassName = className.c_str();
 	wcex.hIcon = m_hIcon;
 
-	if (!RegisterClassEx(&wcex)) 
+	if (!RegisterClassEx(&wcex))
 	{
 		std::string err = std::string("Class creation failed: ") + std::to_string(GetLastError());
 		throw std::runtime_error(err);
@@ -74,12 +75,43 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 		this
 	);
 
-	if (!m_hWnd) 
+	if (!m_hWnd)
 	{
 		DWORD err = GetLastError();
 		throw std::runtime_error("Window creation failed (" + std::to_string(err) + ")");
 		return;
 	}
+
+}
+
+BOOL mui::Window::SetCaptionColor(COLORREF color)
+{
+	LRESULT result = DwmSetWindowAttribute(m_hWnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
+	if (result < 0)
+	{
+		LPWSTR messageBuffer = nullptr;
+
+		DWORD size = FormatMessageW(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			(DWORD)result,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPWSTR)&messageBuffer,
+			0,
+			NULL
+		);
+
+		std::wstring message = std::wstring(L"Set Caption Color failed: ") + ((size && messageBuffer) ? messageBuffer : L"Unknown error") + L"\n";
+
+		if (messageBuffer)
+			LocalFree(messageBuffer);
+		
+		OutputDebugString(message.c_str());
+
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 void mui::Window::Show()

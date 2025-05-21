@@ -34,6 +34,7 @@ private:
 	void InitializeComponent()
 	{
 		SetTitle(L"Dark Theme Window");
+		SetCaptionColor(RGB(30, 30, 30));
 		this->KeyDown = std::bind(&DarkThemeWindow::OnKeyDown, this, std::placeholders::_1, std::placeholders::_2);
 		auto layout = std::make_shared<StackLayout>(Vertical);
 		auto button = std::make_shared<Button>(L"Add item");
