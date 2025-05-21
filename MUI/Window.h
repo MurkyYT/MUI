@@ -20,7 +20,7 @@ namespace mui
 		BOOL SetCaptionColor(COLORREF color);
 		size_t GetHeight();
 		size_t GetWidth();
-		void Activate() { SetForegroundWindow(m_hWnd); SetFocus(m_hWnd); }
+		void Activate();
 		void SetMaxWidth(size_t width);
 		void SetMaxHeight(size_t width);
 		void SetMinWidth(size_t width);

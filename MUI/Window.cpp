@@ -84,6 +84,17 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 
 }
 
+void mui::Window::Activate()
+{
+	if (IsIconic(m_hWnd))
+		SendMessage(m_hWnd, WM_SYSCOMMAND, SC_RESTORE, 0);
+
+	SetForegroundWindow(m_hWnd);
+	SetActiveWindow(m_hWnd);
+	SetWindowPos(m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE);
+	RedrawWindow(m_hWnd, NULL, 0, RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
+}
+
 BOOL mui::Window::SetCaptionColor(COLORREF color)
 {
 	LRESULT result = DwmSetWindowAttribute(m_hWnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
