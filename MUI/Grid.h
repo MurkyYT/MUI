@@ -46,12 +46,14 @@ namespace mui
 		void AddRow(RowDefinition definition) { m_rows.push_back(definition); }
 
 		void SetRow(const std::shared_ptr<UIElement>& element, size_t row);
+		void SetRowSpan(const std::shared_ptr<UIElement>& element, size_t rowSpan);
 		void SetColumn(const std::shared_ptr<UIElement>& element, size_t column);
+		void SetColumnSpan(const std::shared_ptr<UIElement>& element, size_t columnSpan);
 
 		std::vector<RowDefinition>& RowDefinitions();
 		std::vector<ColumnDefinition>& ColumnDefinitions();
 
-		void AddChild(const std::shared_ptr<UIElement>& element, size_t row, size_t column);
+		void AddChild(const std::shared_ptr<UIElement>& element);
 		void RemoveChild(const std::shared_ptr<UIElement>& element);
 
 		size_t GetMinWidth() override;
@@ -64,6 +66,8 @@ namespace mui
 		{
 			size_t row;
 			size_t column;
+			size_t rowSpan = 1;
+			size_t columnSpan = 1;
 		};
 
 		size_t m_lastRequestedHeight = 0;

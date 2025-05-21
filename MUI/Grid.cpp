@@ -29,11 +29,10 @@ mui::Grid::Grid()
 std::vector<mui::RowDefinition>& mui::Grid::RowDefinitions() { return m_rows; }
 std::vector<mui::ColumnDefinition>& mui::Grid::ColumnDefinitions() { return m_columns; }
 
-void mui::Grid::AddChild(const std::shared_ptr<UIElement>& element, size_t row, size_t column) 
+void mui::Grid::AddChild(const std::shared_ptr<UIElement>& element) 
 {
-	size_t realRow = min(m_rows.size(), row);
-	size_t realColumn = min(m_columns.size(), column);
-	m_elementGridPlacement[element.get()] = { realRow, realColumn };
+	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
+		m_elementGridPlacement[element.get()] = { 0, 0, 1, 1 };
 
 	m_collection.Add(element);
 }
@@ -42,24 +41,34 @@ void mui::Grid::SetRow(const std::shared_ptr<UIElement>& element, size_t row)
 {
 	size_t realRow = min(m_rows.size(), row);
 	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
-	{
-		m_elementGridPlacement[element.get()] = { realRow, 0 };
-		m_collection.Add(element);
-	}
+		m_elementGridPlacement[element.get()] = { realRow, 0, 1, 1 };
 	else
 		m_elementGridPlacement[element.get()].row = realRow;
+}
+
+void mui::Grid::SetRowSpan(const std::shared_ptr<UIElement>& element, size_t rowSpan)
+{
+	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
+		m_elementGridPlacement[element.get()] = { 0, 0, rowSpan, 1 };
+	else
+		m_elementGridPlacement[element.get()].rowSpan = rowSpan;
 }
 
 void mui::Grid::SetColumn(const std::shared_ptr<UIElement>& element, size_t column)
 {
 	size_t realColumn = min(m_columns.size(), column);
 	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
-	{
-		m_elementGridPlacement[element.get()] = { 0, realColumn };
-		m_collection.Add(element);
-	}
+		m_elementGridPlacement[element.get()] = { 0, realColumn, 1, 1 };
 	else
 		m_elementGridPlacement[element.get()].column = realColumn;
+}
+
+void mui::Grid::SetColumnSpan(const std::shared_ptr<UIElement>& element, size_t columnSpan)
+{
+	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
+		m_elementGridPlacement[element.get()] = { 0, 0, 1, columnSpan };
+	else
+		m_elementGridPlacement[element.get()].columnSpan = columnSpan;
 }
 
 void mui::Grid::RemoveChild(const std::shared_ptr<UIElement>& element)
@@ -167,15 +176,19 @@ void mui::Grid::PerformLayout()
 
 	for (const auto& el : m_collection.Items())
 	{
-		size_t row = 0, col = 0;
+		size_t row = 0, col = 0, colSpan = 1, rowSpan = 1;
 		auto it = m_elementGridPlacement.find(el.get());
 		if (it != m_elementGridPlacement.end()) 
 		{
 			row = it->second.row;
+			rowSpan = it->second.rowSpan;
 			col = it->second.column;
+			colSpan = it->second.columnSpan;
 		}
 		else
 			continue;
+
+		double width = 0, height = 0;
 
 		long x = 0;
 		for (size_t i = 0; i < col; ++i)
@@ -185,10 +198,15 @@ void mui::Grid::PerformLayout()
 		for (size_t i = 0; i < row; ++i)
 			y += (long)m_rows[i].actualHeight;
 
+		for (size_t i = col; i < col + colSpan && i < m_columns.size(); ++i)
+			width += m_columns[i].actualWidth;
+		for (size_t i = row; i < row + rowSpan && i < m_rows.size(); ++i)
+			height += m_rows[i].actualHeight;
+
 
 		el->SetAvailableSize({ 0,0,
-			m_columns.size() == 0 ? m_availableSize.right - m_availableSize.left : (int)m_columns[col].actualWidth, 
-			m_rows.size() == 0 ? m_availableSize.bottom - m_availableSize.top : (int)m_rows[row].actualHeight });
+			m_columns.size() == 0 ? m_availableSize.right - m_availableSize.left : (int)width,
+			m_rows.size() == 0 ? m_availableSize.bottom - m_availableSize.top : (int)height });
 		SetWindowPos(el->GetHWND(), NULL, x + (int)el->GetX(), y + (int)el->GetY(), (int)el->GetMaxWidth(), (int)el->GetMaxHeight(), SWP_NOZORDER);
 		InvalidateRect(el->GetHWND(), NULL, TRUE);
 	}
