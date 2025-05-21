@@ -108,10 +108,11 @@ void mui::Grid::CalculateRowHeights()
 		else if (row.height.unit == GridUnitType::Auto)
 		{
 			size_t maxHeight = 0;
-			for (const auto& item : m_elementGridPlacement)
+			for (const auto& element : m_collection.Items())
 			{
-				if (item.second.row == i)
-					maxHeight = max(maxHeight, item.first->GetMinHeight());
+				const auto& item = m_elementGridPlacement[element.get()];
+				if (item.row == i)
+					maxHeight = max(maxHeight, element->GetMinHeight());
 			}
 			row.actualHeight = (double)maxHeight;
 		}
@@ -146,10 +147,11 @@ void mui::Grid::CalculateColumnWidths()
 		else if (col.width.unit == GridUnitType::Auto)
 		{
 			size_t maxWidth = 0;
-			for (const auto& item : m_elementGridPlacement)
+			for (const auto& element : m_collection.Items())
 			{
-				if (item.second.column == i)
-					maxWidth = max(maxWidth, item.first->GetMinWidth());
+				const auto& item = m_elementGridPlacement[element.get()];
+				if (item.column == i)
+					maxWidth = max(maxWidth, element->GetMinWidth());
 			}
 			col.actualWidth = (double)maxWidth;
 		}

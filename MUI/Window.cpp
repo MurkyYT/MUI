@@ -320,6 +320,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				}
 			}
 		}
+		break;
 		case WM_CREATE:
 		{
 			NONCLIENTMETRICS ncm = {};

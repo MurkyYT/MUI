@@ -182,6 +182,22 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 			}
 		}
 		break;
+		case WM_CTLCOLOREDIT:
+		case WM_CTLCOLORBTN:
+		case WM_CTLCOLORSTATIC:
+		{
+			HWND hwnd = (HWND)lParam;
+			if (hwnd != NULL) {
+				int controlId = GetDlgCtrlID(hwnd);
+				if (section->m_content->GetID() == controlId)
+				{
+					EventHandlerResult res = section->m_content->HandleEvent(uMsg, wParam, lParam);
+					if (res.returnVal)
+						return res.value;
+				}
+			}
+		}
+		break;
 		case WM_RBUTTONDOWN:
 		case WM_MBUTTONDOWN:
 			SetFocus(hWnd);
