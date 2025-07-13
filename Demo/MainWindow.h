@@ -36,6 +36,7 @@ private:
 	void OpenDisabledEnabled();
 	void OpenDarkTheme();
 	void OpenGrid();
+	void Closed();
 
 	void InitializeComponent()
 	{
@@ -75,6 +76,8 @@ private:
 		layout3->Children().Add(button);
 
 		SetContent(layout);
+
+		OnClose = std::bind(&MainWindow::Closed, this);
 	}
 #pragma endregion
 };

@@ -88,3 +88,8 @@ void MainWindow::OpenGrid()
 	gridWindow = std::make_shared<GridWindow>();
 	gridWindow->Show();
 }
+
+void MainWindow::Closed()
+{
+	PostQuitMessage(0);
+}
