@@ -115,7 +115,8 @@ mui::UIElement::EventHandlerResult mui::Button::HandleEvent(UINT uMsg, WPARAM wP
 		{
 		case BN_CLICKED:
 		{
-			if (this->OnClick) OnClick(this, { uMsg,wParam,lParam });
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
+			if (this->OnClick) OnClick(this, &args);
 		}
 		break;
 		}

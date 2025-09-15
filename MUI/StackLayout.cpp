@@ -5,8 +5,21 @@
 
 mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 {
-	m_subclass = false;
+	RegisterWindowClass();
+
 	m_orientation = orientation;
+	m_class = L"MUI_StackLayout";
+	m_name = L"";
+
+	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	m_x = 0;
+	m_y = 0;
+}
+
+ATOM mui::StackLayout::RegisterWindowClass() {
+	static ATOM atom = 0;
+	if (atom != 0)
+		return atom;
 
 	WNDCLASSEX wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -17,19 +30,11 @@ mui::StackLayout::StackLayout(StackLayoutOrientation orientation)
 	wcex.hbrBackground = NULL;
 	wcex.lpszClassName = L"MUI_StackLayout";
 
-	if (!RegisterClassEx(&wcex))
-	{
-		DWORD error = GetLastError();
-		if (error != ERROR_CLASS_ALREADY_EXISTS)
-			throw std::runtime_error("Class creation failed");
+	atom = RegisterClassEx(&wcex);
+	if (!atom && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+		throw std::runtime_error("Class creation failed");
 	}
-
-	m_class = L"MUI_StackLayout";
-	m_name = L"";
-
-	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	m_x = 0;
-	m_y = 0;
+	return atom;
 }
 
 void mui::StackLayout::SetParentHWND(HWND p_hWnd)
@@ -190,12 +195,6 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 		case WM_LBUTTONDOWN:
 			SetFocus(hWnd);
 			break;
-		case WM_KEYDOWN:
-			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
-			break;
-		case WM_KEYUP:
-			PostMessage(layout->m_parenthWnd, uMsg, wParam, lParam);
-			break;
 		case MUI_WM_REDRAW:
 		{
 			UIElement* element = (UIElement*)wParam;
@@ -205,7 +204,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				{
 					size_t width = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->GetHorizontalAligment() == Fill
+						&& element->GetHorizontalAlignment() == Fill
 						? element->GetMaxWidth() : element->GetMinWidth();
 
 					size_t height = element->GetMinHeight();
@@ -218,7 +217,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 					size_t width = element->GetMinWidth();
 					size_t height = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->GetVerticalAligment() == Fill
+						&& element->GetVerticalAlignment() == Fill
 						? element->GetMaxHeight() : element->GetMinHeight();
 					
 					if (height == element->GetHeight() && width == element->GetWidth())
@@ -240,7 +239,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 				{
 					size_t width = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->GetHorizontalAligment() == Fill
+						&& element->GetHorizontalAlignment() == Fill
 						? element->GetMaxWidth() : element->GetMinWidth();
 
 					size_t height = element->GetMinHeight();
@@ -259,7 +258,7 @@ LRESULT CALLBACK mui::StackLayout::WindowProc(HWND hWnd, UINT uMsg, WPARAM wPara
 					size_t width = element->GetMinWidth();
 					size_t height = !layout->m_insideAnotherStackLayout &&
 						lstrcmpW(element->GetClass(), L"MUI_StackLayout") != 0
-						&& element->GetVerticalAligment() == Fill
+						&& element->GetVerticalAlignment() == Fill
 						? element->GetMaxHeight() : element->GetMinHeight();
 
 					SetWindowPos(element->GetHWND(), NULL,

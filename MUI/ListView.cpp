@@ -63,7 +63,7 @@ void mui::ListView::SetTextColor(COLORREF color)
 void mui::ListView::SetBackgroundColor(COLORREF color)
 {
 	m_backgroundColor = color;
-	ListView_SetBkColor(m_hWnd, m_backgroundColor);	
+	ListView_SetBkColor(m_hWnd, m_backgroundColor);
 }
 
 void mui::ListView::SetSeparatorColor(COLORREF color)
@@ -133,7 +133,7 @@ LRESULT CALLBACK mui::ListView::HeaderSubclassProc(HWND hWnd, UINT uMsg, WPARAM 
 		break;
 	}
 	case WM_MOUSELEAVE:
-		if(!buttonPressed)
+		if (!buttonPressed)
 			lv->m_hotHeaderColumn = -1;
 		LockWindowUpdate(hWnd);
 		InvalidateRect(hWnd, NULL, TRUE);
@@ -168,8 +168,9 @@ mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM 
 		case LVN_ITEMCHANGED:
 		{
 			LPNMLISTVIEW pnmv = (LPNMLISTVIEW)lParam;
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
 			if (pnmv->iItem != -1 && pnmv->uNewState & LVIS_SELECTED && SelectionChanged)
-				SelectionChanged(this, { uMsg, wParam, lParam });
+				SelectionChanged(this, &args);
 		}
 		break;
 		case NM_CUSTOMDRAW:
@@ -226,13 +227,17 @@ mui::UIElement::EventHandlerResult mui::ListView::HandleEvent(UINT uMsg, WPARAM 
 		}
 		break;
 		case NM_RCLICK:
+		{
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
 			if (this->RightClick)
-				RightClick(this, { uMsg,wParam,lParam });
-			break;
+				RightClick(this, &args);
+		} break;
 		case NM_DBLCLK:
+		{
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
 			if (this->DoubleClick)
-				DoubleClick(this, { uMsg,wParam,lParam });
-			break;
+				DoubleClick(this, &args);
+		} break;
 		}
 	}
 	break;
@@ -288,7 +293,7 @@ BOOL mui::ListView::AddColumn(const wchar_t* title)
 
 	m_columns.push_back(lvc);
 
-	if (m_hWnd) 
+	if (m_hWnd)
 	{
 		UpdateIdealSize();
 		PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
@@ -311,7 +316,7 @@ BOOL mui::ListView::RemoveItem(const std::shared_ptr<ListItem>& item)
 		ListView_DeleteItem(m_hWnd, item->m_index);
 		BOOL hasImage = item->m_iconIndex != -1;
 
-		if (hasImage) 
+		if (hasImage)
 		{
 			m_iconIndex--;
 			ImageList_Remove(m_hLargeIcons, item->m_iconIndex);
@@ -325,9 +330,9 @@ BOOL mui::ListView::RemoveItem(const std::shared_ptr<ListItem>& item)
 			item.iItem = (int)i - 1;
 			item.mask = LVIF_IMAGE;
 			ListView_GetItem(m_hWnd, &item);
-			if(hasImage && m_items[i]->m_iconIndex != -1) item.iImage--;
+			if (hasImage && m_items[i]->m_iconIndex != -1) item.iImage--;
 			ListView_SetItem(m_hWnd, &item);
-			if(hasImage && m_items[i]->m_iconIndex != -1) m_items[i]->m_iconIndex--;
+			if (hasImage && m_items[i]->m_iconIndex != -1) m_items[i]->m_iconIndex--;
 		}
 
 		UpdateIdealSize();
@@ -350,11 +355,11 @@ BOOL mui::ListView::RemoveItem(const std::shared_ptr<ListItem>& item)
 	return TRUE;
 }
 
-BOOL mui::ListView::AddItem(const std::shared_ptr<ListItem>& item) 
+BOOL mui::ListView::AddItem(const std::shared_ptr<ListItem>& item)
 {
 	m_items.push_back(item);
 
-	if (m_hWnd) 
+	if (m_hWnd)
 	{
 		LockWindowUpdate(m_hWnd);
 		LVITEM lvi{};
@@ -397,7 +402,7 @@ BOOL mui::ListView::AddItem(const std::shared_ptr<ListItem>& item)
 
 		return GetLastError() == 0;
 	}
-	
+
 	return TRUE;
 }
 
@@ -453,6 +458,6 @@ void mui::ListView::SetHWND(HWND hWnd)
 			index++;
 		}
 	}
-	
+
 	PostMessage(m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 }

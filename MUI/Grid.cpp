@@ -4,6 +4,18 @@
 
 mui::Grid::Grid()
 {
+	RegisterWindowClass();
+
+	m_class = L"MUI_Grid";
+	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	m_x = m_y = 0;
+}
+
+ATOM mui::Grid::RegisterWindowClass() {
+	static ATOM atom = 0;
+	if (atom != 0)
+		return atom;
+
 	WNDCLASSEX wcex = {};
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -13,23 +25,17 @@ mui::Grid::Grid()
 	wcex.hbrBackground = NULL;
 	wcex.lpszClassName = L"MUI_Grid";
 
-	if (!RegisterClassEx(&wcex))
-	{
-		DWORD error = GetLastError();
-		if (error != ERROR_CLASS_ALREADY_EXISTS)
-			throw std::runtime_error("Class creation failed");
+	atom = RegisterClassEx(&wcex);
+	if (!atom && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+		throw std::runtime_error("Class creation failed");
 	}
-
-	m_class = L"MUI_Grid";
-	m_style = WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-	m_x = m_y = 0;
-	m_subclass = FALSE;
+	return atom;
 }
 
 std::vector<mui::RowDefinition>& mui::Grid::RowDefinitions() { return m_rows; }
 std::vector<mui::ColumnDefinition>& mui::Grid::ColumnDefinitions() { return m_columns; }
 
-void mui::Grid::AddChild(const std::shared_ptr<UIElement>& element) 
+void mui::Grid::AddChild(const std::shared_ptr<UIElement>& element)
 {
 	if (m_elementGridPlacement.find(element.get()) == m_elementGridPlacement.end())
 		m_elementGridPlacement[element.get()] = { 0, 0, 1, 1 };
@@ -75,7 +81,7 @@ void mui::Grid::RemoveChild(const std::shared_ptr<UIElement>& element)
 {
 	auto it = m_elementGridPlacement.find(element.get());
 
-	if(it != m_elementGridPlacement.end())
+	if (it != m_elementGridPlacement.end())
 	{
 		m_elementGridPlacement.erase(it);
 		m_collection.Remove(element);
@@ -176,40 +182,47 @@ void mui::Grid::PerformLayout()
 	CalculateRowHeights();
 	CalculateColumnWidths();
 
+	std::vector<long> colOffsets(m_columns.size() + 1, 0);
+	std::vector<long> rowOffsets(m_rows.size() + 1, 0);
+
+	for (size_t i = 0; i < m_columns.size(); ++i)
+		colOffsets[i + 1] = colOffsets[i] + (long)round(m_columns[i].actualWidth);
+
+	if (!m_columns.empty())
+		colOffsets.back() = (long)(m_availableSize.right - m_availableSize.left);
+
+	for (size_t i = 0; i < m_rows.size(); ++i)
+		rowOffsets[i + 1] = rowOffsets[i] + (long)round(m_rows[i].actualHeight);
+
+	if (!m_rows.empty())
+		rowOffsets.back() = (long)(m_availableSize.bottom - m_availableSize.top);
+
 	for (const auto& el : m_collection.Items())
 	{
-		size_t row = 0, col = 0, colSpan = 1, rowSpan = 1;
 		auto it = m_elementGridPlacement.find(el.get());
-		if (it != m_elementGridPlacement.end()) 
-		{
-			row = it->second.row;
-			rowSpan = it->second.rowSpan;
-			col = it->second.column;
-			colSpan = it->second.columnSpan;
-		}
-		else
+		if (it == m_elementGridPlacement.end())
 			continue;
 
-		double width = 0, height = 0;
+		size_t row = it->second.row;
+		size_t rowSpan = it->second.rowSpan;
+		size_t col = it->second.column;
+		size_t colSpan = it->second.columnSpan;
 
-		long x = 0;
-		for (size_t i = 0; i < col; ++i)
-			x += (long)m_columns[i].actualWidth;
+		long x = col < colOffsets.size() ? colOffsets[col] : 0;
+		long y = row < rowOffsets.size() ? rowOffsets[row] : 0;
 
-		long y = 0;
-		for (size_t i = 0; i < row; ++i)
-			y += (long)m_rows[i].actualHeight;
+		long width = col + colSpan < colOffsets.size() ? colOffsets[col + colSpan] - x
+			: (long)(m_availableSize.right - m_availableSize.left) - x;
+		long height = row + rowSpan < rowOffsets.size() ? rowOffsets[row + rowSpan] - y
+			: (long)(m_availableSize.bottom - m_availableSize.top) - y;
 
-		for (size_t i = col; i < col + colSpan && i < m_columns.size(); ++i)
-			width += m_columns[i].actualWidth;
-		for (size_t i = row; i < row + rowSpan && i < m_rows.size(); ++i)
-			height += m_rows[i].actualHeight;
+		int availWidth = m_columns.empty() ? m_availableSize.right - m_availableSize.left : (int)width;
+		int availHeight = m_rows.empty() ? m_availableSize.bottom - m_availableSize.top : (int)height;
 
-
-		el->SetAvailableSize({ 0,0,
-			m_columns.size() == 0 ? m_availableSize.right - m_availableSize.left : (int)width,
-			m_rows.size() == 0 ? m_availableSize.bottom - m_availableSize.top : (int)height });
-		SetWindowPos(el->GetHWND(), NULL, x + (int)el->GetX(), y + (int)el->GetY(), (int)el->GetMaxWidth(), (int)el->GetMaxHeight(), SWP_NOZORDER);
+		el->SetAvailableSize({ 0, 0, availWidth, availHeight });
+		SetWindowPos(el->GetHWND(), NULL, x + (int)el->GetX(), y + (int)el->GetY(),
+			min((int)el->GetMaxWidth(), availWidth - (int)el->GetX()),
+			min((int)el->GetMaxHeight(), availHeight - (int)el->GetY()), SWP_NOZORDER);
 		InvalidateRect(el->GetHWND(), NULL, TRUE);
 	}
 }
@@ -248,7 +261,7 @@ size_t mui::Grid::GetMinHeight()
 		if (it != m_elementGridPlacement.end())
 			row = it->second.row;
 
-		if(rowToHeight[row] < el->GetMinHeight())
+		if (rowToHeight[row] < el->GetMinHeight())
 			rowToHeight[row] = el->GetMinHeight();
 	}
 
@@ -258,15 +271,15 @@ size_t mui::Grid::GetMinHeight()
 	m_lastRequestedHeight = minHeight;
 	return minHeight;
 }
-size_t mui::Grid::GetMaxWidth() 
-{ 
+size_t mui::Grid::GetMaxWidth()
+{
 	m_lastRequestedWidth = m_availableSize.right - m_availableSize.left;
-	return m_availableSize.right - m_availableSize.left; 
+	return m_availableSize.right - m_availableSize.left;
 }
 size_t mui::Grid::GetMaxHeight()
 {
 	m_lastRequestedHeight = m_availableSize.bottom - m_availableSize.top;
-	return m_availableSize.bottom - m_availableSize.top; 
+	return m_availableSize.bottom - m_availableSize.top;
 }
 
 mui::UIElement::EventHandlerResult mui::Grid::HandleEvent(UINT, WPARAM, LPARAM) { return { FALSE, 0 }; }
@@ -298,6 +311,77 @@ LRESULT CALLBACK mui::Grid::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			HBRUSH hBrush = CreateSolidBrush(grid->m_backgroundColor);
 			FillRect(hdc, &rc, hBrush);
 
+//#ifndef NDEBUG
+//			if (hdc)
+//			{
+//				HPEN gridPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+//				HPEN cellPen = CreatePen(PS_DOT, 1, RGB(0, 255, 0));
+//				HPEN oldPen = (HPEN)SelectObject(hdc, gridPen);
+//
+//				long currentX = 0;
+//				for (size_t i = 0; i < grid->m_columns.size(); ++i)
+//				{
+//					MoveToEx(hdc, currentX, 0, NULL);
+//					LineTo(hdc, currentX, grid->m_availableSize.bottom - grid->m_availableSize.top);
+//					currentX += (long)grid->m_columns[i].actualWidth;
+//				}
+//				MoveToEx(hdc, currentX, 0, NULL);
+//				LineTo(hdc, currentX, grid->m_availableSize.bottom - grid->m_availableSize.top);
+//
+//				long currentY = 0;
+//				for (size_t i = 0; i < grid->m_rows.size(); ++i)
+//				{
+//					MoveToEx(hdc, 0, currentY, NULL);
+//					LineTo(hdc, grid->m_availableSize.right - grid->m_availableSize.left, currentY);
+//					currentY += (long)grid->m_rows[i].actualHeight;
+//				}
+//				MoveToEx(hdc, 0, currentY, NULL);
+//				LineTo(hdc, grid->m_availableSize.right - grid->m_availableSize.left, currentY);
+//
+//				SelectObject(hdc, cellPen);
+//
+//				for (const auto& el : grid->m_collection.Items())
+//				{
+//					size_t row = 0, col = 0, colSpan = 1, rowSpan = 1;
+//					auto it = grid->m_elementGridPlacement.find(el.get());
+//					if (it == grid->m_elementGridPlacement.end())
+//						continue;
+//
+//					row = it->second.row;
+//					rowSpan = it->second.rowSpan;
+//					col = it->second.column;
+//					colSpan = it->second.columnSpan;
+//
+//					long x = 0;
+//					for (size_t i = 0; i < col; ++i)
+//						x += (long)grid->m_columns[i].actualWidth;
+//
+//					long y = 0;
+//					for (size_t i = 0; i < row; ++i)
+//						y += (long)grid->m_rows[i].actualHeight;
+//
+//					double width = 0, height = 0;
+//					for (size_t i = col; i < col + colSpan && i < grid->m_columns.size(); ++i)
+//						width += grid->m_columns[i].actualWidth;
+//					for (size_t i = row; i < row + rowSpan && i < grid->m_rows.size(); ++i)
+//						height += grid->m_rows[i].actualHeight;
+//
+//					RECT elementRect = { x, y, x + (long)width, y + (long)height };
+//					Rectangle(hdc, elementRect.left, elementRect.top, elementRect.right, elementRect.bottom);
+//
+//					char debugText[256];
+//					sprintf_s(debugText, "R%zu:C%zu [%zu, %zu] (%zux%zu)", row, col, rowSpan, colSpan, (size_t)width, (size_t)height);
+//					SetBkMode(hdc, TRANSPARENT);
+//					SetTextColor(hdc, RGB(0, 0, 255));
+//					DrawTextA(hdc, debugText, -1, &elementRect, DT_VCENTER | DT_SINGLELINE);
+//				}
+//
+//				SelectObject(hdc, oldPen);
+//				DeleteObject(gridPen);
+//				DeleteObject(cellPen);
+//			}
+//#endif
+
 			DeleteObject(hBrush);
 			return 1;
 		}
@@ -305,12 +389,6 @@ LRESULT CALLBACK mui::Grid::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		case WM_MBUTTONDOWN:
 		case WM_LBUTTONDOWN:
 			SetFocus(hWnd);
-			break;
-		case WM_KEYDOWN:
-			PostMessage(grid->m_parenthWnd, uMsg, wParam, lParam);
-			break;
-		case WM_KEYUP:
-			PostMessage(grid->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case MUI_WM_REDRAW:
 			PostMessage(grid->m_parenthWnd, uMsg, wParam, lParam);

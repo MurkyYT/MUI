@@ -23,8 +23,8 @@ private:
 
 		layout->Children().Add(button);
 
-		section->SetHorizontalAligment(Start);
-		section->SetVerticalAligment(Center);
+		section->SetHorizontalAlignment(Start);
+		section->SetVerticalAlignment(Center);
 
 		section->SetContent(layout);
 

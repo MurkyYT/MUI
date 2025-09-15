@@ -6,25 +6,10 @@
 
 mui::Section::Section(const std::wstring& text)
 {
-	m_subclass = false;
+	RegisterWindowClass();
+
+
 	m_text = text;
-
-	WNDCLASSEX wcex = {};
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc = Section::WindowProc;
-	wcex.hInstance = GetModuleHandle(NULL);
-	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = NULL;
-	wcex.lpszClassName = L"MUI_Section";
-
-	if (!RegisterClassEx(&wcex))
-	{
-		DWORD error = GetLastError();
-		if (error != ERROR_CLASS_ALREADY_EXISTS)
-			throw std::runtime_error("Class creation failed");
-	}
-
 	m_class = L"MUI_Section";
 	m_name = L"";
 
@@ -38,6 +23,27 @@ mui::Section::Section(const std::wstring& text)
 
 	m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
 }	
+
+ATOM mui::Section::RegisterWindowClass() {
+	static ATOM atom = 0;
+	if (atom != 0)
+		return atom;
+
+	WNDCLASSEX wcex = {};
+	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = Section::WindowProc;
+	wcex.hInstance = GetModuleHandle(NULL);
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = NULL;
+	wcex.lpszClassName = L"MUI_Section";
+
+	atom = RegisterClassEx(&wcex);
+	if (!atom && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+		throw std::runtime_error("Class creation failed");
+	}
+	return atom;
+}
 
 void mui::Section::SetHWND(HWND hWnd)
 {
@@ -234,12 +240,6 @@ LRESULT CALLBACK mui::Section::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 			PostMessage(section->m_parenthWnd, MUI_WM_REDRAW, NULL, NULL);
 		}
-			break;
-		case WM_KEYDOWN:
-			PostMessage(section->m_parenthWnd, uMsg, wParam, lParam);
-			break;
-		case WM_KEYUP:
-			PostMessage(section->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case MUI_WM_REDRAW:
 			PostMessage(section->m_parenthWnd, uMsg, wParam, lParam);

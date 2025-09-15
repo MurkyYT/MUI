@@ -1,0 +1,28 @@
+<Window Class="MainWindow" Title="MUI Visual Designer" Width="800" Height="600" CaptionColor="#181818" OnClose="MainWindow_OnClose" KeyDown="MainWindow_KeyDown">
+    <Grid BackgroundColor="#181818">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <Label Text="Project Explorer" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" TextColor="white" />
+        
+        <Label Text="Window Preview" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" TextColor="white" />
+        
+        <Label Text="Properties" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" TextColor="white" />
+        
+        <TreeView Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="#181818" />
+        
+        <NativeWindowHost Name="windowHost" Grid.Row="1" Grid.Column="1" BackgroundColor="#181818" Border="true" OnResize="WindowHost_OnResize" />
+        
+        <Entry Name="designerEntry" Grid.Row="2" Grid.Column="1" Multiline="true" BackgroundColor="#181818" TextColor="white" NewLine="Entry_NewLine" CharPressed="Entry_CharPressed" Save="Entry_Save" />
+        
+        <Entry Name="debugEntry" Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Text="" Multiline="true" BackgroundColor="#181818" TextColor="white" />
+    </Grid>
+</Window>

@@ -11,7 +11,7 @@ namespace mui
 	class Window
 	{
 	public:
-		Window(const wchar_t* title = L"", size_t height = 500, size_t width = 500);
+		Window(const std::wstring& title = L"", size_t height = 500, size_t width = 500);
 		void Show();
 		void Close();
 		void SetContent(const std::shared_ptr<UIElement>& element);
@@ -30,7 +30,7 @@ namespace mui
 		RECT GetRect();
 		HWND GetHWND() { return m_hWnd; }
 		BOOL IsHidden() { return !IsWindowVisible(m_hWnd); }
-		BOOL SetTitle(const wchar_t* title);
+		BOOL SetTitle(const std::wstring& title);
 		std::wstring GetTitle();
 
 		void SetBackgroundColor(COLORREF color) { m_backgroundColor = color; }

@@ -1,0 +1,12 @@
+#pragma once
+#include "./WindowGenerator.h"
+#include "./LabelGenerator.h"
+#include "./ButtonGenerator.h"
+#include "./CheckBoxGenerator.h"
+#include "./EntryGenerator.h"
+#include "./StackLayoutGenerator.h"
+#include "./GridGenerator.h"
+#include "./TreeViewGenerator.h"
+#include "./NativeWindowHostGenerator.h"
+#include "./SectionGenerator.h"
+#include "./ListViewGenerator.h"

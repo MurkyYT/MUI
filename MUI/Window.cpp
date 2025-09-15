@@ -11,7 +11,7 @@
 
 BOOL mui::Window::s_dpiAware = SetProcessDPIAware();
 
-mui::Window::Window(const wchar_t* title, size_t height, size_t width)
+mui::Window::Window(const std::wstring& title, size_t height, size_t width)
 {
 	if (!s_dpiAware)
 		s_dpiAware = SetProcessDPIAware();
@@ -64,12 +64,12 @@ mui::Window::Window(const wchar_t* title, size_t height, size_t width)
 	(
 		0,
 		className.c_str(),
-		title,
+		title.c_str(),
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		(int)height,
 		(int)width,
+		(int)height,
 		NULL,
 		NULL,
 		GetModuleHandle(NULL),
@@ -175,9 +175,9 @@ void mui::Window::SetContent(const std::shared_ptr<UIElement>& element)
 	element->Initialize(m_hWnd, (DWORD)1, m_hFont);
 }
 
-BOOL mui::Window::SetTitle(const wchar_t* title)
+BOOL mui::Window::SetTitle(const std::wstring& title)
 {
-	return SetWindowText(m_hWnd, title);
+	return SetWindowText(m_hWnd, title.c_str());
 }
 
 std::wstring mui::Window::GetTitle()
@@ -263,8 +263,9 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				SetWindowLongPtr(window->m_content->GetHWND(), GWLP_USERDATA, NULL);
 			}
 			window->m_content = NULL;
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
 			if (window->OnClose)
-				window->OnClose(window, { uMsg, wParam, lParam });
+				window->OnClose(window, &args);
 		}
 		break;
 		case MUI_WM_REDRAW:
@@ -273,7 +274,6 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		{
 			if(window->m_content)
 			{
-				LockWindowUpdate(window->m_content->GetHWND());
 				RECT rect{};
 				GetClientRect(hWnd, &rect);
 				window->m_content->SetAvailableSize(rect);
@@ -284,7 +284,6 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 					(int)window->m_content->GetMaxHeight() , 
 					NULL);
 				InvalidateRect(window->m_content->GetHWND(), NULL, TRUE);
-				LockWindowUpdate(NULL);
 			}
 		}
 		break;
@@ -342,14 +341,16 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		break;
 		case WM_KEYDOWN:
 		{
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
 			if (window->KeyDown)
-				window->KeyDown(window, { uMsg, wParam, lParam });
+				window->KeyDown(window, &args);
 		}
 		break;
 		case WM_KEYUP:
 		{
+			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
 			if (window->KeyUp)
-				window->KeyUp(window, { uMsg, wParam, lParam });
+				window->KeyUp(window, &args);
 		}
 		break;
 		default:

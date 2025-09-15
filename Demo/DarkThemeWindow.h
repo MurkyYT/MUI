@@ -18,9 +18,9 @@ private:
 
 		label->SetText(L"List view example: " + std::to_wstring(listView->ItemCount()));
 	}
-	void OnKeyDown(void* element, EventArgs_t args)
+	void OnKeyDown(void* element, EventArgs_t* args)
 	{
-		if (args.wParam == VK_DELETE)
+		if (args->wParam == VK_DELETE)
 			RemoveItem();
 	}
 	void AddItem()
@@ -46,7 +46,7 @@ private:
 		entry->SetPlaceholder(L"Enter item text");
 		entry->Completed = std::bind(&DarkThemeWindow::AddItem, this);
 
-		checkBox->SetHorizontalAligment(Center);
+		checkBox->SetHorizontalAlignment(Center);
 		checkBox->SetChecked(TRUE);
 
 		listView->AddColumn(L"Values");
@@ -90,7 +90,7 @@ private:
 
 		SetContent(layout);
 
-		label->SetTextAligment(Center);
+		label->SetTextAlignment(Center);
 	}
 
 	std::shared_ptr<ListView> listView;

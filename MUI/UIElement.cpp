@@ -7,15 +7,74 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 {
 	UIElement* element = (UIElement*)uIdSubclass;
 
-	if (element) 
+	if (element)
 	{
+		EventArgs_t args = { uMsg, wParam, lParam, FALSE };
 		switch (uMsg)
 		{
+		case WM_MOUSEMOVE:
+			if (!element->m_mouseInside)
+			{
+				element->m_mouseInside = true;
+
+				TRACKMOUSEEVENT tme = {};
+				tme.cbSize = sizeof(TRACKMOUSEEVENT);
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = hWnd;
+				TrackMouseEvent(&tme);
+
+				if (element->MouseEnter)
+				{
+					EventArgs_t enterArgs = { NULL, wParam, lParam, FALSE };
+					element->MouseEnter(element, &enterArgs);
+				}
+			}
+
+			if (element->MouseMove)
+				element->MouseMove(element, &args);
+			break;
+		case WM_MOUSELEAVE:
+			element->m_mouseInside = false;
+			if (element->MouseLeave)
+				element->MouseLeave(element, &args);
+			break;
+		case WM_LBUTTONDOWN:
+			if (element->LeftMouseDown)
+				element->LeftMouseDown(element, &args);
+			break;
+		case WM_LBUTTONUP:
+			if (element->LeftMouseUp)
+				element->LeftMouseUp(element, &args);
+			break;
+		case WM_LBUTTONDBLCLK:
+			if (element->LeftMouseDoubleClick)
+				element->LeftMouseDoubleClick(element, &args);
+			break;
+		case WM_RBUTTONDOWN:
+			if (element->RightMouseDown)
+				element->RightMouseDown(element, &args);
+			break;
+		case WM_RBUTTONUP:
+			if (element->RightMouseUp)
+				element->RightMouseUp(element, &args);
+			break;
+		case WM_RBUTTONDBLCLK:
+			if (element->RightMouseDoubleClick)
+				element->RightMouseDoubleClick(element, &args);
+			break;
 		case WM_KEYDOWN:
-			PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
+			if (element->KeyDown)
+				element->KeyDown(element, &args);
+
+			if (!args.handled)
+				PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case WM_KEYUP:
-			PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
+			if (element->KeyUp)
+				element->KeyUp(element, &args);
+
+			if (!args.handled)
+				PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
 			break;
 		case WM_DESTROY:
 		case WM_NCDESTROY:
@@ -29,6 +88,6 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		if (res.returnVal)
 			return res.value;
 	}
-		
+
 	return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 }

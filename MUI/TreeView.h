@@ -70,7 +70,7 @@ namespace mui
 		{
 			child->m_parent = this; 
 			m_children.push_back(child);
-			if(m_treeView->GetHWND())
+			if(m_treeView && m_treeView->GetHWND())
 			{
 				LockWindowUpdate(m_treeView->GetHWND());
 				TVINSERTSTRUCT tvis = { 0 };
@@ -93,7 +93,7 @@ namespace mui
 			auto it = std::find(m_children.begin(), m_children.end(), child);
 			if (it != m_children.end())
 			{
-				if (m_treeView->GetHWND())
+				if (m_treeView && m_treeView->GetHWND())
 				{
 					LockWindowUpdate(m_treeView->GetHWND());
 					TreeView_DeleteItem(m_treeView->GetHWND(), child->m_hItem);
@@ -114,7 +114,7 @@ namespace mui
 
 			if (it != m_children.end())
 			{
-				if (m_treeView->GetHWND())
+				if (m_treeView && m_treeView->GetHWND())
 				{
 					LockWindowUpdate(m_treeView->GetHWND());
 					TreeView_DeleteItem(m_treeView->GetHWND(), child->m_hItem);

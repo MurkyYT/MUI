@@ -16,9 +16,13 @@ namespace mui
 
 		BOOL SetPlaceholder(const std::wstring& text);
 
-		BOOL SetTextAligment(LayoutAligment aligment);
+		BOOL SetTextAlignment(LayoutAlignment alignment);
 
 		BOOL SetMultiline(BOOL multiline);
+
+		void SetCaretPos(size_t pos);
+
+		void SetIndentation(size_t indent);
 
 		std::wstring GetText();
 
@@ -26,9 +30,13 @@ namespace mui
 		void SetBackgroundColor(COLORREF color);
 
 		EventCallback_t TextChanged{ NULL };
+		EventCallback_t NewLine{ NULL };
+		EventCallback_t CharPressed{ NULL };
 		EventCallback_t Completed{ NULL };
+		EventCallback_t Save{ NULL };
 
 	private:
+		int m_indentation = 8;
 		COLORREF m_textColor = RGB(0, 0, 0);
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		HBRUSH m_backroundBrush = CreateSolidBrush(m_backgroundColor);

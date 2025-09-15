@@ -18,6 +18,8 @@ namespace mui
 		void SetExpandButtonColor(COLORREF color);
 
 	private:
+		static ATOM RegisterWindowClass();
+
 		std::shared_ptr<UIElement> m_content = NULL;
 		std::wstring m_text;
 		BOOL m_expanded = FALSE;

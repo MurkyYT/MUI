@@ -1,16 +1,16 @@
 #pragma once
 
+#include "Events.h"
+
 #include <Windows.h>
-
 #include <CommCtrl.h>
-
 #include <string>
 
 #define MUI_WM_REDRAW (WM_APP + 7525)
 
 namespace mui
 {
-	enum LayoutAligment
+	enum LayoutAlignment
 	{
 		Fill,
 		Start,
@@ -31,14 +31,14 @@ namespace mui
 		}
 		virtual size_t GetMaxWidth() 
 		{
-			if (m_horizontalAligment == Fill)
+			if (m_horizontalAlignment == Fill)
 				return m_availableSize.right - m_availableSize.left;
 			else
 				return m_idealSize.cx;
 		}
 		virtual size_t GetMaxHeight()
 		{
-			if (m_verticalAligment == Fill)
+			if (m_verticalAlignment == Fill)
 				return m_availableSize.bottom - m_availableSize.top;
 			else
 				return m_idealSize.cy;
@@ -64,48 +64,49 @@ namespace mui
 			if (!m_hWnd)
 				return m_x;
 
-			switch (m_horizontalAligment)
+			switch (m_horizontalAlignment)
 			{
 			case mui::Fill:
 				return m_availableSize.left;
 			case mui::Start:
 				return m_availableSize.left;
 			case mui::End:
-				return m_availableSize.right - GetMinWidth();
+				return (size_t)max(0, (int)(m_availableSize.right - (int)GetMinWidth()));
 			case mui::Center:
-				return (m_availableSize.right - m_availableSize.left) / 2 - GetMinWidth() / 2;
+				return (size_t)max(0, (int)((m_availableSize.right - m_availableSize.left) / 2 - (int)(GetMinWidth() / 2)));
 			}
 
 			return m_x;
 		}
+
 		virtual size_t GetY()
 		{
 			if (!m_hWnd)
 				return m_y;
 
-			switch (m_verticalAligment)
+			switch (m_verticalAlignment)
 			{
 			case mui::Fill:
 				return m_availableSize.top;
 			case mui::Start:
 				return m_availableSize.top;
 			case mui::End:
-				return m_availableSize.bottom - GetMinHeight();
+				return (size_t)max(0, (int)(m_availableSize.bottom - (int)GetMinHeight()));
 			case mui::Center:
-				return (m_availableSize.bottom - m_availableSize.top) / 2 - GetMinHeight() / 2;
+				return (size_t)max(0, (int)((m_availableSize.bottom - m_availableSize.top) / 2 - (int)(GetMinHeight() / 2)));
 			}
 
 			return m_y;
 		}
 
-		void SetHorizontalAligment(LayoutAligment aligment) 
+		void SetHorizontalAlignment(LayoutAlignment alignment) 
 		{
-			m_horizontalAligment = aligment;
+			m_horizontalAlignment = alignment;
 		}
 
-		void SetVerticalAligment(LayoutAligment aligment)
+		void SetVerticalAlignment(LayoutAlignment alignment)
 		{
-			m_verticalAligment = aligment;
+			m_verticalAlignment = alignment;
 		}
 
 		void SetEnabled(BOOL enabled)
@@ -115,13 +116,36 @@ namespace mui
 			EnableWindow(m_hWnd, enabled);
 		}
 
+		void SetBorder(BOOL enabled)
+		{
+			m_hasBorder = enabled;
+
+			DWORD style = (DWORD)GetWindowLongPtr(m_hWnd, GWL_STYLE);
+
+			if (enabled)
+				style |= WS_BORDER;
+
+			else
+				style &= ~WS_BORDER;
+
+			SetWindowLongPtr(m_hWnd, GWL_STYLE, style);
+
+
+			SetWindowPos(
+				m_hWnd,
+				nullptr,
+				0, 0, 0, 0,
+				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED
+			);
+		}
+
 		HWND GetHWND() { return m_hWnd; }
 		const wchar_t* GetClass() { return m_class.c_str(); }
 		const wchar_t* GetName() { return m_name.c_str(); }
 		DWORD GetStyle() { return m_style; }
 		DWORD GetExStyle() { return m_exStyle; }
-		LayoutAligment GetVerticalAligment() { return m_verticalAligment; }
-		LayoutAligment GetHorizontalAligment() { return m_horizontalAligment; }
+		LayoutAlignment GetVerticalAlignment() { return m_verticalAlignment; }
+		LayoutAlignment GetHorizontalAlignment() { return m_horizontalAlignment; }
 		BOOL IsEnabled() { return m_enabled; }
 
 		virtual void SetBackgroundColor(COLORREF color) { m_backgroundColor = color; }
@@ -139,7 +163,7 @@ namespace mui
 				m_exStyle,
 				GetClass(),
 				GetName(),
-				m_style | WS_CHILD,
+				m_style | WS_CHILD | (m_hasBorder ? WS_BORDER : 0),
 				(int)GetX(), (int)GetY(), (int)GetWidth(), (int)GetHeight(),
 				parenthWnd,
 				(HMENU)(INT64)id,
@@ -160,8 +184,7 @@ namespace mui
 
 			SetParentHWND(parenthWnd);
 
-			if (m_subclass)
-				SetWindowSubclass(m_hWnd, UIElement::CustomProc, (UINT_PTR)this, NULL);
+			SetWindowSubclass(m_hWnd, UIElement::CustomProc, (UINT_PTR)this, NULL);
 
 			EnableWindow(m_hWnd, m_enabled);
 
@@ -181,11 +204,24 @@ namespace mui
 
 		virtual EventHandlerResult HandleEvent(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
+		EventCallback_t KeyDown{ NULL };
+		EventCallback_t KeyUp{ NULL };
+
+		EventCallback_t LeftMouseDown{ NULL };
+		EventCallback_t LeftMouseUp{ NULL };
+		EventCallback_t LeftMouseDoubleClick{ NULL };
+
+		EventCallback_t RightMouseDown{ NULL };
+		EventCallback_t RightMouseUp{ NULL };
+		EventCallback_t RightMouseDoubleClick{ NULL };
+
+		EventCallback_t MouseMove{ NULL };
+		EventCallback_t MouseEnter{ NULL };
+		EventCallback_t MouseLeave{ NULL };
+
 		virtual void UpdateIdealSize() {};
 
 	protected:
-
-		BOOL GetSubclass() { return m_subclass; }
 
 		virtual void SetHWND(HWND hWnd)
 		{
@@ -197,10 +233,10 @@ namespace mui
 			m_parenthWnd = p_hWnd;
 		}
 
-		~UIElement() { if (m_subclass) RemoveWindowSubclass(m_hWnd, CustomProc, (UINT_PTR)this); }
+		~UIElement() { RemoveWindowSubclass(m_hWnd, CustomProc, (UINT_PTR)this); }
 
-		LayoutAligment m_verticalAligment = Fill;
-		LayoutAligment m_horizontalAligment = Fill;
+		LayoutAlignment m_verticalAlignment = Fill;
+		LayoutAlignment m_horizontalAlignment = Fill;
 
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
 
@@ -227,8 +263,9 @@ namespace mui
 		int m_minHeight = -1;
 		int m_maxHeight = -1;
 
-		BOOL m_subclass = TRUE;
 		BOOL m_enabled = TRUE;
+		BOOL m_mouseInside = FALSE;
+		BOOL m_hasBorder = FALSE;
 
 		RECT m_availableSize = {0,0,0,0};
 

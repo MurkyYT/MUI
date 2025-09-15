@@ -13,7 +13,7 @@ namespace mui
 
 		BOOL SetText(const std::wstring& text);
 
-		BOOL SetTextAligment(LayoutAligment aligment);
+		BOOL SetTextAlignment(LayoutAlignment alignment);
 
 		std::wstring GetText();
 

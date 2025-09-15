@@ -4,23 +4,33 @@
 
 SIZE GetLabelIdealSize(HWND hwndLabel)
 {
-    HDC hdc = GetDC(hwndLabel);
     SIZE size = { 0 };
 
-    if (hdc)
-    {
-        HFONT hFont = (HFONT)SendMessage(hwndLabel, WM_GETFONT, 0, 0);
-        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+    HDC hdc = GetDC(hwndLabel);
+    if (!hdc)
+        return size;
 
-        int len = GetWindowTextLength(hwndLabel);
-        std::wstring text;
-        text.reserve(len + 1);
-        GetWindowText(hwndLabel, &text[0], len + 1);
+    HFONT hFont = (HFONT)SendMessage(hwndLabel, WM_GETFONT, 0, 0);
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
+    int len = GetWindowTextLength(hwndLabel);
+    std::wstring text(len + 1, L'\0');
+    GetWindowText(hwndLabel, &text[0], len + 1);
+
+    if (len > 0)
         GetTextExtentPoint32(hdc, text.c_str(), len, &size);
-        SelectObject(hdc, hOldFont);
-        ReleaseDC(hwndLabel, hdc);
-    }
+
+    SelectObject(hdc, hOldFont);
+    ReleaseDC(hwndLabel, hdc);
+
+    DWORD style = (DWORD)GetWindowLongPtr(hwndLabel, GWL_STYLE);
+    DWORD exStyle = (DWORD)GetWindowLongPtr(hwndLabel, GWL_EXSTYLE);
+
+    RECT rc = { 0, 0, size.cx, size.cy };
+    AdjustWindowRectEx(&rc, style, FALSE, exStyle);
+
+    size.cx = rc.right - rc.left;
+    size.cy = rc.bottom - rc.top;
 
     return size;
 }
@@ -33,7 +43,7 @@ mui::Label::Label(const wchar_t* text, int x, int y, int width, int height)
     m_y = y;
     m_width = width;
     m_height = height;
-    m_style = WS_VISIBLE | SS_LEFT;
+    m_style = WS_VISIBLE | SS_LEFT | SS_WORDELLIPSIS | SS_NOTIFY;
 }
 
 mui::Label::Label(const wchar_t* text, int x, int y) : Label(text, x, y, 0, 0)
@@ -126,22 +136,25 @@ BOOL mui::Label::SetText(const std::wstring& text)
     return res;
 }
 
-BOOL mui::Label::SetTextAligment(LayoutAligment aligment)
+BOOL mui::Label::SetTextAlignment(LayoutAlignment alignment)
 {
     m_style &= ~SS_CENTER;
     m_style &= ~SS_LEFT;
     m_style &= ~SS_RIGHT;
 
-    switch (aligment)
+    switch (alignment)
     {
     case mui::Fill:
         return FALSE;
     case mui::Start:
         m_style |= SS_LEFT;
+        break;
     case mui::End:
         m_style |= SS_RIGHT;
+        break;
     case mui::Center:
         m_style |= SS_CENTER;
+        break;
     default:
         break;
     }

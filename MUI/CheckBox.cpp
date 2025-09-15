@@ -158,7 +158,8 @@ mui::UIElement::EventHandlerResult mui::CheckBox::HandleEvent(UINT uMsg, WPARAM 
 		{
 		case BN_CLICKED:
 		{
-			if (this->StateChanged) StateChanged(this, { uMsg,wParam,lParam });
+            EventArgs_t args = { uMsg, wParam,lParam, FALSE };
+			if (this->StateChanged) StateChanged(this, &args);
 		}
         break;
 		}

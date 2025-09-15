@@ -62,6 +62,8 @@ namespace mui
 		size_t GetMaxHeight() override;
 
 	private:
+		static ATOM RegisterWindowClass();
+
 		struct GridPlacement
 		{
 			size_t row;

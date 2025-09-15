@@ -189,8 +189,10 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
     {
         if (wParam == VK_RETURN && GetSelectedItem() != NULL)
         {
+            EventArgs_t args = { uMsg, wParam,lParam, FALSE };
+
             if (OnReturn)
-                OnReturn(this, { uMsg, wParam, lParam });
+                OnReturn(this, &args);
             return { TRUE, 1 };
         }
     }
@@ -202,8 +204,10 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
         case TVN_ITEMCHANGED:
         {
             NMTVITEMCHANGE* pnmv = (NMTVITEMCHANGE*)lParam;
+            EventArgs_t args = { uMsg, wParam,lParam, FALSE };
+
             if (pnmv->uStateNew & TVIS_SELECTED && SelectionChanged)
-                SelectionChanged(this, { uMsg, wParam, lParam });
+                SelectionChanged(this, &args);
         }
         break;
         case NM_CUSTOMDRAW:
@@ -292,13 +296,17 @@ mui::UIElement::EventHandlerResult mui::TreeView::HandleEvent(UINT uMsg, WPARAM 
         }
         break;
         case NM_RCLICK:
+        {
+            EventArgs_t args = { uMsg, wParam,lParam, FALSE };
             if (this->RightClick)
-                RightClick(this, { uMsg,wParam,lParam });
-            break;
+                RightClick(this, &args);
+        } break;
         case NM_DBLCLK:
+        {
+            EventArgs_t args = { uMsg, wParam,lParam, FALSE };
             if (this->DoubleClick)
-                DoubleClick(this, { uMsg,wParam,lParam });
-            break;
+                DoubleClick(this, &args);
+        } break;
         }
     }
     break;
