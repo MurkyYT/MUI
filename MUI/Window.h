@@ -5,6 +5,7 @@
 
 #include "./UIElement.h"
 #include "./Events.h"
+#include "./Menu.h"
 
 namespace mui
 {
@@ -27,6 +28,9 @@ namespace mui
 		void SetMaxHeight(size_t width);
 		void SetMinWidth(size_t width);
 		void SetMinHeight(size_t width);
+
+		void SetMenu(std::shared_ptr<mui::Menu> menu);
+
 		POINT GetTopLeft();
 		RECT GetRect();
 		HWND GetHWND() { return m_hWnd; }
@@ -54,6 +58,7 @@ namespace mui
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
 		COLORREF m_captionColor = RGB(249, 241, 239);
 		std::shared_ptr<UIElement> m_content = NULL;
+		std::shared_ptr<Menu> m_menu = NULL;
 
 		static BOOL s_dpiAware;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

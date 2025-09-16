@@ -169,6 +169,7 @@
     <ClInclude Include="ListViewGenerator.h" />
     <ClInclude Include="MainWindow.g.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="MenuGenerator.h" />
     <ClInclude Include="NativeWindowHostGenerator.h" />
     <ClInclude Include="pugixml\pugiconfig.hpp" />
     <ClInclude Include="pugixml\pugixml.hpp" />

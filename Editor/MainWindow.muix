@@ -1,7 +1,17 @@
 ﻿<Window Class="MainWindow" Title="MUI Visual Designer" Width="800" Height="600" OnClose="MainWindow_OnClose" KeyDown="MainWindow_KeyDown" DragAndDrop="MainWindow_DragAndDrop">
+	<!-- Top menu bar of the window -->
+	<Menu BackgroundColor="#181818" ItemBackgroundColor="#181818" BottomBarColor="#303030" TextColor="White" ItemBackgroundHotColor="#242424"  ItemBackgroundSelectedColor="#202020">
+		<MenuItem Text="File">
+			<MenuItem Text="Open" OnClick="File_Open"/>
+			<MenuSeparator/>
+			<MenuItem Text="Exit" OnClick="File_Exit"/>
+		</MenuItem>
+		<MenuItem Text="Help">
+			<MenuItem Text="About" OnClick="Help_About"/>
+		</MenuItem>
+	</Menu>
 	<!-- Main Window Grid -->
 	<Grid BackgroundColor="#181818">
-	
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" />
 			<ColumnDefinition Width="4*" />

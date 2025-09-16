@@ -26,6 +26,11 @@ private:
 
 	void WindowHost_OnResize(const void* sender, mui::EventArgs_t* e) override;
 
+	void File_Open(const void* sender, mui::EventArgs_t* e) override;
+	void File_Exit(const void* sender, mui::EventArgs_t* e) override;
+
+	void Help_About(const void* sender, mui::EventArgs_t* e) override;
+
 	void Entry_NewLine(const void* sender, mui::EventArgs_t* e) override;
 	void Entry_Save(const void* sender, mui::EventArgs_t* e) override;
 	void Entry_CharPressed(const void* sender, mui::EventArgs_t* e) override;

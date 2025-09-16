@@ -1,5 +1,6 @@
 #pragma once
 #include "IGenerator.h"
+#include "MenuGenerator.h"
 #include "resource.h"
 
 class WindowGenerator : public GeneratorBase {
@@ -47,6 +48,25 @@ public:
             COLORREF color = ParseColor(backgroundColor);
             if (color != CLR_INVALID) {
                 wind->SetBackgroundColor(color);
+            }
+        }
+
+        std::shared_ptr<MenuGenerator> menuGen = NULL;
+        std::shared_ptr<GeneratorBase> contentGen = NULL;
+
+        for (const auto& child : children) {
+            if (child->GetElementName() == L"Menu") {
+                menuGen = std::dynamic_pointer_cast<MenuGenerator>(child);
+            }
+            else {
+                contentGen = child;
+            }
+        }
+
+        if (menuGen) {
+            auto menu = menuGen->CreateMenuPreview();
+            if (menu) {
+                wind->SetMenu(menu);
             }
         }
 
@@ -108,19 +128,32 @@ public:
             }
         }
 
-        if (children.size() == 1)
-        {
-            output += children[0]->Generate();
+        std::shared_ptr<GeneratorBase> menuChild = NULL;
+        std::shared_ptr<GeneratorBase> contentChild = NULL;
 
-            std::wstring childVarName;
-            std::wstring childName = children[0]->GetProperty(L"Name");
-            if (!childName.empty()) {
-                childVarName = childName;
+        for (const auto& child : children) {
+            if (child->GetElementName() == L"Menu") {
+                menuChild = child;
             }
             else {
-                childVarName = children[0]->GetElementName() + std::to_wstring(children[0]->GetIndex());
+                contentChild = child;
             }
+        }
 
+        if (menuChild) {
+            output += menuChild->Generate();
+            std::wstring menuVarName = menuChild->GetVariableName();
+            output += L"\t\tSetMenu(" + menuVarName + L"); \r\n";
+        }
+
+        if (contentChild) {
+            output += contentChild->Generate();
+            std::wstring contentVarName = contentChild->GetVariableName();
+            output += L"\t\tSetContent(" + contentVarName + L");\r\n";
+        }
+        else if (children.size() == 1 && !menuChild) {
+            output += children[0]->Generate();
+            std::wstring childVarName = children[0]->GetVariableName();
             output += L"\t\tSetContent(" + childVarName + L");\r\n";
         }
 
@@ -129,7 +162,7 @@ public:
         output += UIElementGeneratorBase::CollectAllEventHandlerFunctions(UIElementGeneratorBase::s_rootGenerator);
         output += UIElementGeneratorBase::CollectAllMemberVariables(UIElementGeneratorBase::s_rootGenerator);
 
-        const std::vector<std::wstring> events = { L"OnClose", L"DragAndDrop", L"WndProc"};
+        const std::vector<std::wstring> events = { L"OnClose", L"DragAndDrop", L"WndProc" };
 
         for (const auto& eventName : events) {
             std::wstring handlerName = GetProperty(eventName);

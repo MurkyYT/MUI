@@ -61,6 +61,16 @@ static void RegisterGenerators()
 	generatorsManager.RegisterGenerator(L"ListView.Column",
 		[]() { return std::make_shared<ListViewColumnGenerator>(); },
 		{ L"Title", L"Width" });
+	generatorsManager.RegisterGenerator(L"Menu",
+		[]() { return std::make_shared<MenuGenerator>(); },
+		{ L"TextColor", L"BackgroundColor", L"BottomBarColor", L"ItemBackgroundColor", L"ItemBackgroundHotColor",
+		  L"ItemBackgroundSelectedColor", L"Name" });
+	generatorsManager.RegisterGenerator(L"MenuItem",
+		[]() { return std::make_shared<MenuItemGenerator>(); },
+		{ L"Text", L"Enabled", L"Checked", L"Shortcut", L"OnClick", L"Name" });
+	generatorsManager.RegisterGenerator(L"MenuSeparator",
+		[]() { return std::make_shared<MenuSeparatorGenerator>(); },
+		{ L"" });
 
 	WIN32_FIND_DATAA findFileData;
 	HANDLE hFind = FindFirstFileA("./generators/*.dll", &findFileData);
@@ -90,8 +100,6 @@ MainWindow::MainWindow()
 	RegisterGenerators();
 
 	InitializeComponent();
-
-	SetTitle(GetTitle() + L" - " + MVD_WVERSION);
 } 
 
 void MainWindow::MainWindow_OnClose(const void* sender, mui::EventArgs_t* e)
@@ -241,7 +249,7 @@ std::shared_ptr<GeneratorBase> MainWindow::ParseXMLNode(const pugi::xml_node& no
 			MessageBoxW(GetHWND(), errorMsg.c_str(), L"Parse Error", MB_OK | MB_ICONERROR);
 			SetFocus(designerEntry->GetHWND());
 			designerEntry->SetCaretPos(node.offset_debug());
-			return nullptr;
+			return NULL;
 		}
 
 		generator->SetProperty(attrName, attrValue);
@@ -252,10 +260,13 @@ std::shared_ptr<GeneratorBase> MainWindow::ParseXMLNode(const pugi::xml_node& no
 		if (child.type() == pugi::node_element)
 		{
 			std::shared_ptr<GeneratorBase> childGenerator = ParseXMLNode(child, index);
-			if (childGenerator)
+			if (childGenerator) 
+			{
 				generator->AddChild(childGenerator);
+				childGenerator->SetParent(generator);
+			}
 			else
-				return nullptr;
+				return NULL;
 		}
 	}
 
@@ -308,10 +319,16 @@ void MainWindow::ParseXML(BOOL generateCode)
 	{
 		UIElementGeneratorBase::s_rootGenerator = rootGenerator;
 
-		if (generateCode)
-			GenerateCode(rootGenerator, doc.first_child());
+		try {
+			if (generateCode)
+				GenerateCode(rootGenerator, doc.first_child());
 
-		UpdatePreview(rootGenerator);
+			UpdatePreview(rootGenerator);
+		}
+		catch (std::runtime_error e)
+		{
+			MessageBoxA(GetHWND(), e.what(), "Error", MB_OK | MB_ICONERROR);
+		}
 	}
 }
 
@@ -350,11 +367,20 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 
 		SetWindowLongPtr(previewWindow->GetHWND(), GWL_STYLE, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX ^ WS_CAPTION);
 
-		if (previewWindow && rootGenerator->GetChildren().size() == 1)
-			previewWindow->SetContent(rootGenerator->GetChildren()[0]->CreateUIElementPreview());
-		else if (rootGenerator->GetChildren().size() > 1)
-		{
-			MessageBox(GetHWND(), L"Only one child allowed in Window", L"Error", MB_OK | MB_ICONERROR);
+		std::shared_ptr<GeneratorBase> menuChild = NULL;
+		std::shared_ptr<GeneratorBase> contentChild = NULL;
+
+		for (const auto& child : rootGenerator->GetChildren()) {
+			if (child->GetElementName() == L"Menu") {
+				menuChild = child;
+			}
+			else {
+				contentChild = child;
+			}
+		}
+
+		if (rootGenerator->GetChildren().size() > 2) {
+			MessageBox(GetHWND(), L"Window can have at most 2 children: one Menu and one content element", L"Error", MB_OK | MB_ICONERROR);
 			SetFocus(designerEntry->GetHWND());
 			designerEntry->SetCaretPos(0);
 			previewWindow->Close();
@@ -362,9 +388,41 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 			return;
 		}
 
+		if (rootGenerator->GetChildren().size() == 2 && !menuChild) {
+			MessageBox(GetHWND(), L"When Window has 2 children, one must be a Menu", L"Error", MB_OK | MB_ICONERROR);
+			SetFocus(designerEntry->GetHWND());
+			designerEntry->SetCaretPos(0);
+			previewWindow->Close();
+			previewWindow = NULL;
+			return;
+		}
+
+		if (menuChild) {
+			auto menuGen = std::dynamic_pointer_cast<MenuGenerator>(menuChild);
+			if (menuGen) {
+				auto menu = menuGen->CreateMenuPreview();
+				if (menu) {
+					previewWindow->SetMenu(menu);
+				}
+			}
+		}
+
+		if (contentChild) {
+			auto contentElement = contentChild->CreateUIElementPreview();
+			if (contentElement) {
+				previewWindow->SetContent(contentElement);
+			}
+		}
+		else if (rootGenerator->GetChildren().size() == 1 && !menuChild) {
+			auto contentElement = rootGenerator->GetChildren()[0]->CreateUIElementPreview();
+			if (contentElement) {
+				previewWindow->SetContent(contentElement);
+			}
+		}
+
 		windowHost->SetHostedWindow(previewWindow->GetHWND());
-		SetWindowPos(previewWindow->GetHWND(), NULL, 
-			0,0,
+		SetWindowPos(previewWindow->GetHWND(), NULL,
+			0, 0,
 			windowSize.cx, windowSize.cy, SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 		COLORREF bgColor = previewWindow->GetCaptionColor();
@@ -383,6 +441,21 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 		MessageBoxA(GetHWND(), ("Preview Error: " + std::string(e.what())).c_str(),
 			"Preview Error", MB_OK | MB_ICONWARNING);
 	}
+}
+
+void MainWindow::File_Open(const void* sender, mui::EventArgs_t* e)
+{
+	MessageBox(GetHWND(), L"Hello", L"Test", MB_OK);
+}
+
+void MainWindow::File_Exit(const void* sender, mui::EventArgs_t* e)
+{
+	PostQuitMessage(0);
+}
+
+void MainWindow::Help_About(const void* sender, mui::EventArgs_t* e)
+{
+	MessageBox(GetHWND(), L"MUI Visual Designer (" MVD_WVERSION L")\nCreated by: Murky\nBuilt at: " __TIMESTAMP__ , L"About", MB_OK | MB_ICONINFORMATION);
 }
 
 void MainWindow::GenerateCode(std::shared_ptr<GeneratorBase> rootGenerator, const pugi::xml_node& rootNode)

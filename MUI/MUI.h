@@ -18,3 +18,4 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "./Grid.h"
 #include "./NativeWindowHost.h"
 #include "./Window.h"
+#include "./Menu.h"

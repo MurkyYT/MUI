@@ -51,6 +51,7 @@ protected:
 
     std::vector<std::pair<std::wstring, std::wstring>> properties;
     std::vector<std::shared_ptr<GeneratorBase>> children;
+    std::shared_ptr<GeneratorBase> m_parent;
     std::wstring elementName;
     size_t index = 0;
 
@@ -58,6 +59,10 @@ public:
     size_t GetIndex() const { return index; }
     void SetIndex(size_t index) {
         this->index = index;
+    }
+
+    void SetParent(std::shared_ptr<GeneratorBase> parent) {
+        this->m_parent = parent;
     }
 
     void SetProperty(const std::wstring& name, const std::wstring& value) {

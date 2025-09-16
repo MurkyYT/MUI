@@ -47,7 +47,8 @@ public:
 
         std::vector<std::wstring> allProperties = properties;
 
-        if (elementName != L"Window") {
+        if (elementName != L"Window" && 
+            elementName != L"Menu" && elementName != L"MenuItem" && elementName != L"MenuSeparator") {
             allProperties.insert(allProperties.begin(), baseUIProperties.begin(), baseUIProperties.end());
 
             std::vector<std::wstring> uniqueProperties;

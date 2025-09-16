@@ -10,3 +10,4 @@
 #include "./NativeWindowHostGenerator.h"
 #include "./SectionGenerator.h"
 #include "./ListViewGenerator.h"
+#include "./MenuGenerator.h"

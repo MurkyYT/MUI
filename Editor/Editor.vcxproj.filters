@@ -86,6 +86,9 @@
     <ClInclude Include="ListViewGenerator.h">
       <Filter>Generators</Filter>
     </ClInclude>
+    <ClInclude Include="MenuGenerator.h">
+      <Filter>Generators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">
