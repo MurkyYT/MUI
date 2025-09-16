@@ -37,7 +37,7 @@ namespace mui
 		BOOL HideColumns();
 		BOOL ShowColumns();
 
-		BOOL AddColumn(const wchar_t* title);
+		BOOL AddColumn(std::wstring title);
 
 		BOOL AddItem(const std::shared_ptr<ListItem>& item);
 		BOOL RemoveItem(const std::shared_ptr<ListItem>& item);
@@ -76,6 +76,7 @@ namespace mui
 
 		std::vector<std::shared_ptr<ListItem>> m_items;
 		std::vector<LVCOLUMN> m_columns;
+		std::vector<std::wstring> m_columnsTitles;
 		HIMAGELIST m_hLargeIcons = NULL;
 		HIMAGELIST m_hSmallIcons = NULL;
 

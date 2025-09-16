@@ -81,6 +81,10 @@ size_t mui::StackLayout::CalcMinHeight()
 				height = (long)temp;
 		}
 	}
+
+	if (m_hasBorder)
+		height += 2;
+
 	return height;
 }
 
@@ -101,6 +105,10 @@ size_t mui::StackLayout::CalcMinWidth()
 				width = (long)temp;
 		}
 	}
+
+	if (m_hasBorder)
+		width += 2;
+
 	return width;
 }
 

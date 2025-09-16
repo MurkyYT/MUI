@@ -86,7 +86,7 @@ void mui::Section::UpdateIdealSize()
 
 	size.cx = (LONG)(m_expanded ? max((LONG)minWidth + m_expandSize.cx, size.cx + m_expandSize.cx) : size.cx + m_expandSize.cx);
 
-	size.cy += (LONG)(m_expanded ? m_content->GetMinHeight() : 0);
+	size.cy += (LONG)(m_expanded && m_content ? m_content->GetMinHeight() : 0);
 
 	m_idealSize = size;
 }
@@ -258,7 +258,8 @@ void mui::Section::SetBackgroundColor(COLORREF color)
 {
 	m_backgroundColor = color;
 
-	m_content->SetBackgroundColor(color);
+	if(m_content)
+		m_content->SetBackgroundColor(color);
 
 	m_customBackground = TRUE;
 }

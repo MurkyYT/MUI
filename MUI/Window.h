@@ -11,6 +11,7 @@ namespace mui
 	class Window
 	{
 	public:
+		~Window();
 		Window(const std::wstring& title = L"", size_t height = 500, size_t width = 500);
 		void Show();
 		void Close();
@@ -36,10 +37,14 @@ namespace mui
 		void SetBackgroundColor(COLORREF color) { m_backgroundColor = color; }
 
 		COLORREF GetBackgroundColor() { return m_backgroundColor; }
+		COLORREF GetCaptionColor() { return m_captionColor; }
 
 		EventCallback_t KeyDown{ NULL };
 		EventCallback_t KeyUp{ NULL };
 		EventCallback_t OnClose{ NULL };
+
+		EventCallback_t DragAndDrop{ NULL };
+		EventCallback_t WndProc{ NULL };
 	private:
 		HWND m_hWnd;
 		HICON m_hIcon;
@@ -47,6 +52,7 @@ namespace mui
 		POINT m_minSize = { GetSystemMetrics(SM_CXMINTRACK), GetSystemMetrics(SM_CYMINTRACK) };
 		POINT m_maxSize = { GetSystemMetrics(SM_CXMAXTRACK), GetSystemMetrics(SM_CYMAXTRACK) };
 		COLORREF m_backgroundColor = RGB(255, 255, 255);
+		COLORREF m_captionColor = RGB(249, 241, 239);
 		std::shared_ptr<UIElement> m_content = NULL;
 
 		static BOOL s_dpiAware;

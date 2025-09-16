@@ -15,7 +15,7 @@ mui::NativeWindowHost::NativeWindowHost()
     m_style = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN;
     m_exStyle = 0;
 
-    m_defaultSize = { 200, 150 };
+    m_defaultSize = { 0,0 };
     m_idealSize = m_defaultSize;
 }
 

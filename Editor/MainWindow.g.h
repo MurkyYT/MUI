@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <MUI.h>
 
@@ -14,7 +14,6 @@ protected:
 		SetTitle(L"MUI Visual Designer");
 		SetHeight(600);
 		SetWidth(800);
-		SetCaptionColor(RGB(24, 24, 24));
 		std::shared_ptr<mui::Grid> Grid1 = std::make_shared<mui::Grid>();
 		Grid1->SetBackgroundColor(RGB(24, 24, 24));
 		Grid1->AddRow(mui::RowDefinition(mui::GridLength::Auto()));
@@ -32,12 +31,51 @@ protected:
 		std::shared_ptr<mui::Label> Label12 = std::make_shared<mui::Label>(L"Properties");
 		Label12->SetHorizontalAlignment(mui::LayoutAlignment::Center);
 		Label12->SetTextColor(RGB(255, 255, 255));
-		std::shared_ptr<mui::TreeView> TreeView13 = std::make_shared<mui::TreeView>();
-		TreeView13->SetBackgroundColor(RGB(24, 24, 24));
+		std::shared_ptr<mui::StackLayout> StackLayout13 = std::make_shared<mui::StackLayout>(mui::StackLayoutOrientation::Vertical);
+		StackLayout13->SetBorder(TRUE);
+		StackLayout13->SetBackgroundColor(RGB(24, 24, 24));
+		std::shared_ptr<mui::Section> Section14 = std::make_shared<mui::Section>(L"Test");
+		Section14->SetBorder(TRUE);
+		Section14->SetBackgroundColor(RGB(24, 24, 24));
+		Section14->SetTextColor(RGB(255, 255, 255));
+		Section14->SetExpandButtonColor(RGB(255, 255, 255));
+		std::shared_ptr<mui::Label> Label15 = std::make_shared<mui::Label>(L"Hi!!!");
+		Label15->SetTextColor(RGB(255, 255, 255));
+		Section14->SetContent(Label15);
+		std::shared_ptr<mui::Section> Section16 = std::make_shared<mui::Section>(L"Name");
+		Section16->SetBorder(TRUE);
+		Section16->SetBackgroundColor(RGB(24, 24, 24));
+		Section16->SetTextColor(RGB(255, 255, 255));
+		Section16->SetExpandButtonColor(RGB(255, 255, 255));
+		std::shared_ptr<mui::Label> Label17 = std::make_shared<mui::Label>(L"Wazup!!!");
+		Label17->SetTextColor(RGB(255, 255, 255));
+		Section16->SetContent(Label17);
+		StackLayout13->Children().Add(Section14);
+		StackLayout13->Children().Add(Section16);
+		std::shared_ptr<mui::TreeView> TreeView18 = std::make_shared<mui::TreeView>();
+		TreeView18->SetBackgroundColor(RGB(24, 24, 24));
+		std::shared_ptr<mui::Grid> Grid19 = std::make_shared<mui::Grid>();
+		Grid19->SetBorder(TRUE);
+		Grid19->SetBackgroundColor(RGB(26, 26, 26));
+		std::shared_ptr<mui::Grid> Grid20 = std::make_shared<mui::Grid>();
+		Grid20->SetVerticalAlignment(mui::LayoutAlignment::Center);
+		Grid20->SetHorizontalAlignment(mui::LayoutAlignment::Center);
+		Grid20->AddRow(mui::RowDefinition(mui::GridLength::Auto()));
+		Grid20->AddRow(mui::RowDefinition(mui::GridLength::Auto()));
+		Grid20->AddColumn(mui::ColumnDefinition(mui::GridLength::Auto()));
+		windowCaption = std::make_shared<mui::StackLayout>(mui::StackLayoutOrientation::Horizontal);
+		windowCaption->SetBorder(TRUE);
+		windowCaption->SetBackgroundColor(RGB(255, 255, 255));
+		windowTitleLabel = std::make_shared<mui::Label>(L"");
+		windowCaption->Children().Add(windowTitleLabel);
 		windowHost = std::make_shared<mui::NativeWindowHost>();
 		windowHost->SetBorder(TRUE);
-		windowHost->SetBackgroundColor(RGB(24, 24, 24));
 		windowHost->OnResize = std::bind(&MainWindowBase::WindowHost_OnResize, this, std::placeholders::_1, std::placeholders::_2);
+		Grid20->AddChild(windowCaption);
+		Grid20->SetRow(windowCaption, 0);
+		Grid20->AddChild(windowHost);
+		Grid20->SetRow(windowHost, 1);
+		Grid19->AddChild(Grid20);
 		designerEntry = std::make_shared<mui::Entry>(L"");
 		designerEntry->SetBackgroundColor(RGB(24, 24, 24));
 		designerEntry->SetMultiline(TRUE);
@@ -45,10 +83,6 @@ protected:
 		designerEntry->NewLine = std::bind(&MainWindowBase::Entry_NewLine, this, std::placeholders::_1, std::placeholders::_2);
 		designerEntry->CharPressed = std::bind(&MainWindowBase::Entry_CharPressed, this, std::placeholders::_1, std::placeholders::_2);
 		designerEntry->Save = std::bind(&MainWindowBase::Entry_Save, this, std::placeholders::_1, std::placeholders::_2);
-		debugEntry = std::make_shared<mui::Entry>(L"");
-		debugEntry->SetBackgroundColor(RGB(24, 24, 24));
-		debugEntry->SetMultiline(TRUE);
-		debugEntry->SetTextColor(RGB(255, 255, 255));
 		Grid1->AddChild(Label10);
 		Grid1->SetRow(Label10, 0);
 		Grid1->SetColumn(Label10, 0);
@@ -58,23 +92,24 @@ protected:
 		Grid1->AddChild(Label12);
 		Grid1->SetRow(Label12, 0);
 		Grid1->SetColumn(Label12, 2);
-		Grid1->AddChild(TreeView13);
-		Grid1->SetRow(TreeView13, 1);
-		Grid1->SetColumn(TreeView13, 0);
-		Grid1->SetRowSpan(TreeView13, 2);
-		Grid1->AddChild(windowHost);
-		Grid1->SetRow(windowHost, 1);
-		Grid1->SetColumn(windowHost, 1);
+		Grid1->AddChild(StackLayout13);
+		Grid1->SetRow(StackLayout13, 1);
+		Grid1->SetColumn(StackLayout13, 2);
+		Grid1->SetRowSpan(StackLayout13, 2);
+		Grid1->AddChild(TreeView18);
+		Grid1->SetRow(TreeView18, 1);
+		Grid1->SetColumn(TreeView18, 0);
+		Grid1->SetRowSpan(TreeView18, 2);
+		Grid1->AddChild(Grid19);
+		Grid1->SetRow(Grid19, 1);
+		Grid1->SetColumn(Grid19, 1);
 		Grid1->AddChild(designerEntry);
 		Grid1->SetRow(designerEntry, 2);
 		Grid1->SetColumn(designerEntry, 1);
-		Grid1->AddChild(debugEntry);
-		Grid1->SetRow(debugEntry, 1);
-		Grid1->SetColumn(debugEntry, 2);
-		Grid1->SetRowSpan(debugEntry, 2);
 		SetContent(Grid1);
 		OnClose = std::bind(&MainWindowBase::MainWindow_OnClose, this, std::placeholders::_1, std::placeholders::_2);
 		KeyDown = std::bind(&MainWindowBase::MainWindow_KeyDown, this, std::placeholders::_1, std::placeholders::_2);
+		DragAndDrop = std::bind(&MainWindowBase::MainWindow_DragAndDrop, this, std::placeholders::_1, std::placeholders::_2);
 	}
 
 	virtual void Entry_CharPressed(const void* sender, mui::EventArgs_t* e) = 0;
@@ -82,8 +117,10 @@ protected:
 	virtual void Entry_Save(const void* sender, mui::EventArgs_t* e) = 0;
 	virtual void MainWindow_KeyDown(const void* sender, mui::EventArgs_t* e) = 0;
 	virtual void WindowHost_OnResize(const void* sender, mui::EventArgs_t* e) = 0;
+	std::shared_ptr<mui::StackLayout> windowCaption;
+	std::shared_ptr<mui::Label> windowTitleLabel;
 	std::shared_ptr<mui::NativeWindowHost> windowHost;
 	std::shared_ptr<mui::Entry> designerEntry;
-	std::shared_ptr<mui::Entry> debugEntry;
 	virtual void MainWindow_OnClose(const void* sender, mui::EventArgs_t* e) = 0;
+	virtual void MainWindow_DragAndDrop(const void* sender, mui::EventArgs_t* e) = 0;
 };

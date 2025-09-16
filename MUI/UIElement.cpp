@@ -62,6 +62,7 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 			if (element->RightMouseDoubleClick)
 				element->RightMouseDoubleClick(element, &args);
 			break;
+		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			if (element->KeyDown)
 				element->KeyDown(element, &args);
@@ -69,6 +70,7 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 			if (!args.handled)
 				PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
 			break;
+		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			if (element->KeyUp)
 				element->KeyUp(element, &args);

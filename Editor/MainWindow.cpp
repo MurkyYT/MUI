@@ -1,3 +1,7 @@
+﻿#include <shlwapi.h>
+
+#pragma comment(lib, "shlwapi.lib")
+
 #include "MainWindow.h"
 #include "resource.h"
 
@@ -11,7 +15,7 @@ static void RegisterGenerators()
 {
 	generatorsManager.RegisterGenerator(L"Window",
 		[]() { return std::make_shared<WindowGenerator>(); },
-		{ L"Width", L"Height", L"MaxWidth", L"MinWidth", L"MaxHeight", L"MinHeight", L"CaptionColor", L"Title", L"BackgroundColor", L"Class", L"OnClose", L"KeyDown", L"KeyUp" });
+		{ L"WndProc", L"DragAndDrop", L"Width", L"Height", L"MaxWidth", L"MinWidth", L"MaxHeight", L"MinHeight", L"CaptionColor", L"Title", L"BackgroundColor", L"Class", L"OnClose", L"KeyDown", L"KeyUp"});
 	generatorsManager.RegisterGenerator(L"Label",
 		[]() { return std::make_shared<LabelGenerator>(); },
 		{ L"Text", L"TextAlignment", L"TextColor" });
@@ -54,7 +58,7 @@ static void RegisterGenerators()
 	generatorsManager.RegisterGenerator(L"ListView",
 		[]() { return std::make_shared<ListViewGenerator>(); },
 		{ L"TextColor", L"SeparatorColor", L"HoverColor", L"ShowColumns", L"RightClick", L"DoubleClick", L"SelectionChanged" });
-	generatorsManager.RegisterGenerator(L"Column",
+	generatorsManager.RegisterGenerator(L"ListView.Column",
 		[]() { return std::make_shared<ListViewColumnGenerator>(); },
 		{ L"Title", L"Width" });
 
@@ -93,6 +97,100 @@ MainWindow::MainWindow()
 void MainWindow::MainWindow_OnClose(const void* sender, mui::EventArgs_t* e)
 {
 	PostQuitMessage(0);
+}
+
+void MainWindow::MainWindow_DragAndDrop(const void* sender, mui::EventArgs_t* e)
+{
+	HDROP hdrop = (HDROP)e->wParam;
+
+	size_t files = DragQueryFile(hdrop, 0xFFFFFFFF, NULL, NULL);
+
+	if (files > 1)
+	{
+		MessageBox(GetHWND(), L"Only one file allowed for now", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	for (UINT i = 0; i < files; i++)
+	{
+		size_t neededSize = DragQueryFile(hdrop, i, NULL, NULL);
+		std::wstring buf;
+		buf.resize(neededSize + 1);
+		DragQueryFile(hdrop, i, (LPWSTR)buf.data(), (UINT)buf.size());
+		LoadFile(buf);
+	}
+}
+
+void MainWindow::LoadFile(const std::wstring& path)
+{
+	designerEntry->SetText(L"");
+	if (previewWindow) 
+	{
+		previewWindow->Close();
+		previewWindow = NULL;
+	}
+
+	windowHost->RemoveHostedWindow();
+
+	SetTitle(L"MUI Visual Designer");
+	if (path.substr(path.size() - 5, 4) != L"muix") {
+
+		MessageBox(GetHWND(), L"Wrong file extention, should be 'muix'", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	HANDLE hFile = CreateFileW(
+		path.c_str(),
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		MessageBox(GetHWND(), L"Error occurred when opening the file", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	DWORD fileSize = GetFileSize(hFile, NULL);
+	if (fileSize == INVALID_FILE_SIZE) {
+		CloseHandle(hFile);
+		MessageBox(GetHWND(), L"Error occurred when reading file size", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	std::string utf8(fileSize, '\0');
+	DWORD bytesRead = 0;
+
+	if (!ReadFile(hFile, (void*)utf8.data(), fileSize, &bytesRead, NULL)) {
+		CloseHandle(hFile);
+		MessageBox(GetHWND(), L"Error occurred when reading file content", L"Error", MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	CloseHandle(hFile);
+
+	if (utf8.size() >= 3 &&
+		(unsigned char)utf8[0] == 0xEF &&
+		(unsigned char)utf8[1] == 0xBB &&
+		(unsigned char)utf8[2] == 0xBF)
+	{
+		utf8.erase(0, 3);
+	}
+
+	int wlen = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(),
+		(int)utf8.size(), nullptr, 0);
+
+	std::wstring wstr(wlen, L'\0');
+	MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(),
+		(int)utf8.size(), &wstr[0], wlen);
+
+	SetTitle(L"MUI Visual Designer - " + path);
+	currentFile = path;
+	designerEntry->SetText(wstr);
+	ParseXML();
 }
 
 static size_t GetXMLNodeChildCount(const pugi::xml_node& node)
@@ -165,7 +263,7 @@ std::shared_ptr<GeneratorBase> MainWindow::ParseXMLNode(const pugi::xml_node& no
 }
 
 
-void MainWindow::ParseXML()
+void MainWindow::ParseXML(BOOL generateCode)
 {
 	pugi::xml_document doc;
 
@@ -210,7 +308,9 @@ void MainWindow::ParseXML()
 	{
 		UIElementGeneratorBase::s_rootGenerator = rootGenerator;
 
-		GenerateCode(rootGenerator);
+		if (generateCode)
+			GenerateCode(rootGenerator, doc.first_child());
+
 		UpdatePreview(rootGenerator);
 	}
 }
@@ -221,8 +321,8 @@ void MainWindow::WindowHost_OnResize(const void* sender, mui::EventArgs_t* e)
 	{
 		SIZE windowSize = { (LONG)previewWindow->GetWidth(), (LONG)previewWindow->GetHeight() };
 		SetWindowPos(previewWindow->GetHWND(), NULL,
-			(int)windowHost->GetWidth() / 2 - windowSize.cx / 2,
-			(int)windowHost->GetHeight() / 2 - windowSize.cy / 2,
+			0 ,
+			0,
 			windowSize.cx, windowSize.cy, SWP_NOACTIVATE);
 	}
 }
@@ -247,11 +347,12 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 
 		windowHost->RemoveHostedWindow();
 		previewWindow = rootGenerator->CreateWindowPreview();
-		SetWindowLongPtr(previewWindow->GetHWND(), GWL_STYLE, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX);
+
+		SetWindowLongPtr(previewWindow->GetHWND(), GWL_STYLE, WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX ^ WS_CAPTION);
 
 		if (previewWindow && rootGenerator->GetChildren().size() == 1)
 			previewWindow->SetContent(rootGenerator->GetChildren()[0]->CreateUIElementPreview());
-		else if (rootGenerator->GetChildren().size() != 1)
+		else if (rootGenerator->GetChildren().size() > 1)
 		{
 			MessageBox(GetHWND(), L"Only one child allowed in Window", L"Error", MB_OK | MB_ICONERROR);
 			SetFocus(designerEntry->GetHWND());
@@ -263,9 +364,20 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 
 		windowHost->SetHostedWindow(previewWindow->GetHWND());
 		SetWindowPos(previewWindow->GetHWND(), NULL, 
-			(int)windowHost->GetWidth() / 2 - windowSize.cx / 2,
-			(int)windowHost->GetHeight() / 2 - windowSize.cy / 2,
-			windowSize.cx, windowSize.cy, SWP_NOACTIVATE);
+			0,0,
+			windowSize.cx, windowSize.cy, SWP_NOACTIVATE | SWP_FRAMECHANGED);
+
+		COLORREF bgColor = previewWindow->GetCaptionColor();
+		BYTE r = GetRValue(bgColor);
+		BYTE g = GetGValue(bgColor);
+		BYTE b = GetBValue(bgColor);
+
+		double brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+		COLORREF textColor = (brightness < 128) ? RGB(255, 255, 255) : RGB(0, 0, 0);
+
+		windowTitleLabel->SetText(L"      " + previewWindow->GetTitle());
+		windowCaption->SetBackgroundColor(bgColor);
+		windowTitleLabel->SetTextColor(textColor);
 	}
 	catch (const std::exception& e) {
 		MessageBoxA(GetHWND(), ("Preview Error: " + std::string(e.what())).c_str(),
@@ -273,17 +385,170 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 	}
 }
 
-void MainWindow::GenerateCode(std::shared_ptr<GeneratorBase> rootGenerator)
+void MainWindow::GenerateCode(std::shared_ptr<GeneratorBase> rootGenerator, const pugi::xml_node& rootNode)
 {
 	std::wstring generatedCode = rootGenerator->Generate();
+	std::wstring basePath = currentFile;
+	wchar_t pathBuffer[MAX_PATH];
+	wcsncpy_s(pathBuffer, basePath.c_str(), _TRUNCATE);
 
-	debugEntry->SetText(generatedCode);
+	PathRemoveFileSpecW(pathBuffer);
+	basePath = pathBuffer;
+
+	std::wstring newFilePath = basePath + L"\\" +
+		std::wstring(rootNode.attribute(L"Class").value()) + L".g.h";
+
+	FILE* f;
+	if (_wfopen_s(&f, newFilePath.c_str(), L"wb") == 0 && f)
+	{
+		unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
+		fwrite(bom, 1, sizeof(bom), f);
+
+		int len = WideCharToMultiByte(CP_UTF8, 0,
+			generatedCode.c_str(),
+			(int)generatedCode.size(),
+			nullptr, 0, nullptr, nullptr);
+
+		std::string utf8(len, '\0');
+		WideCharToMultiByte(CP_UTF8, 0,
+			generatedCode.c_str(),
+			(int)generatedCode.size(),
+			(LPSTR)utf8.data(), len,
+			nullptr, nullptr);
+
+		fwrite(utf8.data(), 1, utf8.size(), f);
+
+		fclose(f);
+	}
+}
+
+void MainWindow::SaveCurrentFile()
+{
+	FILE* f;
+	if (_wfopen_s(&f, currentFile.c_str(), L"wb") == 0 && f)
+	{
+		std::wstring content = designerEntry->GetText();
+		unsigned char bom[] = { 0xEF, 0xBB, 0xBF };
+		fwrite(bom, 1, sizeof(bom), f);
+
+		int len = WideCharToMultiByte(CP_UTF8, 0,
+			content.c_str(),
+			(int)content.size(),
+			nullptr, 0, nullptr, nullptr);
+
+		std::string utf8(len, '\0');
+		WideCharToMultiByte(CP_UTF8, 0,
+			content.c_str(),
+			(int)content.size(),
+			(LPSTR)utf8.data(), len,
+			nullptr, nullptr);
+
+		fwrite(utf8.data(), 1, utf8.size(), f);
+
+		fclose(f);
+	}
+}
+
+void MainWindow::MoveLineUp()
+{
+	HWND hEdit = designerEntry->GetHWND();
+	DWORD start, end;
+	SendMessage(hEdit, EM_GETSEL, (WPARAM)&start, (LPARAM)&end);
+
+	int currentLineIndex = (int)SendMessage(hEdit, EM_LINEFROMCHAR, start, 0);
+	if (currentLineIndex == 0) return;
+
+	int textLength = (int)SendMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
+	std::wstring allText(textLength + 1, L'\0');
+	SendMessage(hEdit, WM_GETTEXT, textLength + 1, (LPARAM)allText.data());
+	allText.resize(textLength);
+
+	int currentLineStart = (int)SendMessage(hEdit, EM_LINEINDEX, currentLineIndex, 0);
+	int prevLineStart = (int)SendMessage(hEdit, EM_LINEINDEX, currentLineIndex - 1, 0);
+	int nextLineStart = (int)SendMessage(hEdit, EM_LINEINDEX, currentLineIndex + 1, 0);
+	if (nextLineStart == -1) nextLineStart = textLength;
+
+	std::wstring prevLine = allText.substr(prevLineStart, currentLineStart - prevLineStart);
+	std::wstring currentLine = allText.substr(currentLineStart, nextLineStart - currentLineStart);
+
+	if (prevLine.size() >= 2 && prevLine.compare(prevLine.size() - 2, 2, L"\r\n") == 0) {
+		prevLine = prevLine.substr(0, prevLine.length() - 2);
+	}
+	if (currentLine.size() >= 2 && currentLine.compare(currentLine.size() - 2, 2, L"\r\n") == 0) {
+		currentLine = currentLine.substr(0, currentLine.length() - 2);
+	}
+
+	std::wstring newText = currentLine + L"\r\n" + prevLine;
+	if (nextLineStart < textLength) {
+		newText += L"\r\n";
+	}
+
+	SendMessage(hEdit, EM_SETSEL, prevLineStart, nextLineStart);
+	SendMessage(hEdit, EM_REPLACESEL, TRUE, (LPARAM)newText.c_str());
+
+	int caretOffset = start - currentLineStart;
+	int newCaretPos = prevLineStart + caretOffset;
+	SendMessage(hEdit, EM_SETSEL, newCaretPos, newCaretPos);
+}
+
+void MainWindow::MoveLineDown()
+{
+	HWND hEdit = designerEntry->GetHWND();
+	DWORD start, end;
+	SendMessage(hEdit, EM_GETSEL, (WPARAM)&start, (LPARAM)&end);
+
+	int currentLineIndex = (int)SendMessage(hEdit, EM_LINEFROMCHAR, start, 0);
+	int totalLines = (int)SendMessage(hEdit, EM_GETLINECOUNT, 0, 0);
+	if (currentLineIndex >= totalLines - 1) return;
+
+	int textLength = (int)SendMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
+	std::wstring allText(textLength + 1, L'\0');
+	SendMessage(hEdit, WM_GETTEXT, textLength + 1, (LPARAM)allText.data());
+	allText.resize(textLength);
+
+	int currentLineStart = (int)SendMessage(hEdit, EM_LINEINDEX, currentLineIndex, 0);
+	int nextLineStart = (int)SendMessage(hEdit, EM_LINEINDEX, currentLineIndex + 1, 0);
+	int nextNextLineStart = (int)SendMessage(hEdit, EM_LINEINDEX, currentLineIndex + 2, 0);
+	if (nextNextLineStart == -1) nextNextLineStart = textLength;
+
+	std::wstring currentLine = allText.substr(currentLineStart, nextLineStart - currentLineStart);
+	std::wstring nextLine = allText.substr(nextLineStart, nextNextLineStart - nextLineStart);
+
+	if (currentLine.size() >= 2 && currentLine.compare(currentLine.size() - 2, 2, L"\r\n") == 0) {
+		currentLine = currentLine.substr(0, currentLine.length() - 2);
+	}
+	if (nextLine.size() >= 2 && nextLine.compare(nextLine.size() - 2, 2, L"\r\n") == 0) {
+		nextLine = nextLine.substr(0, nextLine.length() - 2);
+	}
+
+	std::wstring newText = nextLine + L"\r\n" + currentLine;
+	if (nextNextLineStart < textLength) {
+		newText += L"\r\n";
+	}
+
+	SendMessage(hEdit, EM_SETSEL, currentLineStart, nextNextLineStart);
+	SendMessage(hEdit, EM_REPLACESEL, TRUE, (LPARAM)newText.c_str());
+
+	int caretOffset = start - currentLineStart;
+	int newCaretPos = currentLineStart + (int)nextLine.length() + 2 + caretOffset;
+	SendMessage(hEdit, EM_SETSEL, newCaretPos, newCaretPos);
 }
 
 void MainWindow::MainWindow_KeyDown(const void* sender, mui::EventArgs_t* e)
 {
 	if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && e->wParam == 'S') {
-		ParseXML();
+		SaveCurrentFile();
+		ParseXML(TRUE);
+	}
+	else if ((GetAsyncKeyState(VK_MENU) & 0x8000)) {
+		if (e->wParam == VK_UP) {
+			MoveLineUp();
+			e->handled = true;
+		}
+		else if (e->wParam == VK_DOWN) {
+			MoveLineDown();
+			e->handled = true;
+		}
 	}
 }
 
@@ -309,7 +574,7 @@ void MainWindow::Entry_NewLine(const void* sender, mui::EventArgs_t* e)
 	lineText.resize(lineLength);
 
 	int indent = 0;
-	while (indent < lineText.size() && (lineText[indent] == L' ' || lineText[indent] == L'\t'))
+	while (indent < lineText.size() && lineText[indent] == L'\t')
 		indent++;
 
 	std::wstring baseIndent = lineText.substr(0, indent);
@@ -317,7 +582,7 @@ void MainWindow::Entry_NewLine(const void* sender, mui::EventArgs_t* e)
 	int lineCaretIndex = caretPos - lineStart;
 	bool betweenTags = false;
 	int nextPos = lineCaretIndex;
-	while (nextPos < lineText.size() && lineText[nextPos] == L' ')
+	while (nextPos < lineText.size() && lineText[nextPos] == L'\t')
 		nextPos++;
 
 	if (nextPos < lineText.size() && lineText[nextPos] == L'<' && nextPos + 1 < lineText.size() && lineText[nextPos + 1] == L'/')

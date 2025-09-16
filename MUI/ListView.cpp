@@ -282,12 +282,13 @@ std::shared_ptr<mui::ListItem> mui::ListView::GetSelectedItem()
 	return NULL;
 }
 
-BOOL mui::ListView::AddColumn(const wchar_t* title)
+BOOL mui::ListView::AddColumn(std::wstring title)
 {
+	m_columnsTitles.push_back(title);
 	LVCOLUMN lvc{};
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	lvc.iSubItem = m_columnIndex++;
-	lvc.pszText = (LPWSTR)title;
+	lvc.pszText = (LPWSTR)m_columnsTitles[m_columnsTitles.size() - 1].c_str();
 	lvc.cx = LVSCW_AUTOSIZE_USEHEADER;
 	lvc.fmt = LVCFMT_LEFT;
 
@@ -423,8 +424,12 @@ void mui::ListView::SetHWND(HWND hWnd)
 	if (!m_columnsVisible)
 		HideColumns();
 
-	for (const LVCOLUMN& column : m_columns)
+	for (LVCOLUMN& column : m_columns)
+	{
+		column.pszText = (LPWSTR)m_columnsTitles[column.iSubItem].c_str();
 		ListView_InsertColumn(m_hWnd, column.iSubItem, &column);
+		ListView_SetColumnWidth(m_hWnd, column.iSubItem, column.cx);
+	}
 
 	for (const std::shared_ptr<ListItem>& item : m_items)
 	{

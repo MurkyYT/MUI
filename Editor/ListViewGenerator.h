@@ -34,7 +34,7 @@ public:
         }
 
         for (const auto& child : GetChildren()) {
-            if (child->GetElementName() == L"Column") {
+            if (child->GetElementName() == L"ListView.Column") {
                 std::wstring title = child->GetProperty(L"Title");
                 if (!title.empty()) {
                     listView->AddColumn(title.c_str());
@@ -97,7 +97,7 @@ public:
         }
 
         for (const auto& child : GetChildren()) {
-            if (child->GetElementName() == L"Column") {
+            if (child->GetElementName() == L"ListView.Column") {
                 std::wstring title = child->GetProperty(L"Title");
                 std::wstring width = child->GetProperty(L"Width");
 

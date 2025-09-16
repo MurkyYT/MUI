@@ -11,6 +11,22 @@
 
 BOOL mui::Window::s_dpiAware = SetProcessDPIAware();
 
+mui::Window::~Window()
+{
+	DeleteObject(m_hFont);
+	DestroyIcon(m_hIcon);
+	SetWindowLongPtr(m_hWnd, GWLP_USERDATA, NULL);
+	if (m_content)
+	{
+		DestroyWindow(m_content->GetHWND());
+		SetWindowLongPtr(m_content->GetHWND(), GWLP_USERDATA, NULL);
+	}
+	m_content = NULL;
+	EventArgs_t args = { 0, 0,0, FALSE };
+	if (OnClose)
+		OnClose(this, &args);
+}
+
 mui::Window::Window(const std::wstring& title, size_t height, size_t width)
 {
 	if (!s_dpiAware)
@@ -83,6 +99,7 @@ mui::Window::Window(const std::wstring& title, size_t height, size_t width)
 		return;
 	}
 
+	DragAcceptFiles(m_hWnd, TRUE);
 }
 
 void mui::Window::SetCustomIcon(HICON icon)
@@ -131,6 +148,8 @@ BOOL mui::Window::SetCaptionColor(COLORREF color)
 
 		return FALSE;
 	}
+
+	m_captionColor = color;
 
 	return TRUE;
 }
@@ -240,6 +259,17 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 	{
 		switch (uMsg)
 		{
+		case WM_DROPFILES:
+		{
+			EventArgs_t args = { uMsg, wParam, lParam };
+
+			if (window->DragAndDrop)
+				window->DragAndDrop(window, &args);
+
+			DragFinish((HDROP)wParam);
+			return 0;
+		}
+		break;
 		case WM_ERASEBKGND:
 		{
 			HDC hdc = (HDC)wParam;
@@ -339,6 +369,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 			window->m_hFont = CreateFontIndirect(&ncm.lfMessageFont);
 		}
 		break;
+		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 		{
 			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
@@ -346,6 +377,7 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 				window->KeyDown(window, &args);
 		}
 		break;
+		case WM_SYSKEYUP:
 		case WM_KEYUP:
 		{
 			EventArgs_t args = { uMsg, wParam,lParam, FALSE };
@@ -356,6 +388,13 @@ LRESULT CALLBACK mui::Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LP
 		default:
 			break;
 		}
+
+		EventArgs_t args = { uMsg, wParam, lParam };
+		if (window->WndProc)
+			window->WndProc(window, &args);
+
+		if (args.handled)
+			return args.msg;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

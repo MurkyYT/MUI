@@ -189,13 +189,13 @@ void mui::Grid::PerformLayout()
 		colOffsets[i + 1] = colOffsets[i] + (long)round(m_columns[i].actualWidth);
 
 	if (!m_columns.empty())
-		colOffsets.back() = (long)(m_availableSize.right - m_availableSize.left);
+		colOffsets.back() = (long)(m_lastRequestedWidth);
 
 	for (size_t i = 0; i < m_rows.size(); ++i)
 		rowOffsets[i + 1] = rowOffsets[i] + (long)round(m_rows[i].actualHeight);
 
 	if (!m_rows.empty())
-		rowOffsets.back() = (long)(m_availableSize.bottom - m_availableSize.top);
+		rowOffsets.back() = (long)(m_lastRequestedHeight);
 
 	for (const auto& el : m_collection.Items())
 	{
@@ -212,12 +212,12 @@ void mui::Grid::PerformLayout()
 		long y = row < rowOffsets.size() ? rowOffsets[row] : 0;
 
 		long width = col + colSpan < colOffsets.size() ? colOffsets[col + colSpan] - x
-			: (long)(m_availableSize.right - m_availableSize.left) - x;
+			: (long)(m_lastRequestedWidth) - x;
 		long height = row + rowSpan < rowOffsets.size() ? rowOffsets[row + rowSpan] - y
-			: (long)(m_availableSize.bottom - m_availableSize.top) - y;
+			: (long)(m_lastRequestedHeight) - y;
 
-		int availWidth = m_columns.empty() ? m_availableSize.right - m_availableSize.left : (int)width;
-		int availHeight = m_rows.empty() ? m_availableSize.bottom - m_availableSize.top : (int)height;
+		int availWidth = m_columns.empty() ? (int)m_lastRequestedWidth : (int)width;
+		int availHeight = m_rows.empty() ? (int)m_lastRequestedHeight : (int)height;
 
 		el->SetAvailableSize({ 0, 0, availWidth, availHeight });
 		SetWindowPos(el->GetHWND(), NULL, x + (int)el->GetX(), y + (int)el->GetY(),
@@ -271,15 +271,26 @@ size_t mui::Grid::GetMinHeight()
 	m_lastRequestedHeight = minHeight;
 	return minHeight;
 }
+
 size_t mui::Grid::GetMaxWidth()
 {
-	m_lastRequestedWidth = m_availableSize.right - m_availableSize.left;
-	return m_availableSize.right - m_availableSize.left;
+	if (m_horizontalAlignment == Fill)
+	{
+		m_lastRequestedWidth = m_availableSize.right - m_availableSize.left;
+		return m_availableSize.right - m_availableSize.left;
+	}
+	else
+		return GetMinWidth();
 }
 size_t mui::Grid::GetMaxHeight()
 {
-	m_lastRequestedHeight = m_availableSize.bottom - m_availableSize.top;
-	return m_availableSize.bottom - m_availableSize.top;
+	if (m_verticalAlignment == Fill)
+	{
+		m_lastRequestedHeight = m_availableSize.bottom - m_availableSize.top;
+		return m_availableSize.bottom - m_availableSize.top;
+	}
+	else
+		return GetMinHeight();
 }
 
 mui::UIElement::EventHandlerResult mui::Grid::HandleEvent(UINT, WPARAM, LPARAM) { return { FALSE, 0 }; }

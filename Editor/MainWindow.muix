@@ -1,28 +1,65 @@
-<Window Class="MainWindow" Title="MUI Visual Designer" Width="800" Height="600" CaptionColor="#181818" OnClose="MainWindow_OnClose" KeyDown="MainWindow_KeyDown">
-    <Grid BackgroundColor="#181818">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="4*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        
-        <Label Text="Project Explorer" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" TextColor="white" />
-        
-        <Label Text="Window Preview" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" TextColor="white" />
-        
-        <Label Text="Properties" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" TextColor="white" />
-        
-        <TreeView Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="#181818" />
-        
-        <NativeWindowHost Name="windowHost" Grid.Row="1" Grid.Column="1" BackgroundColor="#181818" Border="true" OnResize="WindowHost_OnResize" />
-        
-        <Entry Name="designerEntry" Grid.Row="2" Grid.Column="1" Multiline="true" BackgroundColor="#181818" TextColor="white" NewLine="Entry_NewLine" CharPressed="Entry_CharPressed" Save="Entry_Save" />
-        
-        <Entry Name="debugEntry" Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Text="" Multiline="true" BackgroundColor="#181818" TextColor="white" />
-    </Grid>
+﻿<Window Class="MainWindow" Title="MUI Visual Designer" Width="800" Height="600" OnClose="MainWindow_OnClose" KeyDown="MainWindow_KeyDown" DragAndDrop="MainWindow_DragAndDrop">
+	<!-- Main Window Grid -->
+	<Grid BackgroundColor="#181818">
+	
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="4*" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="2*" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+		
+		<!-- Top Labels -->
+		<Label Text="Project Explorer" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" TextColor="White"/>
+		<Label Text="Window Preview" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" TextColor="White"/>
+		<Label Text="Properties" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" TextColor="White"/>
+		
+		<!-- Properties StackLayout -->
+		<StackLayout Orientation="Vertical" Grid.Column="2" Grid.RowSpan="2" Grid.Row="1" Border="True" BackgroundColor="#181818">
+			<Section Text="Test" BackgroundColor="#181818" TextColor="White" ExpandButtonColor="White" Border="True">
+				<Label Text="Hi!!!" TextColor="White"/>
+			</Section>
+			<Section Text="Name" BackgroundColor="#181818" TextColor="White" ExpandButtonColor="White" Border="True">
+				<Label Text="Wazup!!!" TextColor="White"/>
+			</Section>
+		</StackLayout>
+		
+		<!-- Project Files TreeView -->
+		<TreeView Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="#181818"/>
+		
+		<!-- Window Preview Grid -->
+		<Grid Grid.Row="1" Grid.Column="1" BackgroundColor="rgb(26,26,26)" Border="True">
+		
+			<!-- Fake Window Grid -->
+			<Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+			
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+				
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				
+				<!-- Fake Window Caption-->
+				<StackLayout Orientation="Horizontal" Grid.Row="0" BackgroundColor="White" Border="True" Name="windowCaption">
+					<Label Name="windowTitleLabel" />
+				</StackLayout>
+				
+				<!-- Real Window host -->
+				<NativeWindowHost Name="windowHost" Grid.Row="1" Border="true" OnResize="WindowHost_OnResize" Border="True"/>
+			</Grid>
+			
+		</Grid>
+		
+		<!-- XML Editor entry -->
+		<Entry Name="designerEntry" Grid.Row="2" Grid.Column="1" Multiline="true" NewLine="Entry_NewLine" CharPressed="Entry_CharPressed" Save="Entry_Save" BackgroundColor="#181818" TextColor="White"/>
+		
+	</Grid>
 </Window>

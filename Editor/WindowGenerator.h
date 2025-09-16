@@ -128,10 +128,16 @@ public:
         output += L"\t}\r\n\r\n";
         output += UIElementGeneratorBase::CollectAllEventHandlerFunctions(UIElementGeneratorBase::s_rootGenerator);
         output += UIElementGeneratorBase::CollectAllMemberVariables(UIElementGeneratorBase::s_rootGenerator);
-        std::wstring onClose = GetProperty(L"OnClose");
-        if (!onClose.empty()) {
-            output += L"\tvirtual void " + onClose + L"(const void* sender, mui::EventArgs_t* e) = 0;\r\n";
+
+        const std::vector<std::wstring> events = { L"OnClose", L"DragAndDrop", L"WndProc"};
+
+        for (const auto& eventName : events) {
+            std::wstring handlerName = GetProperty(eventName);
+            if (!handlerName.empty()) {
+                output += L"\tvirtual void " + handlerName + L"(const void* sender, mui::EventArgs_t* e) = 0;\r\n";
+            }
         }
+
         output += L"};\r\n";
         return output;
     }
@@ -199,22 +205,14 @@ private:
         std::wstring output;
         std::wstring className = GetProperty(L"Class") + L"Base";
 
-        std::wstring onClose = GetProperty(L"OnClose");
-        if (!onClose.empty()) {
-            output += L"\t\tOnClose = std::bind(&" + className + L"::" + onClose +
-                L", this, std::placeholders::_1, std::placeholders::_2);\r\n";
-        }
+        const std::vector<std::wstring> events = { L"OnClose", L"KeyDown", L"KeyUp", L"DragAndDrop", L"WndProc" };
 
-        std::wstring keyDown = GetProperty(L"KeyDown");
-        if (!keyDown.empty()) {
-            output += L"\t\tKeyDown = std::bind(&" + className + L"::" + keyDown +
-                L", this, std::placeholders::_1, std::placeholders::_2);\r\n";
-        }
-
-        std::wstring keyUp = GetProperty(L"KeyUp");
-        if (!keyUp.empty()) {
-            output += L"\t\tKeyUp = std::bind(&" + className + L"::" + keyUp +
-                L", this, std::placeholders::_1, std::placeholders::_2);\r\n";
+        for (const auto& eventName : events) {
+            std::wstring handlerName = GetProperty(eventName);
+            if (!handlerName.empty()) {
+                output += L"\t\t" + eventName + L" = std::bind(&" + className + L"::" + handlerName +
+                    L", this, std::placeholders::_1, std::placeholders::_2);\r\n";
+            }
         }
 
         return output;
