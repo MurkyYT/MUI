@@ -32,28 +32,47 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 
 			if (element->MouseMove)
 				element->MouseMove(element, &args);
-			break;
+			if (args.handled)
+				return args.msg;
+			else
+				break;
+
 		case WM_MOUSELEAVE:
 			element->m_mouseInside = false;
 			if (element->MouseLeave)
 				element->MouseLeave(element, &args);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_LBUTTONDOWN:
 			if (element->LeftMouseDown)
 				element->LeftMouseDown(element, &args);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_LBUTTONUP:
 			if (element->LeftMouseUp)
 				element->LeftMouseUp(element, &args);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_LBUTTONDBLCLK:
 			if (element->LeftMouseDoubleClick)
 				element->LeftMouseDoubleClick(element, &args);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_RBUTTONDOWN:
 			if (element->RightMouseDown)
 				element->RightMouseDown(element, &args);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_RBUTTONUP:
 			if (element->RightMouseUp)
 				element->RightMouseUp(element, &args);
@@ -61,7 +80,10 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		case WM_RBUTTONDBLCLK:
 			if (element->RightMouseDoubleClick)
 				element->RightMouseDoubleClick(element, &args);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			if (element->KeyDown)
@@ -69,7 +91,10 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 
 			if (!args.handled)
 				PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			if (element->KeyUp)
@@ -77,7 +102,10 @@ LRESULT CALLBACK mui::UIElement::CustomProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 
 			if (!args.handled)
 				PostMessage(element->m_parenthWnd, uMsg, wParam, lParam);
-			break;
+			if(args.handled)
+				return args.msg;
+			else
+				break;
 		case WM_DESTROY:
 		case WM_NCDESTROY:
 			RemoveWindowSubclass(hWnd, CustomProc, uIdSubclass);

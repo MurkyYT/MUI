@@ -14,9 +14,9 @@
 	<!-- Main Window Grid -->
 	<Grid BackgroundColor="#181818">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*" />
+			<!--<ColumnDefinition Width="*" />-->
 			<ColumnDefinition Width="4*" />
-			<ColumnDefinition Width="*" />
+			<!--<ColumnDefinition Width="*" />-->
 		</Grid.ColumnDefinitions>
 		
 		<Grid.RowDefinitions>
@@ -26,25 +26,26 @@
 		</Grid.RowDefinitions>
 		
 		<!-- Top Labels -->
-		<Label Text="Project Explorer" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" TextColor="White"/>
-		<Label Text="Window Preview" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" TextColor="White"/>
-		<Label Text="Properties" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" TextColor="White"/>
+		<!--<Label Text="Project Explorer" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" TextColor="White"/>-->
+		<Label Text="Window Preview" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" TextColor="White"/>
+		
+		<!--<Label Text="Properties" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" TextColor="White"/>-->
 		
 		<!-- Properties StackLayout -->
-		<StackLayout Orientation="Vertical" Grid.Column="2" Grid.RowSpan="2" Grid.Row="1" Border="True" BackgroundColor="#181818">
+		<!--<StackLayout Orientation="Vertical" Grid.Column="2" Grid.RowSpan="2" Grid.Row="1" Border="True" BackgroundColor="#181818">
 			<Section Text="Test" BackgroundColor="#181818" TextColor="White" ExpandButtonColor="White" Border="True">
 				<Label Text="Hi!!!" TextColor="White"/>
 			</Section>
 			<Section Text="Name" BackgroundColor="#181818" TextColor="White" ExpandButtonColor="White" Border="True">
 				<Label Text="Wazup!!!" TextColor="White"/>
 			</Section>
-		</StackLayout>
+		</StackLayout>-->
 		
 		<!-- Project Files TreeView -->
-		<TreeView Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="#181818"/>
+		<!--<TreeView Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BackgroundColor="#181818"/>-->
 		
 		<!-- Window Preview Grid -->
-		<Grid Grid.Row="1" Grid.Column="1" BackgroundColor="rgb(26,26,26)" Border="True">
+		<Grid Grid.Row="1" Grid.Column="0" BackgroundColor="rgb(26,26,26)" Border="True">
 		
 			<!-- Fake Window Grid -->
 			<Grid VerticalAlignment="Center" HorizontalAlignment="Center" Visible="False"  Name="fakeWindowGrid">
@@ -70,7 +71,7 @@
 		</Grid>
 		
 		<!-- XML Editor entry -->
-		<Entry Name="designerEntry" Grid.Row="2" Grid.Column="1" Multiline="true" NewLine="Entry_NewLine" CharPressed="Entry_CharPressed" Save="Entry_Save" BackgroundColor="#181818" TextColor="White"/>
+		<Entry Name="designerEntry" Grid.Row="2" Grid.Column="0" Multiline="true" KeyDown="Entry_KeyDown" NewLine="Entry_NewLine" CharPressed="Entry_CharPressed" Save="Entry_Save" BackgroundColor="#181818" TextColor="White"/>
 		
 	</Grid>
 </Window>

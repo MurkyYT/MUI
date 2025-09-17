@@ -663,6 +663,47 @@ void MainWindow::Entry_Save(const void* sender, mui::EventArgs_t* e)
 	e->handled = true;
 }
 
+void MainWindow::Entry_KeyDown(const void* sender, mui::EventArgs_t* e)
+{
+	HWND hEdit = designerEntry->GetHWND();
+	DWORD start = 0;
+	SendMessage(hEdit, EM_GETSEL, (WPARAM)&start, NULL);
+	DWORD caretPos = start;
+
+	int lineIndex = (int)SendMessage(hEdit, EM_LINEFROMCHAR, caretPos, 0);
+	int lineStart = (int)SendMessage(hEdit, EM_LINEINDEX, lineIndex, 0);
+	int lineLength = (int)SendMessage(hEdit, EM_LINELENGTH, lineStart, 0);
+
+	if (lineLength == 0) return;
+
+	std::wstring lineText(lineLength, L'\0');
+	*(WORD*)lineText.data() = (WORD)lineLength;
+	SendMessage(hEdit, EM_GETLINE, lineIndex, (LPARAM)lineText.data());
+	lineText.resize(lineLength);
+
+	int caretInLine = (int)(caretPos - lineStart);
+	if (caretInLine < 1) return;
+
+	if (e->wParam == VK_HOME)
+	{
+		int firstChar = 0;
+		while (firstChar < lineText.length() && (lineText[firstChar] == L' ' || lineText[firstChar] == L'\t')) {
+			firstChar++;
+		}
+
+		int lineStart = (int)SendMessage(hEdit, EM_LINEINDEX, -1, 0);
+
+		int targetPos;
+		if (caretInLine == firstChar)
+			targetPos = lineStart;
+		else
+			targetPos = lineStart + firstChar;
+
+		SendMessage(hEdit, EM_SETSEL, targetPos, targetPos);
+		e->handled = true;
+		e->msg = 0;
+	}
+}
 void MainWindow::Entry_NewLine(const void* sender, mui::EventArgs_t* e)
 {
 	HWND hEdit = designerEntry->GetHWND();
@@ -754,6 +795,14 @@ void MainWindow::Entry_CharPressed(const void* sender, mui::EventArgs_t* e)
 
 		if (pos < 0) return;
 
+		bool isSelfClosing = false;
+
+		for (size_t i = pos; i < caretInLine; i++)
+		{
+			if(lineText[i] == '/' && i + 1 < caretInLine && lineText[i + 1] == '>')
+				isSelfClosing = true;
+		}
+
 		std::wstring tagName;
 		for (int i = pos + 1; i < caretInLine; ++i)
 		{
@@ -766,7 +815,7 @@ void MainWindow::Entry_CharPressed(const void* sender, mui::EventArgs_t* e)
 				return;
 		}
 
-		if (tagName.empty()) return;
+		if (tagName.empty() || isSelfClosing) return;
 
 		std::wstring closingTag = L"</" + tagName + L">";
 

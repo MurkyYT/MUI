@@ -224,7 +224,7 @@ mui::Window::~Window()
 		OnClose(this, &args);
 }
 
-mui::Window::Window(const std::wstring& title, size_t height, size_t width)
+mui::Window::Window(const std::wstring& title, size_t height, size_t width) : m_hFont(NULL)
 {
 	if (!s_dpiAware)
 		s_dpiAware = SetProcessDPIAware();

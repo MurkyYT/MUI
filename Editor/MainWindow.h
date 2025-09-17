@@ -34,7 +34,7 @@ private:
 	void Help_About(const void* sender, mui::EventArgs_t* e) override;
 
 	void Entry_NewLine(const void* sender, mui::EventArgs_t* e) override;
+	void Entry_KeyDown(const void* sender, mui::EventArgs_t* e) override;
 	void Entry_Save(const void* sender, mui::EventArgs_t* e) override;
 	void Entry_CharPressed(const void* sender, mui::EventArgs_t* e) override;
 };
-
