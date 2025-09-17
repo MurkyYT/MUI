@@ -9,7 +9,6 @@ mui::ListView::ListView(int x, int y, int width, int height)
 	m_class = WC_LISTVIEW;
 	m_name = L"";
 	m_style = WS_VISIBLE | WS_CHILD | WS_BORDER | LVS_REPORT | WS_CLIPSIBLINGS | LVS_SINGLESEL;
-	m_exStyle = TVS_EX_DOUBLEBUFFER;
 
 	m_hLargeIcons = ImageList_Create(32,
 		32,

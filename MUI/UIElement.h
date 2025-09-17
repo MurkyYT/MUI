@@ -193,7 +193,7 @@ namespace mui
 		{
 			m_id = id;
 			HWND hWnd = CreateWindowEx(
-				m_exStyle | WS_EX_COMPOSITED,
+				m_exStyle,
 				GetClass(),
 				GetName(),
 				m_style | WS_CHILD | (m_hasBorder ? WS_BORDER : 0),
