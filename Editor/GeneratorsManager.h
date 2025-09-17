@@ -35,7 +35,8 @@ private:
         L"RightMouseDoubleClick",
         L"MouseMove",
         L"MouseEnter",
-        L"MouseLeave"
+        L"MouseLeave",
+        L"Visible"
     };
 
 public:

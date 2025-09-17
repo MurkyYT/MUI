@@ -188,6 +188,12 @@ protected:
             output += L"\t\t" + varName + L"->SetBorder(" + (hasBorder ? L"TRUE" : L"FALSE") + L");\r\n";
         }
 
+        std::wstring visible = GetProperty(L"Visible");
+        if (!visible.empty()) {
+            BOOL isVisible = (visible == L"true" || visible == L"True" || visible == L"1");
+            output += L"\t\t" + varName + L"->SetVisible(" + (isVisible ? L"TRUE" : L"FALSE") + L");\r\n";
+        }
+
         std::wstring backgroundColor = GetProperty(L"BackgroundColor");
         if (!backgroundColor.empty()) {
             COLORREF color = ParseColor(backgroundColor);
@@ -249,8 +255,7 @@ protected:
         return s_rootGenerator;
     }
 
-    template<typename T>
-    void ApplyCommonProperties(std::shared_ptr<T> element) const {
+    void ApplyCommonProperties(std::shared_ptr<mui::UIElement> element) const {
         std::wstring verticalAlignment = GetProperty(L"VerticalAlignment");
         if (!verticalAlignment.empty()) {
             if (verticalAlignment == L"Center")
@@ -285,6 +290,12 @@ protected:
         if (!border.empty()) {
             BOOL hasBorder = (border == L"true" || border == L"True" || border == L"1");
             element->SetBorder(hasBorder);
+        }
+
+        std::wstring visible = GetProperty(L"Visible");
+        if (!visible.empty()) {
+            BOOL isVisible = (visible == L"true" || visible == L"True" || visible == L"1");
+            element->SetVisible(isVisible);
         }
 
         std::wstring backgroundColor = GetProperty(L"BackgroundColor");

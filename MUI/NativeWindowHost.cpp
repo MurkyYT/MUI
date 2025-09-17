@@ -138,6 +138,9 @@ void mui::NativeWindowHost::RemoveHostedWindow()
 
 size_t mui::NativeWindowHost::GetMinWidth()
 {
+    if (!m_visible)
+        return 0;
+
     if (m_hostedWindow && IsWindow(m_hostedWindow))
     {
         RECT rect;
@@ -149,6 +152,9 @@ size_t mui::NativeWindowHost::GetMinWidth()
 
 size_t mui::NativeWindowHost::GetMinHeight()
 {
+    if (!m_visible)
+        return 0;
+
     if (m_hostedWindow && IsWindow(m_hostedWindow))
     {
         RECT rect;

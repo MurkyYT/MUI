@@ -3,6 +3,7 @@
 	<Menu BackgroundColor="#181818" ItemBackgroundColor="#181818" BottomBarColor="#303030" TextColor="White" ItemBackgroundHotColor="#242424"  ItemBackgroundSelectedColor="#202020">
 		<MenuItem Text="File">
 			<MenuItem Text="Open" OnClick="File_Open"/>
+			<MenuItem Text="Close" OnClick="File_Close"/>
 			<MenuSeparator/>
 			<MenuItem Text="Exit" OnClick="File_Exit"/>
 		</MenuItem>
@@ -46,7 +47,7 @@
 		<Grid Grid.Row="1" Grid.Column="1" BackgroundColor="rgb(26,26,26)" Border="True">
 		
 			<!-- Fake Window Grid -->
-			<Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+			<Grid VerticalAlignment="Center" HorizontalAlignment="Center" Visible="False"  Name="fakeWindowGrid">
 			
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto"/>

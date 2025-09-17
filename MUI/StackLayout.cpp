@@ -66,6 +66,9 @@ void mui::StackLayout::SetHWND(HWND hWnd)
 
 size_t mui::StackLayout::CalcMinHeight()
 {
+	if (!m_visible)
+		return 0;
+
 	unsigned long height = 0;
 	if (m_orientation == StackLayoutOrientation::Vertical)
 	{
@@ -90,6 +93,9 @@ size_t mui::StackLayout::CalcMinHeight()
 
 size_t mui::StackLayout::CalcMinWidth()
 {
+	if (!m_visible)
+		return 0;
+
 	unsigned long width = 0;
 	if (m_orientation == StackLayoutOrientation::Horizontal)
 	{
@@ -114,6 +120,9 @@ size_t mui::StackLayout::CalcMinWidth()
 
 size_t mui::StackLayout::CalcMaxHeight()
 {
+	if (!m_visible)
+		return 0;
+
 	unsigned long height = 0;
 	if (m_orientation == StackLayoutOrientation::Vertical)
 	{
@@ -138,6 +147,9 @@ size_t mui::StackLayout::CalcMaxHeight()
 
 size_t mui::StackLayout::CalcMaxWidth()
 {
+	if (!m_visible)
+		return 0;
+
 	unsigned long width = 0;
 	if (m_orientation == StackLayoutOrientation::Horizontal)
 	{

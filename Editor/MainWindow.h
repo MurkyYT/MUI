@@ -13,6 +13,7 @@ private:
 
 	std::shared_ptr<GeneratorBase> ParseXMLNode(const pugi::xml_node& node, size_t& index);
 	void LoadFile(const std::wstring& path);
+	void CloseFile();
 	void SaveCurrentFile();
 	void MoveLineUp();
 	void MoveLineDown();
@@ -27,6 +28,7 @@ private:
 	void WindowHost_OnResize(const void* sender, mui::EventArgs_t* e) override;
 
 	void File_Open(const void* sender, mui::EventArgs_t* e) override;
+	void File_Close(const void* sender, mui::EventArgs_t* e) override;
 	void File_Exit(const void* sender, mui::EventArgs_t* e) override;
 
 	void Help_About(const void* sender, mui::EventArgs_t* e) override;

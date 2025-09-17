@@ -229,6 +229,12 @@ void mui::Grid::PerformLayout()
 
 size_t mui::Grid::GetMinWidth()
 {
+	if (!m_visible)
+	{
+		m_lastRequestedWidth = 0;
+		return 0;
+	}
+
 	size_t minWidth = 0;
 	std::vector<size_t> columnToWidth;
 	columnToWidth.resize(m_columns.size() == 0 ? 1 : m_columns.size());
@@ -251,6 +257,12 @@ size_t mui::Grid::GetMinWidth()
 }
 size_t mui::Grid::GetMinHeight()
 {
+	if (!m_visible)
+	{
+		m_lastRequestedHeight = 0;
+		return 0;
+	}
+
 	size_t minHeight = 0;
 	std::vector<size_t> rowToHeight;
 	rowToHeight.resize(m_rows.size() == 0 ? 1 : m_rows.size());
@@ -274,6 +286,12 @@ size_t mui::Grid::GetMinHeight()
 
 size_t mui::Grid::GetMaxWidth()
 {
+	if (!m_visible)
+	{
+		m_lastRequestedWidth = 0;
+		return 0;
+	}
+
 	if (m_horizontalAlignment == Fill)
 	{
 		m_lastRequestedWidth = m_availableSize.right - m_availableSize.left;
@@ -284,6 +302,12 @@ size_t mui::Grid::GetMaxWidth()
 }
 size_t mui::Grid::GetMaxHeight()
 {
+	if (!m_visible)
+	{
+		m_lastRequestedHeight = 0;
+		return 0;
+	}
+
 	if (m_verticalAlignment == Fill)
 	{
 		m_lastRequestedHeight = m_availableSize.bottom - m_availableSize.top;

@@ -23,14 +23,23 @@ namespace mui
 	public:
 		virtual size_t GetMinWidth()
 		{
+			if (!m_visible)
+				return 0;
+
 			return m_idealSize.cx;
 		}
 		virtual size_t GetMinHeight()
 		{
+			if (!m_visible)
+				return 0;
+
 			return m_idealSize.cy;
 		}
 		virtual size_t GetMaxWidth() 
 		{
+			if (!m_visible)
+				return 0;
+
 			if (m_horizontalAlignment == Fill)
 				return m_availableSize.right - m_availableSize.left;
 			else
@@ -38,6 +47,9 @@ namespace mui
 		}
 		virtual size_t GetMaxHeight()
 		{
+			if (!m_visible)
+				return 0;
+
 			if (m_verticalAlignment == Fill)
 				return m_availableSize.bottom - m_availableSize.top;
 			else
@@ -45,22 +57,33 @@ namespace mui
 		}
 		virtual size_t GetHeight()
 		{
+			if (!m_visible)
+				return 0;
+
 			if (!m_hWnd)
 				return m_height;
+
 			RECT rect{};
 			GetWindowRect(m_hWnd, &rect);
 			return rect.bottom - rect.top;
 		}
 		virtual size_t GetWidth() 
 		{
+			if (!m_visible)
+				return 0;
+
 			if (!m_hWnd)
 				return m_width;
+
 			RECT rect{};
 			GetWindowRect(m_hWnd, &rect);
 			return rect.right - rect.left;
 		}
 		virtual size_t GetX()
 		{
+			if (!m_visible)
+				return 0;
+
 			if (!m_hWnd)
 				return m_x;
 
@@ -81,6 +104,9 @@ namespace mui
 
 		virtual size_t GetY()
 		{
+			if (!m_visible)
+				return 0;
+
 			if (!m_hWnd)
 				return m_y;
 
@@ -114,6 +140,13 @@ namespace mui
 			m_enabled = enabled;
 
 			EnableWindow(m_hWnd, enabled);
+		}
+
+		void SetVisible(BOOL visible)
+		{
+			m_visible = visible;
+
+			ShowWindow(m_hWnd, visible ? SW_SHOWNA : SW_HIDE);
 		}
 
 		void SetBorder(BOOL enabled)
@@ -160,7 +193,7 @@ namespace mui
 		{
 			m_id = id;
 			HWND hWnd = CreateWindowEx(
-				m_exStyle,
+				m_exStyle | WS_EX_COMPOSITED,
 				GetClass(),
 				GetName(),
 				m_style | WS_CHILD | (m_hasBorder ? WS_BORDER : 0),
@@ -188,7 +221,7 @@ namespace mui
 
 			EnableWindow(m_hWnd, m_enabled);
 
-			ShowWindow(GetHWND(), SW_SHOW);
+			ShowWindow(m_hWnd, m_visible ? SW_SHOWNA : SW_HIDE);
 		}
 
 		void SetAvailableSize(RECT rect)
@@ -266,6 +299,7 @@ namespace mui
 		BOOL m_enabled = TRUE;
 		BOOL m_mouseInside = FALSE;
 		BOOL m_hasBorder = FALSE;
+		BOOL m_visible = TRUE;
 
 		RECT m_availableSize = {0,0,0,0};
 

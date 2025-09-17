@@ -121,18 +121,19 @@ void MainWindow::MainWindow_DragAndDrop(const void* sender, mui::EventArgs_t* e)
 
 	for (UINT i = 0; i < files; i++)
 	{
-		size_t neededSize = DragQueryFile(hdrop, i, NULL, NULL);
-		std::wstring buf;
-		buf.resize(neededSize + 1);
-		DragQueryFile(hdrop, i, (LPWSTR)buf.data(), (UINT)buf.size());
+		UINT neededSize = DragQueryFile(hdrop, i, NULL, 0);
+		std::wstring buf(neededSize, L'\0');
+		DragQueryFile(hdrop, i, (LPWSTR)buf.data(), neededSize + 1);
 		LoadFile(buf);
 	}
 }
 
-void MainWindow::LoadFile(const std::wstring& path)
+void MainWindow::CloseFile()
 {
+	if (currentFile.empty()) return;
+
 	designerEntry->SetText(L"");
-	if (previewWindow) 
+	if (previewWindow)
 	{
 		previewWindow->Close();
 		previewWindow = NULL;
@@ -140,8 +141,19 @@ void MainWindow::LoadFile(const std::wstring& path)
 
 	windowHost->RemoveHostedWindow();
 
+	windowTitleLabel->SetText(L"");
+	fakeWindowGrid->SetVisible(FALSE);
+
 	SetTitle(L"MUI Visual Designer");
-	if (path.substr(path.size() - 5, 4) != L"muix") {
+
+	currentFile = L"";
+}
+
+void MainWindow::LoadFile(const std::wstring& path)
+{
+	CloseFile();
+
+	if (path.substr(path.size() - 4, 4) != L"muix") {
 
 		MessageBox(GetHWND(), L"Wrong file extention, should be 'muix'", L"Error", MB_OK | MB_ICONERROR);
 		return;
@@ -198,6 +210,7 @@ void MainWindow::LoadFile(const std::wstring& path)
 	SetTitle(L"MUI Visual Designer - " + path);
 	currentFile = path;
 	designerEntry->SetText(wstr);
+	fakeWindowGrid->SetVisible(TRUE);
 	ParseXML();
 }
 
@@ -443,9 +456,29 @@ void MainWindow::UpdatePreview(std::shared_ptr<GeneratorBase> rootGenerator)
 	}
 }
 
+void MainWindow::File_Close(const void* sender, mui::EventArgs_t* e)
+{
+	CloseFile();
+}
+
 void MainWindow::File_Open(const void* sender, mui::EventArgs_t* e)
 {
-	MessageBox(GetHWND(), L"Hello", L"Test", MB_OK);
+	OPENFILENAME ofn = { 0 };
+	wchar_t fileName[MAX_PATH] = { 0 };
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = GetHWND();
+	ofn.lpstrFilter = L"MUI XML Files (*.muix)\0*.muix\0All Files (*.*)\0*.*\0";
+	ofn.lpstrFile = fileName;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.lpstrDefExt = L"muix";
+
+	if (GetOpenFileName(&ofn))
+	{
+		std::wstring path = fileName;
+		LoadFile(path);
+	}
 }
 
 void MainWindow::File_Exit(const void* sender, mui::EventArgs_t* e)

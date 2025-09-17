@@ -46,79 +46,57 @@ SIZE GetEditIdealSize(HWND hwndEdit)
 void UpdateEditScrollbars(HWND hEdit)
 {
     LONG_PTR style = GetWindowLongPtr(hEdit, GWL_STYLE);
+    if (!(style & ES_MULTILINE)) return;
 
-    BOOL isMultiline = (style & ES_MULTILINE) != 0;
-    BOOL needHScroll = FALSE;
-    BOOL needVScroll = FALSE;
+    BOOL currentVScroll = (style & WS_VSCROLL) != 0;
+    BOOL currentHScroll = (style & WS_HSCROLL) != 0;
 
-    if (isMultiline)
+    HDC hdc = GetDC(hEdit);
+    if (!hdc) return;
+
+    HFONT hFont = (HFONT)SendMessage(hEdit, WM_GETFONT, 0, 0);
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+    TEXTMETRIC tm;
+    GetTextMetrics(hdc, &tm);
+
+    int lineHeight = tm.tmHeight + tm.tmExternalLeading;
+    int lineCount = (int)SendMessage(hEdit, EM_GETLINECOUNT, 0, 0);
+    int totalTextHeight = lineCount * lineHeight;
+
+    RECT rc;
+    GetClientRect(hEdit, &rc);
+    BOOL needVScroll = totalTextHeight > (rc.bottom - rc.top);
+
+    int maxLineWidth = 0;
+    for (int i = 0; i < lineCount; ++i)
     {
-        HDC hdc = GetDC(hEdit);
-        HFONT hFont = (HFONT)SendMessage(hEdit, WM_GETFONT, 0, 0);
-        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+        int lineStart = (int)SendMessage(hEdit, EM_LINEINDEX, i, 0);
+        int lineLen = (int)SendMessage(hEdit, EM_LINELENGTH, lineStart, 0);
+        if (lineLen == 0) continue;
 
-        TEXTMETRIC tm;
-        GetTextMetrics(hdc, &tm);
+        std::wstring buffer(lineLen + 1, L'\0');
+        *(WORD*)&buffer[0] = (WORD)lineLen;
+        SendMessage(hEdit, EM_GETLINE, i, (LPARAM)buffer.data());
 
-        if (hOldFont) SelectObject(hdc, hOldFont);
-        ReleaseDC(hEdit, hdc);
+        SIZE size;
+        GetTextExtentPoint32W(hdc, buffer.data(), lineLen, &size);
 
-        int lineHeight = tm.tmHeight + tm.tmExternalLeading;
-        int lineCount = (int)SendMessage(hEdit, EM_GETLINECOUNT, 0, 0);
-        int totalTextHeight = lineCount * lineHeight;
-
-        RECT rc;
-        GetClientRect(hEdit, &rc);
-        int clientHeight = rc.bottom - rc.top;
-
-        needVScroll = totalTextHeight > clientHeight;
-
-        int maxLineWidth = 0;
-        for (int i = 0; i < lineCount; ++i)
-        {
-            int lineStart = (int)SendMessage(hEdit, EM_LINEINDEX, i, 0);
-            int lineLen = (int)SendMessage(hEdit, EM_LINELENGTH, lineStart, 0);
-            if (lineLen == 0) continue;
-
-            std::wstring buffer(lineLen + 2, L'\0');
-            *(WORD*)&buffer[0] = (WORD)lineLen;
-            SendMessage(hEdit, EM_GETLINE, i, (LPARAM)buffer.data());
-
-            const wchar_t* textStart = &buffer[2]; 
-
-            HDC hdcLine = GetDC(hEdit);
-            HFONT hFontLine = (HFONT)SendMessage(hEdit, WM_GETFONT, 0, 0);
-            HFONT hOldFontLine = (HFONT)SelectObject(hdcLine, hFontLine);
-
-            SIZE size;
-            GetTextExtentPoint32W(hdcLine, textStart, lineLen, &size);
-
-            if (hOldFontLine) SelectObject(hdcLine, hOldFontLine);
-            ReleaseDC(hEdit, hdcLine);
-
-            if (size.cx > maxLineWidth)
-                maxLineWidth = size.cx;
-        }
-
-        int clientWidth = rc.right - rc.left;
-        needHScroll = maxLineWidth > clientWidth;
+        if (size.cx > maxLineWidth)
+            maxLineWidth = size.cx;
     }
 
-    ShowScrollBar(hEdit, SB_VERT, needVScroll);
-    ShowScrollBar(hEdit, SB_HORZ, needHScroll);
+    if (hOldFont) SelectObject(hdc, hOldFont);
+    ReleaseDC(hEdit, hdc);
 
-    if (needVScroll)
-        style |= WS_VSCROLL;
-    else
-        style &= ~WS_VSCROLL;
+    BOOL needHScroll = maxLineWidth > (rc.right - rc.left);
 
-    if (needHScroll)
-        style |= WS_HSCROLL;
-    else
-        style &= ~WS_HSCROLL;
-
-    SetWindowLongPtr(hEdit, GWL_STYLE, style);
-    RedrawWindow(hEdit, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN);
+    if (needVScroll != currentVScroll || needHScroll != currentHScroll)
+    {
+        ShowScrollBar(hEdit, SB_VERT, needVScroll);
+        ShowScrollBar(hEdit, SB_HORZ, needHScroll);
+        InvalidateRect(hEdit, NULL, FALSE);
+    }
 }
 
 mui::Entry::Entry(const wchar_t* text, int x, int y, int width, int height)
@@ -174,20 +152,28 @@ mui::UIElement::EventHandlerResult mui::Entry::HandleEvent(UINT uMsg, WPARAM wPa
             if (args.handled)
                 break;
 
-            HideCaret(m_hWnd);
-
             SIZE prevIdeal = m_idealSize;
-
-            UpdateEditScrollbars(m_hWnd);
             UpdateIdealSize();
+
+            static int prevLineCount = 0;
+            static int prevMaxLineWidth = 0;
+
+            int currentLineCount = (int)SendMessage(m_hWnd, EM_GETLINECOUNT, 0, 0);
+            DWORD sel = (DWORD)SendMessage(m_hWnd, EM_GETSEL, 0, 0);
+            int currentLine = (int)SendMessage(m_hWnd, EM_LINEFROMCHAR, LOWORD(sel), 0);
+            int currentLineLen = (int)SendMessage(m_hWnd, EM_LINELENGTH, SendMessage(m_hWnd, EM_LINEINDEX, currentLine, 0), 0);
+
+            if (currentLineCount != prevLineCount || currentLineLen > prevMaxLineWidth || currentLineLen < prevMaxLineWidth - 50) {
+                UpdateEditScrollbars(m_hWnd);
+                prevLineCount = currentLineCount;
+                prevMaxLineWidth = currentLineLen;
+            }
 
             if (!EqualRect(&prevAvail, &m_availableSize) &&
                 (prevIdeal.cx != m_idealSize.cx || prevIdeal.cy != m_idealSize.cy))
             {
                 PostMessage(m_parenthWnd, MUI_WM_REDRAW, (WPARAM)this, NULL);
             }
-
-            ShowCaret(m_hWnd);
         }
         break;
         default:
@@ -242,7 +228,6 @@ mui::UIElement::EventHandlerResult mui::Entry::HandleEvent(UINT uMsg, WPARAM wPa
     break;
     case WM_CTLCOLOREDIT:
     case WM_CTLCOLORSTATIC:
-        SetBkMode((HDC)wParam, TRANSPARENT);
         SetBkColor((HDC)wParam, m_backgroundColor);
         ::SetTextColor((HDC)wParam, m_textColor);
         return { TRUE , (LRESULT)m_backroundBrush};
